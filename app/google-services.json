@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "325436218268",
+    "firebase_url": "https://food-tinder-c4t9.firebaseio.com",
+    "project_id": "food-tinder-c4t9",
+    "storage_bucket": "food-tinder-c4t9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325436218268:android:d1a5e3563cfa7a707c8659",
+        "android_client_info": {
+          "package_name": "com.example.foodtinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "325436218268-o59dv0ldknk29euu42oljcclu7hg639s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7I41NW4o7Vo8J2vYruCFps6T-Oq8Vtzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "325436218268-o59dv0ldknk29euu42oljcclu7hg639s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
