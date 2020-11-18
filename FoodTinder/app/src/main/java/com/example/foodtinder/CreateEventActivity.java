@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.Sampler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,26 +24,31 @@ import com.google.firebase.database.ValueEventListener;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class CreateEventActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button btnDatePicker, btnTimePicker;
-    EditText txtDate, txtTime;
+    EditText txtDate, txtTime, txtName;     //ENCAP INTO EVENT CLASS
     private int mYear, mMonth, mDay, mHour, mMinute;
 
     Spinner locationPicker, budgetPicker;
-    private String location, budget;
+    private String location, budget;        //ENCAP INTO EVENT CLASS
 
     Button btnCreateEvent;
 
     DatabaseReference db, eventCount_ref, events_ref;
-    private int eventCount;
+    public int eventCount;      //ENCAP INTO EVENT CLASS
+    public String eventStatus;      //ENCAP INTO EVENT CLASS
+    public ArrayList<String> eventInfoList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eventcreation);
+
+        txtName = findViewById(R.id.in_event_name);
 
         btnDatePicker = findViewById(R.id.btn_date);
         btnTimePicker = findViewById(R.id.btn_time);
@@ -90,6 +97,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 eventCount = dataSnapshot.getValue(int.class);
+                Log.i("Check", "# of events : "+eventCount);
             }
 
             @Override
@@ -97,6 +105,24 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                 Log.w("Check", databaseError.toException());
             }
         });
+
+
+        events_ref.addValueEventListener(new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                eventInfoList.clear();
+                for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()) {
+                    eventInfoList.add(eventSnapshot.getKey());
+                    Log.i("Check", eventInfoList.toString());
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w("Check", databaseError.toException());
+            }
+        });
+
+
     }
 
     @Override
@@ -146,10 +172,30 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             events_ref.child("E"+eventCount).child("Time").setValue(txtTime.getText().toString());
             events_ref.child("E"+eventCount).child("Location").setValue(location);
             events_ref.child("E"+eventCount).child("Budget").setValue(budget);
-            Log.i("Check", "Event created");
-            Intent toListEvents = new Intent(CreateEventActivity.this, ListEventsActivity.class);
-            startActivity(toListEvents);
 
+            events_ref.child("E"+eventCount).child("Name").setValue(txtName);
+            Log.i("Check", "Event created");
+
+            //CHECK VALUE OF BUDGET AND LOCATION
+            if (!budget.equals("To be decided") && !location.equals("To be decided")){ eventStatus = "Ready to swipe";}
+            else {
+                eventStatus = "Waiting for preferences";
+                //if (budget.equals("To be decided")){ //SEND AS EXTRA}
+                //if (location.equals("To be decided")){ //SEND AS EXTRA}
+            }
+
+            events_ref.child("E"+eventCount).child("Status").setValue(eventStatus);
+            Log.i("Check", "Event created");
+
+            //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
+
+            //BELOW CODE IS FROM DISPLAY ALL GROUPS THEN NEXT -> DISPLAY ALL EVENTS
+            Intent toListEvents = new Intent(CreateEventActivity.this, ListEventsActivity.class);
+            Bundle eventExtras = new Bundle();
+            eventExtras.putStringArrayList("eventInfoList", eventInfoList);
+            eventExtras.putInt("eventCount", eventCount);
+            toListEvents.putExtras(eventExtras);
+            startActivity(toListEvents);
         }
     }
 

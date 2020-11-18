@@ -11,6 +11,14 @@
     android:orientation="vertical"
     tools:context=".CreateEventActivity">
 
+    <EditText
+        android:id="@+id/in_event_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textShortMessage"
+        android:text="Enter event name" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

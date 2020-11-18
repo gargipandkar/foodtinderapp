@@ -33,6 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ListEventsActivity"/>
+        <activity android:name=".IndicatePreferencesActivity"/>
     </application>
 
 </manifest>
