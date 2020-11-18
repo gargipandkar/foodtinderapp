@@ -1,5 +1,6 @@
 package com.example.foodtinder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
@@ -19,34 +20,35 @@ import java.util.ArrayList;
 public class ListEventsActivity extends AppCompatActivity {
 
     DatabaseReference db, eventCount_ref, events_ref;
-    private int eventCount;
-    public ArrayList<String> eventInfoList = new ArrayList<>();
+
+    ArrayList<String> eventInfoList;
+    int eventCount;
+
+    Intent intent;
+    Bundle eventExtras;
+
 
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_listevents);
 
         db = FirebaseDatabase.getInstance().getReference();
         eventCount_ref = db.child("eventCount");
         events_ref = db.child("events");
 
-        eventCount_ref.addValueEventListener(new ValueEventListener (){
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot){
-                eventCount = dataSnapshot.getValue(int.class);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError){
-                Log.w("Check", databaseError.toException());
-            }
+        intent = getIntent();
+        eventExtras = intent.getExtras();
+        eventInfoList = eventExtras.getStringArrayList("eventInfoList");
+        eventCount = eventExtras.getInt("eventCount");
 
-        });
 
-        events_ref.addValueEventListener(new ValueEventListener() {
+        /*
+        //DELETE, USED INTENT AND EXTRAS INSTEAD
+        eventCount_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()){
-                    eventInfoList.add(eventSnapshot.getKey());
-                }
-
+                eventCount = dataSnapshot.getValue(int.class);
+                Log.i("Check", "# of events : "+eventCount);
             }
 
             @Override
@@ -55,15 +57,32 @@ public class ListEventsActivity extends AppCompatActivity {
             }
         });
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_listevents);
 
+        events_ref.addListenerForSingleValueEvent(new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()) {
+                    eventInfoList.add(eventSnapshot.getKey());
+                    Log.i("Check", eventInfoList.toString());
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w("Check", databaseError.toException());
+            }
+        });
+        */
+
+    }
+
+    protected void onStart(){
+        super.onStart();
         LinearLayout layoutListEvents = findViewById(R.id.listevents_layout);
-        Log.i("Check", eventInfoList.toString());
-        Log.i("Check", "# of events = "+eventCount);
+        //Log.i("Check", eventInfoList.toString());
+        //Log.i("Check", "# of events = "+eventCount);
         for (int i = 0; i < eventCount; i++) {
             TextView listItem = new TextView(this);
-            listItem.setText("Event "+i);
+            listItem.setText(eventInfoList.get(i));
             listItem.setId(i);
             layoutListEvents.addView(listItem);
         }
