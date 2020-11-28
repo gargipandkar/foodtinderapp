@@ -1,11 +1,15 @@
 package com.example.foodtinder;
 
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,32 +31,22 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Handler handler;
 
+//    SharedPreferences prefs;
+//    private static final String SHARED_PREF_NAME = "prefs";
+//    private static final String KEY_NAME = "name";
+//    private static final String KEY_EMAIL = "email";
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-
-        //code starts here
-        Button enter_btn = findViewById(R.id.enter_btn);
-//        enter_btn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                Log.i("Check", "Button clicked");
-//                Intent toCreateEvent = new Intent(MainActivity.this, SignInActivity.class);
-//                startActivity(toCreateEvent);
-//            }
-//        });
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if ()
-//            }
-//        });
+
 
     }
 
@@ -68,8 +62,22 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser != null){
             // User is signed in
-            Intent toListEvent = new Intent (MainActivity.this, SignOutActivity.class);
-            startActivity(toListEvent);
+            Intent toHome = new Intent (MainActivity.this, SignOutActivity.class);
+
+            String name = currentUser.getDisplayName();
+            String email = currentUser.getEmail();
+
+//            SharedPreferences.Editor editor = prefs.edit();
+//            editor.putString(KEY_NAME, name);
+//            editor.putString(KEY_EMAIL, email);
+//            editor.apply();
+
+
+//            Uri photoUrl = currentUser.getPhotoUrl();
+//            String photoStr = photoUrl.toString();
+//            User user = new User(name, email);
+
+            startActivity(toHome);
             finish();
         } else {
             // No user is signed in
