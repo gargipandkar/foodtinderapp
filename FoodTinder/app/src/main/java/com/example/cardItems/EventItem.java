@@ -12,6 +12,10 @@ public class EventItem {
         this.mEventLocation = mEventLocation;
     }
 
+    public void changeText(String text){
+        this.mEventName = text;
+    }
+
     public int getmEventImageResource() {
         return mEventImageResource;
     }

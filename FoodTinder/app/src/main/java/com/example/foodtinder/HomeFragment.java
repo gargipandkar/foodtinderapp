@@ -75,6 +75,14 @@ public class HomeFragment extends Fragment {
         eventListAdapter = new EventListAdapter(eventItemArrayList, getContext());
         recyclerView.setAdapter(eventListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        eventListAdapter.setOnItemClickListener(new EventListAdapter.myOnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                eventItemArrayList.get(position).changeText("Clickeddddd");
+                eventListAdapter.notifyItemChanged(position);
+            }
+        });
     }
 
 

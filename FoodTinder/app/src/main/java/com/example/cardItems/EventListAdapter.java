@@ -18,12 +18,17 @@ import java.util.ArrayList;
 public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.MyViewHolder> {
 
 
-    ArrayList<EventItem> eventItemArrayList;
+    private ArrayList<EventItem> eventItemArrayList;
     Context context;
+    private myOnItemClickListener mListener;
 
-//    public interface onItemClickListener {
-//        void onItemClick(int position);
-//    }
+    public interface myOnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(myOnItemClickListener listener){
+        this.mListener = listener;
+    }
 
     public EventListAdapter(ArrayList<EventItem> eventItemArrayList, Context context) {
         this.eventItemArrayList = eventItemArrayList;
@@ -37,7 +42,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.MyVi
 //        LayoutInflater layoutInflater = LayoutInflater.from(context);
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_card_view, parent, false);
 
-        return new MyViewHolder(v);
+        return new MyViewHolder(v, mListener);
     }
 
     @Override
@@ -58,7 +63,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.MyVi
         ImageView imageView;
         TextView eventName, eventDT, eventL;
 
-        public MyViewHolder(@NonNull View itemView) {
+        public MyViewHolder(@NonNull View itemView, myOnItemClickListener listener) {
             super(itemView);
 
             imageView = itemView.findViewById(R.id.card_event_dp);
@@ -66,6 +71,17 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.MyVi
             eventDT = itemView.findViewById(R.id.card_date_time);
             eventL = itemView.findViewById(R.id.card_location);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
         }
     }
 }
