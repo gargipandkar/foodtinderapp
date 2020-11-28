@@ -16,14 +16,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
     User user;
+    Group testgrp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -31,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         user = User.createUser("testUser", "Ricargo");
+        testgrp = Group.createGroup("TESTTTTT", user);
 
         Button enter_btn = findViewById(R.id.enter_btn);
         enter_btn.setOnClickListener(new View.OnClickListener(){
@@ -39,8 +46,10 @@ public class MainActivity extends AppCompatActivity {
 //                Log.i("Check", "Button clicked");
 //                Intent toCreateEvent = new Intent(MainActivity.this, CreateEventActivity.class);
 //                startActivity(toCreateEvent);
-                Group g = new Group("testIDDDDDD");
 
+                                ArrayList l = testgrp.getListOfUsers();
+                String text2 = l.toString();
+                Toast.makeText(getApplicationContext(),text2, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -50,9 +59,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                Intent toGroupPage = new Intent(MainActivity.this, GroupPage.class);
 //                startActivity(toGroupPage);
-                Group testgrp = Group.createGroup("TESTTTTT", user);
+
                 String text = testgrp.getName();
                 Toast.makeText(getApplicationContext(),text, Toast.LENGTH_LONG).show();
+
             }
         });
     }

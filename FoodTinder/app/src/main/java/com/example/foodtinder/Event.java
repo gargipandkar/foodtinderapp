@@ -7,5 +7,10 @@ public class Event {
     static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
     String eventId;
     DatabaseReference event_ref;
+
     //Understand needs of Events before implementing
+    Event(String eventId){
+        this.eventId = eventId;
+        event_ref = db.child("EVENTS/"+eventId);
+    }
 }
