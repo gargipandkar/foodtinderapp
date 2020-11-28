@@ -34,15 +34,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         //code starts here
-        Button enter_btn = findViewById(R.id.enter_btn);
-//        enter_btn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                Log.i("Check", "Button clicked");
-//                Intent toCreateEvent = new Intent(MainActivity.this, SignInActivity.class);
-//                startActivity(toCreateEvent);
-//            }
-//        });
+        /*Button enter_btn = findViewById(R.id.enter_btn);
+        enter_btn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Log.i("Check", "Button clicked");
+                Intent toCreateEvent = new Intent(MainActivity.this, CreateEventActivity.class);
+                startActivity(toCreateEvent);
+            }
+        });
+         */
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
     }
-
+    /*
     @Override
     public void onStart() {
         super.onStart();
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
+    */
 
     private void updateUI(FirebaseUser currentUser) {
 

@@ -1,6 +1,7 @@
-package com.example.lib;
+package com.example.foodtinder;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -11,7 +12,8 @@ import java.util.HashMap;
 
 public class Result {
     ArrayList<String> placeIDs = new ArrayList<>();
-    HashMap<String,HashMap<String,Object>> placeDetails = new HashMap<String, HashMap<String,Object>>();
+    HashMap<String,HashMap<String,String>> placeDetails = new HashMap<String, HashMap<String,String>>();
+    HashMap<String,HashMap<String,Object>> placeDetailsPhotos = new HashMap<String, HashMap<String,Object>>();
     HashMap<String,Object> placeInfo = new HashMap<>();
 
     void addPlaceIDs(String id){
@@ -19,7 +21,7 @@ public class Result {
     }
 
     //parser to process result from NearbySearch requests
-    void nearbySearchParser(String responseBody){
+    void nearbySearchParser(String responseBody) throws JSONException {
         JSONArray results = new JSONArray(responseBody);
         JSONObject resultsObj =  results.getJSONObject(0);
         JSONArray resultsArr = resultsObj.getJSONArray("results");
@@ -30,31 +32,49 @@ public class Result {
     }
 
     //parser to process result from PlaceDetails requests
-    void placeDetailsParser(String responseBody){
+    void placeDetailsParser(String responseBody) throws JSONException {
         JSONArray results = new JSONArray(responseBody);
         JSONObject resultsObj =  results.getJSONObject(0);
         org.json.JSONObject resultsArr = resultsObj.getJSONObject("result");
-
-        HashMap<String,Object> attributes = this.placeDetails.get(resultsArr.getString("name"));
+        HashMap<String,String> attributes = this.placeDetails.get(resultsArr.getString("name"));
         if (attributes==null) {
-            attributes = new HashMap<String, Object>();
+            attributes = new HashMap<String, String>();
         }
 
-        //add each desired attributes to the HashMap, add or remove according to need and specifications of application
-        attributes.put("formatted_address",resultsArr.getString("formatted_address"));
-        attributes.put("business_status",resultsArr.getString("business_status"));
-        attributes.put("price_level",resultsArr.getInt("price_level"));
-        attributes.put("ratings",resultsArr.getInt("price_level"));
-        if (resultsArr.has("photos")){
-            attributes.put("photos",resultsArr.get("photos"));
-        } else {
-            attributes.put("photos",null);
+        String[] keys = new String[]{"formatted_address","business_status","price_level","rating"};
+
+        for(String key:keys){
+            if (resultsArr.has(key)==true){
+                if (key=="price_level" | key=="rating"){
+                    attributes.put(key,Integer.toString(resultsArr.getInt(key)));
+                }else {
+                    attributes.put(key, resultsArr.getString(key));
+                }
+            }
+            else{
+                attributes.put(key,null);
+            }
+
         }
         this.placeDetails.put(resultsArr.getString("name"),attributes);
+
+        HashMap<String,Object> attributes2 = this.placeDetailsPhotos.get(resultsArr.getString("name"));
+        if (attributes2==null) {
+            attributes2 = new HashMap<String, Object>();
+        }
+        if (resultsArr.has("photos")){
+            attributes2.put("photos", resultsArr.getJSONArray("photos"));
+        }
+        else {
+            attributes2.put("photos", null);
+        }
+
+        this.placeDetailsPhotos.put(resultsArr.getString("name"),attributes2);
     }
 
+
     //parser to process result from findPlace requests
-    void findPlaceParser(String responseBody){
+    void findPlaceParser(String responseBody) throws JSONException {
         JSONArray results = new JSONArray(responseBody);
         JSONObject resultsObj =  results.getJSONObject(0);
         JSONArray resultsArr = resultsObj.getJSONArray("candidates");

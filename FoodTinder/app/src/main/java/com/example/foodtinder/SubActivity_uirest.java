@@ -1,4 +1,4 @@
-package com.example.norman_lee.myapplication;
+package com.example.foodtinder;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class SubActivity extends AppCompatActivity {
+public class SubActivity_uirest extends AppCompatActivity {
 
     Spinner spinner1, spinner2;
     Button btnSubmit;

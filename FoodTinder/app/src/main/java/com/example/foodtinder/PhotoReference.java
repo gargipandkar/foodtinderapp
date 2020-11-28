@@ -1,6 +1,7 @@
-package com.example.lib;
+package com.example.foodtinder;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -23,14 +24,14 @@ public class PhotoReference {
     PhotoReference(){};
 
     //Method to obtain the HashMap of Names and an ArrayList of all its photo_reference from the Result class's placeDetails variable
-    void generateReference(Result result){
-        for (String place:result.placeDetails.keySet()){
+    void generateReference(Result result) throws JSONException {
+        for (String place:result.placeDetailsPhotos.keySet()){
 
-            if (result.placeDetails.get(place).get("photos") == null){
+            if (result.placeDetailsPhotos.get(place).get("photos") == null){
                 this.addReference(place,null);
             } else {
 
-                JSONArray res = new JSONArray(result.placeDetails.get(place).get("photos").toString());
+                JSONArray res = new JSONArray(result.placeDetailsPhotos.get(place).get("photos").toString());
 
                 for (int i=0;i<res.length();i++) {
                     JSONObject resObj = res.getJSONObject(i);

@@ -1,4 +1,4 @@
-package com.example.norman_lee.myapplication;
+package com.example.foodtinder;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -128,5 +129,5 @@ public class SubActivity extends AppCompatActivity {
             }
         });
     }
-
 }
+

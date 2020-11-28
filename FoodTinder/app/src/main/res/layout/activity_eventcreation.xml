@@ -20,6 +20,23 @@
         android:text="Enter event name" />
 
     <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/group_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Group" />
+
+        <Spinner
+            android:id="@+id/group_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -71,7 +88,7 @@
             android:id="@+id/location_options"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:entries="@android:array/emailAddressTypes" />
+            android:entries="@array/location_prefer" />
     </LinearLayout>
 
     <LinearLayout
@@ -90,7 +107,25 @@
             android:id="@+id/budget_options"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:entries="@android:array/emailAddressTypes" />
+            android:entries="@array/money_prefer" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/deadline_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Preference Deadline" />
+
+        <Spinner
+            android:id="@+id/deadline_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/deadline_prefer" />
     </LinearLayout>
 
     <Button

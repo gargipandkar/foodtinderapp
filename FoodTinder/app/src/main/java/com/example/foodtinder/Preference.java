@@ -1,4 +1,4 @@
-package com.example.norman_lee.myapplication;
+package com.example.foodtinder;
 
 public class Preference {
     private String location;
