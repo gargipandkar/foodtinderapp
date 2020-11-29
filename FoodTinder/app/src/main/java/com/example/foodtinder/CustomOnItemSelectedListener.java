@@ -15,8 +15,6 @@ public class CustomOnItemSelectedListener implements OnItemSelectedListener {
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
-    }
+    public void onNothingSelected(AdapterView<?> arg0) {}
 
 }

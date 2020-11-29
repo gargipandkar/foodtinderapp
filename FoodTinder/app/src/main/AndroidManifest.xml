@@ -34,6 +34,7 @@
         </activity>
         <activity android:name=".ListEventsActivity"/>
         <activity android:name=".ListGroupsActivity"/>
+        <activity android:name=".Swiping"/>
         <activity android:name=".IndicatePreferencesActivity"/>
     </application>
 

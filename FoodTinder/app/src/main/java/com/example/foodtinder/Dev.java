@@ -1,12 +1,15 @@
 package com.example.foodtinder;
 
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONException;
 
 public class Dev extends AppCompatActivity {
     @Override
@@ -19,7 +22,7 @@ public class Dev extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i("Check", "Button clicked");
-                Intent toCreateEvent = new Intent(Dev.this,CreateEventActivity.class);
+                Intent toCreateEvent = new Intent(Dev.this,Swiping.class);
                 startActivity(toCreateEvent);
             }
         });

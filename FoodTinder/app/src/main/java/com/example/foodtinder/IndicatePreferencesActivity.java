@@ -1,15 +1,112 @@
 package com.example.foodtinder;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+
 public class IndicatePreferencesActivity extends AppCompatActivity {
+
+    Spinner location_pref_options, budget_pref_options;
+    Button btnSubmit;
+    Integer event_id = 0;//selectedEvent.getId();       //TODO send Event object selectedEvent from clicking event on list
+    String user_id = User.getId();
+
+    final DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference budgetPref_ref = db.child("EVENTS").child(String.valueOf(event_id)).child("Preferences").child("listOfBudget");
+    DatabaseReference locationPref_ref = db.child("EVENTS").child(String.valueOf(event_id)).child("Preferences").child("listOfLocation");
+    DatabaseReference completedPref_ref = db.child("EVENTS").child(String.valueOf(event_id)).child("Preferences").child("listOfCompleted");
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preferences);
+
+        //TODO add logic to check if field is "To be decided", only then show spinner
+        addListenerOnSpinner_budget();
+        addListenerOnButton();
+        addListenerOnSpinner_location();
+    }
+
+    // intialize spinners
+    public void addListenerOnSpinner_budget() {
+        budget_pref_options = (Spinner) findViewById(R.id.budget_pref_options);
+        budget_pref_options.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+    }
+
+    public void addListenerOnSpinner_location() {
+        location_pref_options = (Spinner) findViewById(R.id.location_pref_options);
+        location_pref_options.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+    }
+
+    // get the selected dropdown list value
+    public void addListenerOnButton() {
+
+        location_pref_options = (Spinner) findViewById(R.id.location_pref_options);
+        budget_pref_options = (Spinner) findViewById(R.id.budget_pref_options);
+        btnSubmit = (Button) findViewById(R.id.preferences_btn);
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+               // ADD USER TO LIST OF THOSE WHO HAVE FINISHED INDICATING PREFERENCES
+                completedPref_ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<String> ls = dataSnapshot.getValue(ArrayList.class);
+                        ls.add(user_id);
+                        completedPref_ref.push().setValue(ls.toString());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+
+                // WRITE LOCATION PREFERENCE
+                locationPref_ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<String> ls = dataSnapshot.getValue(ArrayList.class);
+                        ls.add(budget_pref_options.getSelectedItem().toString());
+                        locationPref_ref.push().setValue(ls.toString());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+
+                // WRITE BUDGET PREFERENCE
+                budgetPref_ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<String> ls = dataSnapshot.getValue(ArrayList.class);
+                        ls.add(location_pref_options.getSelectedItem().toString());
+                        budgetPref_ref.push().setValue(ls.toString());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+            }
+        });
+    
     }
 
     protected void onStart(){

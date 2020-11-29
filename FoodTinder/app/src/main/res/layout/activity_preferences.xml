@@ -12,17 +12,17 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/location_label"
+            android:id="@+id/location_pref_label"
             android:layout_width="100dp"
             android:layout_height="24dp"
             android:text="Location"
             android:textSize="18sp" />
 
         <Spinner
-            android:id="@+id/location_options"
+            android:id="@+id/location_pref_options"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:entries="@android:array/emailAddressTypes" />
+            android:entries="@array/location_prefer" />
     </LinearLayout>
 
     <LinearLayout
@@ -31,21 +31,21 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/budget_label"
+            android:id="@+id/budget_pref_label"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="Budget"
             android:textSize="18sp" />
 
         <Spinner
-            android:id="@+id/budget_options"
+            android:id="@+id/budget_pref_options"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:entries="@android:array/emailAddressTypes" />
+            android:entries="@array/money_prefer" />
     </LinearLayout>
 
     <Button
-        android:id="@+id/prefernces_btn"
+        android:id="@+id/preferences_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Submit Preferences" />

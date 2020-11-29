@@ -31,15 +31,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class SubActivity_fri27 extends AppCompatActivity {
+//TODO change this to Java class, doesn't need to extend AppCompatActivity
+
+public class BackendActivity extends AppCompatActivity {
 
     String event_id;
     int user_id;
-    public final static String INTENT_EXCH_RATE = "Exchange Rate";
-    private SharedPreferences mPreferences;
-    private String sharedPrefFile = "com.example.android.subsharedprefs";
-    public final static String HOME_KEY = "HOME_KEY"; //A --> Home
-    public final static String FOREIGN_KEY = "FOREIGN_KEY"; //B --> Foreign
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +50,7 @@ public class SubActivity_fri27 extends AppCompatActivity {
         DatabaseReference myRef = database.getReference();
         final boolean[] var = new boolean[2];
 
+        // CHECK EVENT STATUS
         DatabaseReference ref1 = myRef.child("Event/" + event_id + "/init_pref"); // check if init_preference is completed (can be replace with states)
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
@@ -63,6 +61,7 @@ public class SubActivity_fri27 extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) { }
         });
 
+        // CHECK IF RESTAURANT HAS BEEN DECIDED? IDEALLY EVENT STATUS SHOULD REFLECT THIS
         ref1 = myRef.child("Event/" + event_id + "/final_rest"); // check if restaurant has been decided
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
@@ -93,6 +92,8 @@ public class SubActivity_fri27 extends AppCompatActivity {
                 }
             });
         }
+
+        // SET DEFAULT
         else if(var[1]) { //if final preference isnt done, it checks if deadline is crossed or has everyone completed it
             ref1 = myRef.child("Event/" + event_id + "/restaurant_pref/deadline");
             ref1.addValueEventListener(new ValueEventListener() {
@@ -110,7 +111,7 @@ public class SubActivity_fri27 extends AppCompatActivity {
             });
         }
     }
-    //TODO 4.10 Don't forget to override onPause()
+    //Don't forget to override onPause()
     public void complete_init_pref(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference();
@@ -183,6 +184,7 @@ public class SubActivity_fri27 extends AppCompatActivity {
 
         final String preference[] = new String[1];
 
+        // GET BUDGET PARAMETER TO SEND FOR QUERY
         DatabaseReference ref1 = myRef.child("Event/" + event_id + "/preference/money");
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
@@ -213,6 +215,8 @@ public class SubActivity_fri27 extends AppCompatActivity {
 
             }
         });
+
+        // GET LOCATION PARAMETER TO SEND FOR QUERY
         ref1 = myRef.child("Event/" + event_id + "/preference/location");
         ref1.addValueEventListener(new ValueEventListener() {
             @Override

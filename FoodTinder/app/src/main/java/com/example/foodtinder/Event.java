@@ -9,6 +9,7 @@ import java.util.Map;
 
 public class Event {
 
+    Integer id;     //USE AS KEY FOR DATABASE, BUT STORE COPY ALSO?
     String name;
     String group;
     String host;
@@ -68,6 +69,9 @@ public class Event {
             this.status = "Ready to swipe";
         status = "Waiting for preferences";
     }
+
+    @Exclude
+    public Integer getId(){return id;}
 
     public String getName(){return this.name;}
     public String getGroup(){return this.group;}

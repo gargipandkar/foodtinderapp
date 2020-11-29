@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class User  {
         email = in_email;
     }
 
+    @Exclude
     public static String getId(){ return id;}
     public static String getName(){return name;}
     public static String getEmail(){return email;}
