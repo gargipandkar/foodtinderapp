@@ -29,7 +29,7 @@ public class HomeFragment extends Fragment {
     private static ArrayList<Event> eventItemArrayList = new ArrayList<>();;
     EventListAdapterFinal eventListAdapter;
     private static final String TAG = "HomeFragment";
-    String incomingmsg = "";
+
     String eventName, eventLocation, eventBudget, eventStatus;
     Long eventDT;
 
@@ -44,10 +44,6 @@ public class HomeFragment extends Fragment {
 
     public void updateEvent(String name, Long dt, String budget, String location, String status){
         eventItemArrayList.add(new Event( name, name, name, dt, location, budget, status));
-    }
-
-    public interface FragmentHomeListenerEvent {
-        void onNewEvent(Event newevent);
     }
 
 

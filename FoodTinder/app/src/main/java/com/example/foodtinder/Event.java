@@ -13,7 +13,7 @@ import java.util.Map;
 public class Event implements Parcelable {
 
     String name, group, host, location, budget, status;
-    Long eventDateTime;
+    long eventDateTime;
 //    Calendar prefDateTime;
 //    Boolean active;
     String decision;
@@ -118,7 +118,7 @@ public class Event implements Parcelable {
         ArrayList<String> display = new ArrayList<>();
         display.add(this.name);
         display.add(this.group);
-        display.add(this.eventDateTime.toString());
+        display.add(Long.toString(this.eventDateTime));
         display.add(this.status);
 //        if (!this.status.equals("Decided"))
 //            display.add(this.prefDateTime.toString());

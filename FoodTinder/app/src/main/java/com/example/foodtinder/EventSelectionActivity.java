@@ -19,17 +19,17 @@ public class EventSelectionActivity extends AppCompatActivity{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_eventselection);
 
-//        // get event information homeFragment
-//        Intent intent = getIntent();
-//        EventItem eventItem = intent.getParcelableExtra("Event Item");
-//        String eventName = eventItem.getmEventName();
-//        String eventDT = eventItem.getmEventDateTime();
-//
-//        // set event name, date, time
-//        TextView nameView = findViewById(R.id.event_selection_name);
-//        nameView.setText(eventName);
-//        TextView dtView = findViewById(R.id.event_selection_dt);
-//        dtView.setText(eventDT);
+        // get event information homeFragment
+        Intent intent = getIntent();
+        Event eventItem = intent.getParcelableExtra("Event Item");
+        String eventName = eventItem.getName();
+        long eventDT = eventItem.getEventDateTime();
+
+        // set event name, date, time
+        TextView nameView = findViewById(R.id.event_selection_name);
+        nameView.setText(eventName);
+        TextView dtView = findViewById(R.id.event_selection_dt);
+        dtView.setText(Long.toString(eventDT));
         Log.i("EventSelectionActivity", "reached");
 
 

@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -37,12 +39,14 @@ public class CreateEventFragment extends Fragment {
     public static final String TAG = "CreateEventFragment";
     Event currEvent;
 
-    Button btnDatePicker, btnTimePicker;
-    EditText txtDate, txtTime, txtName;     //ENCAP INTO EVENT CLASS
+    TextView btnDatePicker, btnTimePicker;
+    EditText txtName;     //ENCAP INTO EVENT CLASS
     private int mYear, mMonth, mDay, mHour, mMinute;
     private String mName, mLocation, mBudget, group, deadline, eventStatus; //ENCAP INTO EVENT CLASS
     private Long eventDateTimeLong;
     Boolean checkEvent;
+
+
 
     Spinner locationPicker, budgetPicker, groupPicker, deadlinePicker;
     private Calendar eventDateTime = Calendar.getInstance();
@@ -70,12 +74,15 @@ public class CreateEventFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_create_event, container, false);
 
+        Toolbar toolbar = v.findViewById(R.id.toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+//        ((AppCompatActivity)getActivity()).setDisplayHomeAsUpEnabled(true);
+//        ((AppCompatActivity)getActivity()).setDisplayShowHomeEnabled(true);
+        ((AppCompatActivity)getActivity()).setTitle("Create New Group");
+
         txtName = v.findViewById(R.id.in_event_name);
         groupPicker = v.findViewById(R.id.group_options);
         btnDatePicker = v.findViewById(R.id.btn_date);
-        btnTimePicker = v.findViewById(R.id.btn_time);
-        txtDate = v.findViewById(R.id.in_date);
-        txtTime = v.findViewById(R.id.in_time);
         btnDatePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,7 +95,7 @@ public class CreateEventFragment extends Fragment {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        txtDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                        btnDatePicker.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
                         eventDateTime.set(year, monthOfYear, dayOfMonth);
                         eventDateTimeLong = eventDateTime.getTimeInMillis();
                     }
@@ -96,6 +103,7 @@ public class CreateEventFragment extends Fragment {
                 datePickerDialog.show();
             }
         });
+        btnTimePicker = v.findViewById(R.id.btn_time);
         btnTimePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,7 +116,7 @@ public class CreateEventFragment extends Fragment {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        txtTime.setText(hourOfDay + ":" + minute);
+                        btnTimePicker.setText(hourOfDay + ":" + minute);
                         eventDateTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         eventDateTime.set(Calendar.MINUTE, minute);
                         eventDateTimeLong = eventDateTime.getTimeInMillis();
@@ -165,7 +173,7 @@ public class CreateEventFragment extends Fragment {
                 mName = txtName.getText().toString();
                 Log.i(TAG, mName);
 
-                if (eventDateTimeLong == null) {
+                if (eventDateTimeLong == null || mLocation == "Select Location" || mBudget == "Select Budget") {
                     checkEvent = false;
                     eventStatus = "Waiting for preferences";
                 } else {
@@ -243,6 +251,7 @@ public class CreateEventFragment extends Fragment {
 
 
     }
+
 
     @Override
     public void onAttach(Context context) {

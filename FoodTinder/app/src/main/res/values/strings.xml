@@ -10,11 +10,13 @@
     </string-array>
     <string name="spinner_money">Choose money preference</string>
     <string-array name="money_prefer">
+        <item>Select Budget</item>
         <item>$</item>
         <item>$$</item>
         <item>$$$</item>
     </string-array>
     <string-array name="location_prefer">
+        <item>Select Location</item>
         <item>North</item>
         <item>South</item>
         <item>East</item>
