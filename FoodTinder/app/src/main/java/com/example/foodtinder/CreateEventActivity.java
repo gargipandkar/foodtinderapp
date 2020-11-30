@@ -243,7 +243,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             }
 
             //WRITE TO "EVENTS" DATABASE
-            currEvent = new Event(txtName.getText().toString(), group, User.getId(), eventDateTime, location, budget, deadline, eventStatus);
+            currEvent = new Event(Integer.getInteger(eventId), txtName.getText().toString(), group, User.getId(), eventDateTime, location, budget, deadline, eventStatus);
             events_ref.child(eventId).setValue(currEvent);
             Log.i("Check", "Event created");
 

@@ -1,5 +1,6 @@
 package com.example.foodtinder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -21,13 +22,15 @@ public class IndicatePreferencesActivity extends AppCompatActivity {
 
     Spinner location_pref_options, budget_pref_options;
     Button btnSubmit;
-    Integer event_id = 0;//selectedEvent.getId();       //TODO send Event object selectedEvent from clicking event on list
+
+    //TODO send Event object selectedEvent from clicking event on list
     String user_id = User.getId();
+    Event clickedEvent = new Event(3);  //TEMPORARY, GETS EXISTING EVENT
 
     final DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference budgetPref_ref = db.child("EVENTS").child(String.valueOf(event_id)).child("Preferences").child("listOfBudget");
-    DatabaseReference locationPref_ref = db.child("EVENTS").child(String.valueOf(event_id)).child("Preferences").child("listOfLocation");
-    DatabaseReference completedPref_ref = db.child("EVENTS").child(String.valueOf(event_id)).child("Preferences").child("listOfCompleted");
+    DatabaseReference budgetPref_ref = clickedEvent.ref.child("Preferences").child("listOfBudget");
+    DatabaseReference locationPref_ref = clickedEvent.ref.child("Preferences").child("listOfLocation");
+    DatabaseReference completedPref_ref = clickedEvent.ref.child("Preferences").child("listOfCompleted");
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -35,6 +38,8 @@ public class IndicatePreferencesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_preferences);
 
         //TODO add logic to check if field is "To be decided", only then show spinner
+        //if budget=="To be decided", show budget spinner
+        //if location=="To be decided", show location spinner
         addListenerOnSpinner_budget();
         addListenerOnButton();
         addListenerOnSpinner_location();
@@ -104,13 +109,11 @@ public class IndicatePreferencesActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {
                     }
                 });
+
+                Intent next = new Intent(IndicatePreferencesActivity.this, ListEventsActivity.class);
+                startActivity(next);
             }
         });
     
-    }
-
-    protected void onStart(){
-        super.onStart();
-        /*IF FIELD HAS BEEN SET BY HOST THEN DON'T DISPLAY FIELD IN PREFERENCES*/
     }
 }

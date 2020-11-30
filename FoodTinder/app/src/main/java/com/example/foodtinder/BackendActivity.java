@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,60 +32,45 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-//TODO change this to Java class, doesn't need to extend AppCompatActivity
+public class BackendActivity {
 
-public class BackendActivity extends AppCompatActivity {
+    DatabaseReference ref1;
 
-    String event_id;
-    int user_id;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-
-        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_sub);
-
-        //To check if the location and cost preference has been completed or not
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference();
-        final boolean[] var = new boolean[2];
+    public void runCompletionChecks(final Event selectedEvent) {
+        //To check if preference has been completed or not
+        final boolean[] notDone = new boolean[2];
 
         // CHECK EVENT STATUS
-        DatabaseReference ref1 = myRef.child("Event/" + event_id + "/init_pref"); // check if init_preference is completed (can be replace with states)
-        ref1.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                var[0] = dataSnapshot.getValue(Boolean.class);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
+        if (selectedEvent.getStatus().equals("Waiting for preferences"))
+            notDone[0] = true;
+        else
+            notDone[0] = false;
 
         // CHECK IF RESTAURANT HAS BEEN DECIDED? IDEALLY EVENT STATUS SHOULD REFLECT THIS
-        ref1 = myRef.child("Event/" + event_id + "/final_rest"); // check if restaurant has been decided
+        ref1 = selectedEvent.ref.child("decision");
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue(String.class)==null)
-                    var[1] = false;
+                if(dataSnapshot.getValue(String.class).equals("Undecided"))
+                    notDone[1] = true;
                 else
-                    var[1] = true;
+                    notDone[1] = false;
 
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
         });
 
-        if(var[0]) { //if initial preference isnt done, it checks if deadline is crossed or has everyone completed it
-            ref1 = myRef.child("Event/" + event_id + "/preference/deadline");
+        if(notDone[0]) { //if initial preference isnt done, it checks if deadline is crossed or has everyone completed it
+            ref1 = selectedEvent.ref.child("prefDateTime");
+            final Calendar deadline = Calendar.getInstance();
             ref1.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Date date = dataSnapshot.getValue(Date.class);
-                    if (date.after(new Date()))//compare if the deadline is not over
-                        complete_init_pref();
-                    ArrayList<Integer> ls = dataSnapshot.getValue(ArrayList.class);
+                    long millis = dataSnapshot.getValue(long.class);
+                    deadline.setTimeInMillis(millis);
+                    if (deadline.after(Calendar.getInstance()))//compare if the deadline is not over
+                        complete_init_pref(selectedEvent);
                 }
 
                 @Override
@@ -93,16 +79,18 @@ public class BackendActivity extends AppCompatActivity {
             });
         }
 
-        // SET DEFAULT
-        else if(var[1]) { //if final preference isnt done, it checks if deadline is crossed or has everyone completed it
-            ref1 = myRef.child("Event/" + event_id + "/restaurant_pref/deadline");
+
+        else if(notDone[1]) { //if final preference isnt done, it checks if deadline is crossed or has everyone completed it
+            ref1 = selectedEvent.ref.child("eventDateTime");
+            final Calendar deadline = Calendar.getInstance();
             ref1.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Date date = dataSnapshot.getValue(Date.class);
-                    if (date.after(new Date()))//compare if the deadline is not over
-                        complete_final_pref();
-                    ArrayList<Integer> ls = dataSnapshot.getValue(ArrayList.class);
+                    long millis = dataSnapshot.getValue(long.class);
+                    deadline.setTimeInMillis(millis);
+                    deadline.add(Calendar.HOUR_OF_DAY, -1);
+                    if (deadline.after(Calendar.getInstance()))//compare if the deadline is not over
+                        complete_final_pref(selectedEvent);
                 }
 
                 @Override
@@ -111,12 +99,9 @@ public class BackendActivity extends AppCompatActivity {
             });
         }
     }
-    //Don't forget to override onPause()
-    public void complete_init_pref(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference();
 
-        DatabaseReference ref1 = myRef.child("Event/" + event_id + "/L_member/no");
+    public void complete_init_pref(Event selectedEvent){
+        DatabaseReference ref1 = selectedEvent.ref.child("L_member/no");
         final int[] a = new int[1];
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
@@ -128,12 +113,11 @@ public class BackendActivity extends AppCompatActivity {
             }
         });
 
-        ref1 = myRef.child("Event/" + event_id + "/preference/completed");
+        ref1 = selectedEvent.ref.child("Preferences/listOfCompleted");
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<Integer> ls = dataSnapshot.getValue(ArrayList.class);
-//                if (ls.contains(user_id));
                 if(ls.size() == a[0])
                     //next step which is using the preference and location and then inserting the restaurant list for the user
                     //also make a variable to show that restaurants have been already assigned
@@ -146,11 +130,8 @@ public class BackendActivity extends AppCompatActivity {
         });
     }
 
-    public void complete_final_pref(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference();
-
-        DatabaseReference ref1 = myRef.child("Event/" + event_id + "/L_member/no");
+    public void complete_final_pref(final Event selectedEvent){
+        DatabaseReference ref1 = selectedEvent.ref.child("L_member/no");
         final int[] a = new int[1];
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
@@ -162,13 +143,13 @@ public class BackendActivity extends AppCompatActivity {
             }
         });
 
-        ref1 = myRef.child("Event/" + event_id + "/restaurant_pref/completed");
+        ref1 = selectedEvent.ref.child("restaurant_pref/completed");
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<Integer> ls = dataSnapshot.getValue(ArrayList.class);
                 if(ls.size() == a[0])
-                    assign_restaurant();
+                    get_query_params(selectedEvent);
                 a[0] = 0;
             }
 
@@ -177,22 +158,19 @@ public class BackendActivity extends AppCompatActivity {
             }
         });
     }
-    public void assign_restaurant(){
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRef = database.getReference();
-
+    
+    public void get_query_params(Event selectedEvent){
         final String preference[] = new String[1];
 
         // GET BUDGET PARAMETER TO SEND FOR QUERY
-        DatabaseReference ref1 = myRef.child("Event/" + event_id + "/preference/money");
+        DatabaseReference ref1 = selectedEvent.ref.child("Preferences/listOfBudget");
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Integer> ls = dataSnapshot.getValue(List.class);
-                String str[] = {"$","$$","$$$"};
-                int arr[] = new int[3];
-                int largest = -1;
+                String[] str = {"$","$$","$$$"};
+                int[] arr = new int[3];
+                int largest = 0;
                 for (int i = 0; i<3; ++i) {
                     arr[i] = Collections.frequency(ls, str[i]);
                     if(arr[largest]>arr[i])
@@ -217,20 +195,17 @@ public class BackendActivity extends AppCompatActivity {
         });
 
         // GET LOCATION PARAMETER TO SEND FOR QUERY
-        ref1 = myRef.child("Event/" + event_id + "/preference/location");
+        ref1 = selectedEvent.ref.child("Preferences/listOfLocation");
+        final String[] preferenceLoc = new String[1];
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Integer> ls = dataSnapshot.getValue(List.class);
                 Set<String> distinct = new HashSet<String>(dataSnapshot.getValue(List.class));
-                HashMap<String,Integer> restaurant_pref_no = null;
-                int total = 0;
+                int maxFreq = 0;
                 for (String s: distinct) {
-                   restaurant_pref_no.put(s,Collections.frequency(ls, s)) ;
-                   total+=Collections.frequency(ls,s);
-                }
-                for (String s: distinct) {
-                    restaurant_pref_no.put(s,Math.round(restaurant_pref_no.get(s)/total));
+                    int freq = Collections.frequency(ls, s);
+                    if (freq>maxFreq){ preferenceLoc[1]=s;}
                 }
             }
 
@@ -241,5 +216,10 @@ public class BackendActivity extends AppCompatActivity {
         });
 
     }
+
+    public void assign_restaurant_choices(String[] budget, String[] location){
+        //TODO query Places API and send result to database at "listOfRestaurant" child
+    }
+
 
 }

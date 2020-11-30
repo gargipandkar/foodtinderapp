@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SubActivity">
+    tools:context=".Swiping">
     <!-- substitute Home for A -->
     <ImageView
         android:id="@+id/rest_image"
@@ -48,14 +48,14 @@
 
         <Button
             android:id="@+id/dislike"
-            android:layout_width="207dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:text="dislike" />
 
         <Button
             android:id="@+id/like"
-            android:layout_width="207dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:text="like" />
