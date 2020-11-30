@@ -29,7 +29,7 @@ public class ListGroupsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_listevents);
 
         db = FirebaseDatabase.getInstance().getReference();
-        groups_ref = db.child("USERS").child(User.getId()).child("listOfGroups");
+        groups_ref = db.child("USERS").child(User.getId()).child("inGroups");
 
         User.setUserGroups(groups_ref, new DatabaseCallback() {
             @Override

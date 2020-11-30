@@ -35,6 +35,8 @@ public class Event {
     Boolean active;
     String decision;
 
+    ArrayList<Restaurant> listOfRestaurant;
+
     //preference related variables, if required
 
     Event(Integer id){
@@ -68,6 +70,7 @@ public class Event {
         checkExpiry();
         this.decision = "Undecided";
         this.ref = db.child("EVENTS").child(String.valueOf(this.id));
+        this.listOfRestaurant = null;
     }
 
     public void updateEvent(HashMap<String, Object> info){
@@ -77,6 +80,7 @@ public class Event {
         updateEventStatus();
         checkExpiry();
         this.decision = (String) info.get("decision");
+        this.listOfRestaurant = (ArrayList<Restaurant>) info.get("listOfRestaurant");
     }
 
     public void setPrefDeadline(String prefDeadline){
@@ -99,24 +103,42 @@ public class Event {
     }
 
     public void checkExpiry(){
-        /*
         Calendar now = Calendar.getInstance();
         if (this.eventDateTime.after(now))
             active = false;
         active = true;
-        */
+    }
 
+    public boolean passedDeadline(){
+        Calendar now = Calendar.getInstance();
+        if (this.eventDateTime.after(this.prefDateTime))
+            return true;
+        return false;
     }
 
     public void updateEventStatus(){
-        /*
-        Calendar now = Calendar.getInstance();
+        final String[] chosen = {""};
+        ref.child("decision").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                chosen[0]=snapshot.getValue(String.class);
+                setDecision(chosen[0]);
+                if (!chosen[0].equals("Undecided"))
+                    setStatus("Match found");
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
 
-        if (this.prefDateTime.after(now))
-            this.status = "Ready to swipe";
-        status = "Waiting for preferences";
+    void setStatus(String status){
+        this.status = status;
+        ref.child("status").setValue(status);
+    }
 
-         */
+    void setDecision(String decision){
+        this.decision = decision;
+        ref.child("decision").setValue(decision);
     }
 
     @Exclude

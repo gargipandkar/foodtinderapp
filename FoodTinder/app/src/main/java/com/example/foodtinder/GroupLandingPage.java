@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-public class GroupPage extends AppCompatActivity {
+public class GroupLandingPage extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class GroupPage extends AppCompatActivity {
                         if (deepLink != null){
                             String grpId = deepLink.getQueryParameter("grpId");
                             if (grpId != null) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(GroupPage.this);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(GroupLandingPage.this);
                                 builder.setMessage("Join group? Grp Id: " + grpId)
                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
@@ -69,10 +69,10 @@ public class GroupPage extends AppCompatActivity {
 
                     }
                 })
-                .addOnFailureListener(GroupPage.this, new OnFailureListener() {
+                .addOnFailureListener(GroupLandingPage.this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e("GroupPage", "getDynamicLink failure", e);
+                        Log.e("GroupLandingPage", "getDynamicLink failure", e);
                     }
                 });
     }
