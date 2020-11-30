@@ -1,9 +1,14 @@
 package com.example.foodtinder;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.cardItems.EventItem;
 
 public class EventSelectionActivity extends AppCompatActivity{
 
@@ -14,7 +19,18 @@ public class EventSelectionActivity extends AppCompatActivity{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_eventselection);
 
-
+//        // get event information homeFragment
+//        Intent intent = getIntent();
+//        EventItem eventItem = intent.getParcelableExtra("Event Item");
+//        String eventName = eventItem.getmEventName();
+//        String eventDT = eventItem.getmEventDateTime();
+//
+//        // set event name, date, time
+//        TextView nameView = findViewById(R.id.event_selection_name);
+//        nameView.setText(eventName);
+//        TextView dtView = findViewById(R.id.event_selection_dt);
+//        dtView.setText(eventDT);
+        Log.i("EventSelectionActivity", "reached");
 
 
     }

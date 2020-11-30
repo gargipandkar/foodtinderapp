@@ -28,11 +28,6 @@ public class ProfileFragment extends Fragment {
     private User user_details;
     private FirebaseAuth mAuth;
 
-//    SharedPreferences prefs;
-//    private static final String SHARED_PREF_NAME = "prefs";
-//    private static final String KEY_NAME = "name";
-//    private static final String KEY_EMAIL = "email";
-
 
     public interface FragmentProfileListener {
         void onLogout();
@@ -70,9 +65,13 @@ public class ProfileFragment extends Fragment {
 
     private void updateProfile(FirebaseUser currentUser) {
         // get user data from Firebase
-        String name = currentUser.getDisplayName();
-        String email = currentUser.getEmail();
+//        String name = currentUser.getDisplayName();
+//        String email = currentUser.getEmail();
 //        Uri photoUrl = currentUser.getPhotoUrl();
+
+        // get user data from User class
+        String name = User.getName();
+        String email = User.getEmail();
 
         // update username, email and profile picture
         username_detail.setText(name);

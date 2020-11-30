@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,8 +30,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener{
+import java.util.Calendar;
 
+public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener, CreateEventFragment.CreateEventFragmentListener{
+
+//    public static Fragment selectedFragment = new HomeFragment();
+
+    public static final String TAG = "SignOutActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -78,8 +84,12 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
     @Override
     public void onCreateEvent() {
-        Intent toCreateEvent = new Intent(SignOutActivity.this, CreateEventActivity.class);
-        startActivity(toCreateEvent);
+        Fragment creatEventFrag = new CreateEventFragment();
+        Log.i(TAG, "Fragment initialising");
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, creatEventFrag).commit();
+        Log.i(TAG, "Fragment initialised");
+//        Intent toCreateEvent = new Intent(SignOutActivity.this, CreateEventActivity.class);
+//        startActivity(toCreateEvent);
     }
 
     @Override
@@ -89,5 +99,24 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
     }
 
 
-
+    @Override
+    public void onNewEvent(boolean bool, String name, Long dateTime, String budget, String location, String status) {
+        if (bool == true){
+            Log.i(TAG, name);
+            Fragment home = new HomeFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("name", name);
+            bundle.putLong("dateTime", dateTime);
+            bundle.putString("budget", budget);
+            bundle.putString("location", location);
+            bundle.putString("status", status);
+            home.setArguments(bundle);
+            Log.i(TAG, "string");
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, home).commit();
+            Log.i(TAG, "string");
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Ensure all details are filled up", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

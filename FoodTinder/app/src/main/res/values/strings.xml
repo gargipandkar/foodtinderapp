@@ -3,5 +3,23 @@
     <string name="app_name">FoodTinder</string>
     <string name="title_home">Home</string>
     <string name="title_profile">Profile</string>
-
+    <string-array name="deadline_prefer">
+        <item>Today</item>
+        <item>1 day before</item>
+        <item>1 week before</item>
+    </string-array>
+    <string name="spinner_money">Choose money preference</string>
+    <string-array name="money_prefer">
+        <item>$</item>
+        <item>$$</item>
+        <item>$$$</item>
+    </string-array>
+    <string-array name="location_prefer">
+        <item>North</item>
+        <item>South</item>
+        <item>East</item>
+        <item>West</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -63,20 +63,6 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser != null){
             // User is signed in
             Intent toHome = new Intent (MainActivity.this, SignOutActivity.class);
-
-            String name = currentUser.getDisplayName();
-            String email = currentUser.getEmail();
-
-//            SharedPreferences.Editor editor = prefs.edit();
-//            editor.putString(KEY_NAME, name);
-//            editor.putString(KEY_EMAIL, email);
-//            editor.apply();
-
-
-//            Uri photoUrl = currentUser.getPhotoUrl();
-//            String photoStr = photoUrl.toString();
-//            User user = new User(name, email);
-
             startActivity(toHome);
             finish();
         } else {

@@ -22,6 +22,7 @@
             android:gravity="center|bottom">
 
             <TextView
+                android:id="@+id/event_selection_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20sp"
@@ -36,14 +37,10 @@
                 android:text="Created by:" />
 
             <TextView
+                android:id="@+id/event_selection_dt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Date:" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Time:" />
+                android:text="Date Time" />
 
             <ImageView
                 android:layout_width="match_parent"

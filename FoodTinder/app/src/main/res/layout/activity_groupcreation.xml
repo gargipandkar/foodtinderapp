@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".CreateEventActivity">
+    tools:context=".CreateGroupActivity">
 
     <include
         android:id="@+id/toolbar"
@@ -25,14 +25,6 @@
             android:scrollbars="vertical"
             android:orientation="vertical">
 
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="20sp"-->
-<!--                android:layout_marginBottom="20sp"-->
-<!--                android:textStyle="bold"-->
-<!--                android:textSize="20sp"-->
-<!--                android:text="New Group" />-->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,21 +44,6 @@
                 android:layout_marginBottom="10dp"
                 android:text="XXXXX" />
 
-<!--            <RelativeLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_weight="1"-->
-<!--                android:gravity="center|bottom"-->
-<!--                android:orientation="vertical">-->
-
-<!--                <Button-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginTop="20dp"-->
-<!--                    android:layout_marginBottom="20dp"-->
-<!--                    android:text="Create Group" />-->
-<!--            </RelativeLayout>-->
-
         </LinearLayout>
 
     </ScrollView>
@@ -81,8 +58,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="80dp"
+            android:paddingHorizontal="20dp"
             android:background="@drawable/custom_button"
             android:text="Create Group" />
     </RelativeLayout>

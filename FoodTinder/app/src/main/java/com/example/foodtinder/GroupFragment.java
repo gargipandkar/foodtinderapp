@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cardItems.EventItem;
-import com.example.cardItems.EventListAdapter;
+//import com.example.cardItems.EventListAdapter;
 import com.example.cardItems.GroupItem;
 import com.example.cardItems.GroupListAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
