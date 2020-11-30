@@ -59,6 +59,7 @@ public class Group {
     }
 
     void addUser(){
+        //ADD USER TO GROUP AND GROUP TO USER
         this.ref.child("listOfUsers").child(User.getId()).setValue(true);
         User.addGroup(this.id);
     }
@@ -67,6 +68,7 @@ public class Group {
         this.ref.child("listOfEvents").child(String.valueOf(event.id)).setValue(true);
         //event.ref.child("group").setValue(this.id);
     }
+
 
     String getName(){
         if (name == null){

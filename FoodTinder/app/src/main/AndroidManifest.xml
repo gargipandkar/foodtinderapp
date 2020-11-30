@@ -36,6 +36,9 @@
         <activity android:name=".ListGroupsActivity"/>
         <activity android:name=".Swiping"/>
         <activity android:name=".IndicatePreferencesActivity"/>
+        <activity android:name=".CreateGroupActivity"/>
+        <activity android:name=".DisplayGroupLink"/>
+        <activity android:name=".GroupPage"/>
     </application>
 
 </manifest>

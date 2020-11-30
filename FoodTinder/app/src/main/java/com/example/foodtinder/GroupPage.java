@@ -24,7 +24,7 @@ public class GroupPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_grouplink);
         checkForDynamicLinks();
 
     }
@@ -50,9 +50,9 @@ public class GroupPage extends AppCompatActivity {
                                 builder.setMessage("Join group? Grp Id: " + grpId)
                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-                                                //Create group object with id
-                                                //Add user to this group id's list
-                                                //Add intent to go to grp page
+                                                //TODO Create group object with id
+                                                //TODO Add user to this group id's list
+                                                //TODO Add intent to go to ListGroupsActivity
                                             }
                                         })
                                         .setNegativeButton("NO", new DialogInterface.OnClickListener() {
