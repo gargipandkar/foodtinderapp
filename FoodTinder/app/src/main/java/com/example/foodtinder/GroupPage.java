@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +21,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 public class GroupPage extends AppCompatActivity {
-
+    User user = User.createUser("PBY", "bang");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,15 +45,19 @@ public class GroupPage extends AppCompatActivity {
                         }
 
                         if (deepLink != null){
-                            String grpId = deepLink.getQueryParameter("grpId");
+                            final String grpId = deepLink.getQueryParameter("grpId");
                             if (grpId != null) {
+                                final Group joiningGroup = new Group(grpId);
                                 AlertDialog.Builder builder = new AlertDialog.Builder(GroupPage.this);
-                                builder.setMessage("Join group? Grp Id: " + grpId)
+                                builder.setMessage("You have been invited to a group: " + joiningGroup.getName() + "\nDo you want to join the group?")
                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-                                                //Create group object with id
                                                 //Add user to this group id's list
-                                                //Add intent to go to grp page
+                                                joiningGroup.addUser(user);//user should be a proper User object of the authenticated user.
+                                                //Add intent to go to newly joined group page
+//                                                Intent toGroupPage = new Intent(GroupPage.this, MainActivity.class);
+//                                                startActivity(toGroupPage);
+
                                             }
                                         })
                                         .setNegativeButton("NO", new DialogInterface.OnClickListener() {

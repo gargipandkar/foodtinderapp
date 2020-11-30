@@ -1,5 +1,6 @@
 package com.example.foodtinder;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 
 import java.util.ArrayList;
 
@@ -72,7 +75,19 @@ public class Group {
         return this.name;
     }
 
-    String getShareableLink() {return "link_here";}
+    String getShareableLink() {
+        DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse("https://foodtinder.example.com/?grpId="+this.groupId))
+                .setDomainUriPrefix("https://foodtinder.page.link")
+                // Open links with this app on Android
+                .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                // Open links with com.example.ios on iOS
+                .setIosParameters(new DynamicLink.IosParameters.Builder("com.example.ios").build())
+                .buildDynamicLink();
+
+        String dynamicLinkString = dynamicLink.getUri().toString();
+        return dynamicLinkString;
+    }
 
     ArrayList getListOfEvents(){
         if (listOfEvents.size() == 0){

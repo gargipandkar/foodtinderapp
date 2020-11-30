@@ -46,10 +46,14 @@ public class MainActivity extends AppCompatActivity {
 //                Log.i("Check", "Button clicked");
 //                Intent toCreateEvent = new Intent(MainActivity.this, CreateEventActivity.class);
 //                startActivity(toCreateEvent);
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                String t = testgrp.getShareableLink();
+                sendIntent.putExtra(Intent.EXTRA_TEXT, t);
+                sendIntent.setType("text/plain");
 
-                                ArrayList l = testgrp.getListOfUsers();
-                String text2 = l.toString();
-                Toast.makeText(getApplicationContext(),text2, Toast.LENGTH_LONG).show();
+                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                startActivity(shareIntent);
             }
         });
 
