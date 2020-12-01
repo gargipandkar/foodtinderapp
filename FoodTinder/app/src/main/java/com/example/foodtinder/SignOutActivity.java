@@ -86,7 +86,7 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
     public void onCreateEvent() {
         Fragment creatEventFrag = new CreateEventFragment();
         Log.i(TAG, "Fragment initialising");
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, creatEventFrag).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, creatEventFrag).addToBackStack(null).commit();
         Log.i(TAG, "Fragment initialised");
 //        Intent toCreateEvent = new Intent(SignOutActivity.this, CreateEventActivity.class);
 //        startActivity(toCreateEvent);

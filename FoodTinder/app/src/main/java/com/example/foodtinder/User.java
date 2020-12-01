@@ -43,15 +43,17 @@ import androidx.annotation.NonNull;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.concurrent.Future;
 
 public class User  {
-    private static String id = "userId1";
-    private static String name;
-    private static String email;
+    public static String id;
+    public static String name;
+    public static String email;
 
     static ArrayList<String> activeEvents = new ArrayList<>();
     static ArrayList<String> inGroups = new ArrayList<>();
@@ -64,9 +66,17 @@ public class User  {
         email = in_email;
     }
 
+//    @Exclude
     public static String getId(){ return id;}
     public static String getName(){return name;}
     public static String getEmail(){return email;}
+
+    public static void addGroup(String groupId){
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference ref = db.child("USERS").child(id);
+
+        ref.child("inGroups").child(groupId).setValue(true);
+    }
 
     public static void setUserGroups(DatabaseReference userGroups_ref, final DatabaseCallback dbcallback){
         final ArrayList<String> ls = new ArrayList<>();

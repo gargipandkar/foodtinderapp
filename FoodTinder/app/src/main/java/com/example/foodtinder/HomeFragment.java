@@ -3,11 +3,14 @@ package com.example.foodtinder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -54,8 +57,11 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
-        createEventList();
         buildRecycleView(v);
+
+        if (savedInstanceState != null ){
+            //Restore the fragment's instance
+        }
 
         create_event_btn = v.findViewById(R.id.create_event_btn);
         create_event_btn.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +73,19 @@ public class HomeFragment extends Fragment {
         });
 
         return v;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's state here
+//        if (eventItemArrayList.size() > 0) {
+//            for (int i = 0; i < eventItemArrayList.size(); i++){
+//                Event event = eventItemArrayList.get(i);
+//                event.
+//            }
+//        }
+//        outState.putPa
     }
 
     private void buildRecycleView(View v) {
@@ -89,11 +108,6 @@ public class HomeFragment extends Fragment {
     }
 
 
-    private void createEventList() {
-
-//        eventItemArrayList = new ArrayList<>();
-
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

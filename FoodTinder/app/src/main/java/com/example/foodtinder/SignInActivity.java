@@ -52,15 +52,10 @@ public class SignInActivity extends AppCompatActivity{
         setContentView(R.layout.activity_signin);
 
 
-//        TextView welcomeHeader = findViewById(R.id.welcome_label);
         SignInButton googleSignInButton = findViewById(R.id.sign_in_button);
 
 
         // Configure Google Sign In
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(R.string.default_web_client_id))
-//                .requestEmail()
-//                .build();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -81,7 +76,6 @@ public class SignInActivity extends AppCompatActivity{
             public void onDataChange(@NonNull DataSnapshot dataSnapshot){
                 for (DataSnapshot user: dataSnapshot.getChildren())
                     allUsers.add(user.getKey());
-                Log.w(TAG, allUsers.toString());
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -132,6 +126,7 @@ public class SignInActivity extends AppCompatActivity{
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser(); // can remove if user data is not needed
+                            Log.w(TAG, allUsers.toString());
                             fillUserDetails(user);
                             updateUI(user);
                         } else {
@@ -163,9 +158,11 @@ public class SignInActivity extends AppCompatActivity{
             Log.i(TAG, user.getUid());
             String id = user.getUid();
             User currUser = new User(id, user.getDisplayName(), user.getEmail());
-//            if (!allUsers.contains(id)) {
-//                users_ref.child(id).setValue(currUser);
-//            }
+            if (!allUsers.contains(id)) {
+                users_ref.child(id).child("id").setValue(User.getId());
+                users_ref.child(id).child("name").setValue(User.getName());
+                users_ref.child(id).child("email").setValue(User.getEmail());
+            }
         }
     }
 
