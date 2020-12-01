@@ -1,6 +1,7 @@
 package com.example.cardItems;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 public class EventListAdapterFinal extends RecyclerView.Adapter<EventListAdapterFinal.MyViewHolder> {
 
 
+    private static final String TAG = "EventListAdapterFinal";
     private ArrayList<Event> eventArrayList;
     Context context;
     private myOnItemClickListener mListener;
@@ -46,8 +48,10 @@ public class EventListAdapterFinal extends RecyclerView.Adapter<EventListAdapter
 
     @Override
     public void onBindViewHolder(@NonNull EventListAdapterFinal.MyViewHolder holder, int position) {
+//        Log.i(TAG, eventArrayList.get(0).getName());
         holder.eventName.setText(eventArrayList.get(position).getName());
-        holder.eventDT.setText(Long.toString(eventArrayList.get(position).getEventDateTime()));
+        holder.eventDT.setText("date");
+//        holder.eventDT.setText(Long.toString(eventArrayList.get(position).getEventDateTime()));
         holder.eventDecision.setText("Location: " + eventArrayList.get(position).getDecision());
         holder.eventStatus.setText("Status: " + eventArrayList.get(position).getStatus());
     }

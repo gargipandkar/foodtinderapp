@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser != null){
             // User is signed in
+
+            User currUser = new User(currentUser.getUid(), currentUser.getDisplayName(), currentUser.getEmail());
             Intent toHome = new Intent (MainActivity.this, SignOutActivity.class);
             startActivity(toHome);
             finish();

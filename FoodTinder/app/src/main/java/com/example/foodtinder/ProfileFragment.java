@@ -40,9 +40,9 @@ public class ProfileFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
 
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        // Initialize Firebase Auth
+//        mAuth = FirebaseAuth.getInstance();
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
 
 
 
@@ -50,7 +50,9 @@ public class ProfileFragment extends Fragment {
         email_detail = v.findViewById(R.id.email);
         profilePic = v.findViewById(R.id.profilePicture);
 
-        updateProfile(currentUser);
+//        updateProfile(currentUser);
+        updateProfile();
+
 
         logout_btn = v.findViewById(R.id.signout_btn);
         logout_btn.setOnClickListener(new View.OnClickListener() {
@@ -63,21 +65,31 @@ public class ProfileFragment extends Fragment {
         return v;
     }
 
-    private void updateProfile(FirebaseUser currentUser) {
-        // get user data from Firebase
-//        String name = currentUser.getDisplayName();
-//        String email = currentUser.getEmail();
-//        Uri photoUrl = currentUser.getPhotoUrl();
+//    private void updateProfile(FirebaseUser currentUser) {
+//        // get user data from Firebase
+////        String name = currentUser.getDisplayName();
+////        String email = currentUser.getEmail();
+////        Uri photoUrl = currentUser.getPhotoUrl();
+//
+//        // get user data from User class
+//        String name = User.getName();
+//        String email = User.getEmail();
+//
+//        // update username, email and profile picture
+//        username_detail.setText(name);
+//        email_detail.setText(email);
+////        profilePic.setImageURI(photoUrl);
+//
+//    }
 
+    private void updateProfile() {
         // get user data from User class
         String name = User.getName();
         String email = User.getEmail();
 
-        // update username, email and profile picture
+        // update username, email
         username_detail.setText(name);
         email_detail.setText(email);
-//        profilePic.setImageURI(photoUrl);
-
     }
 
     @Override

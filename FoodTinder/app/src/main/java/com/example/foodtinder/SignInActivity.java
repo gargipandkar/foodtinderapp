@@ -163,6 +163,7 @@ public class SignInActivity extends AppCompatActivity{
                 users_ref.child(id).child("name").setValue(User.getName());
                 users_ref.child(id).child("email").setValue(User.getEmail());
             }
+
         }
     }
 

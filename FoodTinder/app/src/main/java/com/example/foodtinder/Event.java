@@ -3,37 +3,68 @@ package com.example.foodtinder;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Event implements Parcelable {
 
     String name, group, host, location, budget, status;
-    long eventDateTime;
-//    Calendar prefDateTime;
-//    Boolean active;
+    long eventDateTime, prefDateTime;
+    int id;     //USE AS KEY FOR DATABASE, BUT STORE COPY ALSO
+    Boolean active;
+
+
+    static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference ref;
     String decision;
 
-    //preference related variables
-//    Event(String name, String group, String host, Calendar eventDateTime, String location, String budget, String prefDeadline, String eventStatus){
-//        this.name = group;
-//        this.group = group;
-//        this.host = host;
-//        this.eventDateTime = eventDateTime;
-//        setPrefDeadline(prefDeadline);
-//        this.location = location;
-//        this.budget = budget;
-//        updateEventStatus();
-//        checkExpiry();
-//        this.decision = "Undecided";
-//    }
 
-    Event(String name, String group, String host, Long eventDateTime, String location, String budget, String eventStatus){
-        this.name = group;
+    HashMap<String, ArrayList<String>> RestaurantPreferences = null;
+
+
+    ArrayList<Restaurant> listOfRestaurant;
+
+    Event(){}
+
+
+    // for swiping.java debugging
+    Event(Integer id){
+        this.id = id;
+        this.ref = db.child("EVENTS").child(String.valueOf(id));
+        this.ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                GenericTypeIndicator<HashMap<String , Object>> gt = new GenericTypeIndicator<HashMap<String, Object>>() {};
+                HashMap<String, Object> info = snapshot.getValue(gt);
+                updateEvent(info);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.i("Check", error.toString());
+            }
+        });
+    }
+
+
+
+    Event(int id, String name, String group, String host, Long eventDateTime, String location, String budget, String eventStatus){
+        this.id = id;
+        this.name = name;
         this.group = group;
         this.host = host;
         this.eventDateTime = eventDateTime;
@@ -41,6 +72,8 @@ public class Event implements Parcelable {
         this.budget = budget;
         this.status = eventStatus;
         this.decision = "Undecided";
+        this.ref = db.child("EVENTS").child(String.valueOf(this.id));
+        this.listOfRestaurant = null;
     }
 
     protected Event(Parcel in) {
@@ -69,39 +102,10 @@ public class Event implements Parcelable {
 
     public void createEvent(){}
 
-//    public void setPrefDeadline(String prefDeadline){
-//        switch (prefDeadline){
-//            case "1 day before": this.prefDateTime = (Calendar)this.eventDateTime.clone();
-//                this.prefDateTime.add(Calendar.DATE, -1);
-//                break;
-//
-//            case "1 week before": this.prefDateTime = (Calendar)this.eventDateTime.clone();
-//                this.prefDateTime.add(Calendar.WEEK_OF_MONTH, - 1);
-//                break;
-//
-//            case "Today": this.prefDateTime = (Calendar)this.eventDateTime.clone();
-//                this.prefDateTime.set(Calendar.HOUR_OF_DAY, 23);
-//                this.prefDateTime.set(Calendar.MINUTE, 59);
-//                break;
-//
-//            default: this.prefDateTime = (Calendar)this.eventDateTime.clone();
-//        }
-//    }
-//
-//    public void checkExpiry(){
-//        Calendar now = Calendar.getInstance();
-//        if (this.eventDateTime.after(now))
-//            active = false;
-//        active = true;
-//    }
-//
-//    public void updateEventStatus(){
-//        Calendar now = Calendar.getInstance();
-//        if (this.prefDateTime.after(now))
-//            this.status = "Ready to swipe";
-//        status = "Waiting for preferences";
-//    }
 
+    public int getId() {
+        return id;
+    }
     public String getName(){return this.name;}
     public String getGroup(){return this.group;}
     public String getHost(){return this.host;}
@@ -110,8 +114,16 @@ public class Event implements Parcelable {
     public String getStatus(){return this.status;}
     public String getDecision(){return this.decision;}
     public long getEventDateTime(){return this.eventDateTime;}
-//    public long getPrefDateTime(){return this.prefDateTime.getTimeInMillis();}
-//    public Boolean getActive(){return this.active;}
+    public long getPrefDateTime(){return this.prefDateTime;}
+    public Boolean getActive(){return this.active;}
+    public ArrayList<Restaurant> getListOfRestaurant() {
+        return listOfRestaurant;
+    }
+    public HashMap<String, ArrayList<String>> getRestaurantPreferences() {
+        return RestaurantPreferences;
+    }
+
+
 
     @Exclude
     public ArrayList<String> getDisplayDetails(){
@@ -144,4 +156,46 @@ public class Event implements Parcelable {
 //        parcel.writeByte((byte) (active == null ? 0 : active ? 1 : 2));
         parcel.writeString(decision);
     }
+
+    public void updateEvent(HashMap<String, Object> info){
+        this.name = (String) info.get("name");
+        this.group = (String) info.get("group");
+        this.host = (String) info.get("host");
+//        updateEventStatus();
+        checkExpiry();
+        this.decision = (String) info.get("decision");
+        this.listOfRestaurant = (ArrayList<Restaurant>) info.get("listOfRestaurant");
+    }
+
+//    public void updateEventStatus(){
+//        final String[] chosen = {""};
+//        ref.child("decision").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                chosen[0]=snapshot.getValue(String.class);
+//                setDecision(chosen[0]);
+//                if (!chosen[0].equals("Undecided"))
+//                    setStatus("Match found");
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) { }
+//        });
+//    }
+
+    public void checkExpiry(){
+//        Calendar now = Calendar.getInstance();
+//        if (this.eventDateTime.after(now))
+//            active = false;
+//        active = true;
+    }
+
+//    void setStatus(String status){
+//        this.status = status;
+//        ref.child("status").setValue(status);
+//    }
+
+//    void setDecision(String decision){
+//        this.decision = decision;
+//        ref.child("decision").setValue(decision);
+//    }
 }

@@ -60,7 +60,8 @@ public class CreateEventFragment extends Fragment {
 
     private CreateEventFragmentListener listener;
     public interface CreateEventFragmentListener {
-        void onNewEvent(boolean checkEvent, String name, Long dateTime, String budget, String location, String status);
+        void onNewEvent(boolean bool, int eventId, String name, String group, String userId, Long dateTime, String budget, String location, String status);
+        void onNewEventUpdate();
     }
 
 //    public CreateEventFragment() {
@@ -78,7 +79,7 @@ public class CreateEventFragment extends Fragment {
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 //        ((AppCompatActivity)getActivity()).setDisplayHomeAsUpEnabled(true);
 //        ((AppCompatActivity)getActivity()).setDisplayShowHomeEnabled(true);
-        ((AppCompatActivity)getActivity()).setTitle("Create New Group");
+        ((AppCompatActivity)getActivity()).setTitle("Create New Event");
 
         txtName = v.findViewById(R.id.in_event_name);
         groupPicker = v.findViewById(R.id.group_options);
@@ -173,17 +174,31 @@ public class CreateEventFragment extends Fragment {
                 mName = txtName.getText().toString();
                 Log.i(TAG, mName);
 
+
+
                 if (eventDateTimeLong == null || mLocation == "Select Location" || mBudget == "Select Budget") {
                     checkEvent = false;
                     eventStatus = "Waiting for preferences";
                 } else {
                     checkEvent = true;
-                    eventStatus = "Ready to swipe";
+                    eventStatus = "Created";
                 }
 
-                listener.onNewEvent(checkEvent, mName, eventDateTimeLong, mBudget, mLocation, eventStatus);
-//                Intent toEventSel = new Intent(getActivity(), EventSelectionActivity.class);
-//                startActivity(toEventSel);
+                eventCount++;
+                eventCount_ref.setValue(eventCount);
+                String eventId = String.valueOf(eventCount);
+
+                //WRITE TO "EVENTS" DATABASE
+                currEvent = new Event(Integer.parseInt(eventId), mName, group, User.getId(), eventDateTimeLong, mLocation, mBudget, eventStatus);
+                events_ref.child(eventId).setValue(currEvent);
+                Log.i("Check", "Event created");
+
+                //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
+                users_ref.child("listOfEvents").child(eventId).setValue(true);
+                //TODO update all users belonging to the group
+
+//                listener.onNewEvent(checkEvent, Integer.parseInt(eventId), mName, group, User.getId(), eventDateTimeLong, mLocation, mBudget, eventStatus);
+                listener.onNewEventUpdate();
             }
         });
 
@@ -192,7 +207,8 @@ public class CreateEventFragment extends Fragment {
 
         db = FirebaseDatabase.getInstance().getReference();
         events_ref = db.child("EVENTS");
-        eventCount_ref = events_ref.child("eventCount");
+        eventCount_ref = db.child("EVENTCOUNT");
+        Log.i(TAG, User.getName());
         users_ref = db.child("USERS").child(User.getId());
 
         eventCount_ref.addValueEventListener(new ValueEventListener() {
@@ -225,6 +241,8 @@ public class CreateEventFragment extends Fragment {
 
 
 
+        setGroupOptions();
+
 
         return v;
     }
@@ -249,6 +267,33 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
+
+    }
+
+    private void setGroupOptions(){
+        Log.i(TAG, "here");
+        dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, new ArrayList<String>());
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        groupPicker.setAdapter(dataAdapter);
+        final ArrayList<String> groupOptions = new ArrayList<>();
+        dataAdapter.add("-- Assign to group --");
+        User.setUserGroups(users_ref.child("listOfGroups"), new DatabaseCallback() {
+            @Override
+            public void onCallback(ArrayList<String> ls) {
+                groupOptions.addAll(ls);
+                Log.i(TAG, groupOptions.toString());
+                //dataAdapter.clear();
+                dataAdapter.addAll(groupOptions);
+                dataAdapter.notifyDataSetChanged();
+
+                User.inGroups.clear();
+                User.inGroups.addAll(ls);
+
+                Log.i("Check", ls.toString());
+                Log.i("Check", User.getId());
+                Log.i("Check", groupOptions.toString());
+            }
+        });
 
     }
 
