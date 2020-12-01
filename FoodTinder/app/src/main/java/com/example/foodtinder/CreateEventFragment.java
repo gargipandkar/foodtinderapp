@@ -60,7 +60,7 @@ public class CreateEventFragment extends Fragment {
 
     private CreateEventFragmentListener listener;
     public interface CreateEventFragmentListener {
-        void onNewEvent(boolean bool, int eventId, String name, String group, String userId, Long dateTime, String budget, String location, String status);
+//        void onNewEvent(boolean bool, int eventId, String name, String group, String userId, Long dateTime, String budget, String location, String status);
         void onNewEventUpdate();
     }
 
@@ -198,7 +198,9 @@ public class CreateEventFragment extends Fragment {
                 //TODO update all users belonging to the group
 
 //                listener.onNewEvent(checkEvent, Integer.parseInt(eventId), mName, group, User.getId(), eventDateTimeLong, mLocation, mBudget, eventStatus);
-                listener.onNewEventUpdate();
+//                listener.onNewEventUpdate();
+                Intent testing = new Intent(getActivity(), TestEvent.class);
+                startActivity(testing);
             }
         });
 
@@ -271,17 +273,15 @@ public class CreateEventFragment extends Fragment {
     }
 
     private void setGroupOptions(){
-        Log.i(TAG, "here");
-        dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, new ArrayList<String>());
+        dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, new ArrayList<String>());
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         groupPicker.setAdapter(dataAdapter);
         final ArrayList<String> groupOptions = new ArrayList<>();
         dataAdapter.add("-- Assign to group --");
-        User.setUserGroups(users_ref.child("listOfGroups"), new DatabaseCallback() {
+        User.setUserGroups(users_ref.child("inGroups"), new DatabaseCallback() {
             @Override
             public void onCallback(ArrayList<String> ls) {
                 groupOptions.addAll(ls);
-                Log.i(TAG, groupOptions.toString());
                 //dataAdapter.clear();
                 dataAdapter.addAll(groupOptions);
                 dataAdapter.notifyDataSetChanged();
@@ -293,6 +293,11 @@ public class CreateEventFragment extends Fragment {
                 Log.i("Check", User.getId());
                 Log.i("Check", groupOptions.toString());
             }
+
+            @Override
+            public void onCallback(Event event) { }
+            public void onCallback (Group group){}
+            public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
         });
 
     }

@@ -18,10 +18,10 @@ import java.util.ArrayList;
 public class GroupListAdapterFinal extends RecyclerView.Adapter<GroupListAdapterFinal.MyViewHolder> {
 
 
-    ArrayList<GroupItem> groupItemArrayList;
+    ArrayList<Group> groupItemArrayList;
     Context context;
 
-    public GroupListAdapterFinal(ArrayList<GroupItem> groupItemArrayList, Context context) {
+    public GroupListAdapterFinal(ArrayList<Group> groupItemArrayList, Context context) {
         this.groupItemArrayList = groupItemArrayList;
         this.context = context;
     }
@@ -38,10 +38,10 @@ public class GroupListAdapterFinal extends RecyclerView.Adapter<GroupListAdapter
 
     @Override
     public void onBindViewHolder(@NonNull GroupListAdapterFinal.MyViewHolder holder, int position) {
-        holder.imageView.setImageResource(groupItemArrayList.get(position).mGroupImageResource());
-        holder.groupName.setText(groupItemArrayList.get(position).mGroupName());
-        holder.groupEvents.setText(groupItemArrayList.get(position).mGroupEvents());
-        holder.groupUsers.setText(groupItemArrayList.get(position).mGroupUsers());
+//        holder.imageView.setImageResource(groupItemArrayList.get(position).mGroupImageResource());
+        holder.groupName.setText(groupItemArrayList.get(position).getName());
+        holder.groupMembers.setText(Integer.toString(groupItemArrayList.get(position).getMemberCount()));
+//        holder.groupUsers.setText(groupItemArrayList.get(position).mGroupUsers());
     }
 
     @Override
@@ -52,14 +52,14 @@ public class GroupListAdapterFinal extends RecyclerView.Adapter<GroupListAdapter
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageView;
-        TextView groupName, groupEvents, groupUsers;
+        TextView groupName, groupMembers, groupUsers;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             imageView = itemView.findViewById(R.id.card_group_dp);
             groupName = itemView.findViewById(R.id.card_group_name);
-            groupEvents = itemView.findViewById(R.id.card_group_events);
+            groupMembers = itemView.findViewById(R.id.card_group_events);
             groupUsers = itemView.findViewById(R.id.card_group_users);
 
         }

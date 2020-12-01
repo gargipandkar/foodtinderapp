@@ -34,7 +34,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener, CreateEventFragment.CreateEventFragmentListener, WaitingEventFragment.FragmentWaitingEventListener{
+public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener, CreateEventFragment.CreateEventFragmentListener, WaitingEventFragment.FragmentWaitingEventListener, WaitingGroupFragment.FragmentWaitingGroupListener{
 
 //    public static Fragment selectedFragment = new HomeFragment();
 
@@ -63,11 +63,13 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
                     switch (item.getItemId()){
                         case R.id.navigation_home:
-                            selectedFragment = new HomeFragment();
+                            selectedFragment = new WaitingEventFragment();
+//                            selectedFragment = new HomeFragment();
                             fragTag = "home";
                             break;
                         case R.id.navigation_group:
-                            selectedFragment = new GroupFragment();
+                            selectedFragment = new WaitingGroupFragment();
+//                            selectedFragment = new GroupFragment();
                             fragTag = "group";
                             break;
                         case R.id.navigation_profile:
@@ -132,39 +134,41 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
     }
 
 
-    @Override
-    public void onNewEvent(boolean bool, int eventId, String name, String group, String userId, Long dateTime, String budget, String location, String status) {
-        if (bool == true){
-            Log.i(TAG, name);
-            Fragment home = new HomeFragment();
-            Bundle bundle = new Bundle();
-            bundle.putInt("eventId", eventId);
-            bundle.putString("name", name);
-            bundle.putString("group", group);
-            bundle.putString("userId", userId);
-            bundle.putLong("dateTime", dateTime);
-            bundle.putString("budget", budget);
-            bundle.putString("location", location);
-            bundle.putString("status", status);
-            home.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, home).commit();
-            Log.i(TAG, "sending event details");
-        }
-        else {
-            Toast.makeText(getApplicationContext(), "Ensure all details are filled up", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    @Override
+//    public void onNewEvent(boolean bool, int eventId, String name, String group, String userId, Long dateTime, String budget, String location, String status) {
+//        if (bool == true){
+//            Log.i(TAG, name);
+//            Fragment home = new HomeFragment();
+//            Bundle bundle = new Bundle();
+//            bundle.putInt("eventId", eventId);
+//            bundle.putString("name", name);
+//            bundle.putString("group", group);
+//            bundle.putString("userId", userId);
+//            bundle.putLong("dateTime", dateTime);
+//            bundle.putString("budget", budget);
+//            bundle.putString("location", location);
+//            bundle.putString("status", status);
+//            home.setArguments(bundle);
+//            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, home).commit();
+//            Log.i(TAG, "sending event details");
+//        }
+//        else {
+//            Toast.makeText(getApplicationContext(), "Ensure all details are filled up", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     @Override
     public void onNewEventUpdate() {
-        Fragment home = new HomeFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, home).commit();
-        Log.i(TAG, "Home Fragment initialised");
+        Log.i(TAG, "onNewEventUpdate()");
+        Fragment waitingEvent = new WaitingEventFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, waitingEvent).commit();
+        Log.i(TAG, "WaitingEvent Fragment initialised");
     }
 
     @Override
     public void onListingEvents(ArrayList<Event> eventArrayList) {
         if (eventArrayList.size() > 0){
+            Log.i(TAG, "onListingEvents");
             // go to Home fragement with list of events
             Fragment home = new HomeFragment();
             Bundle bundle = new Bundle();
@@ -174,6 +178,23 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
             Log.i(TAG, "sending event list");
         } else {
             // go to Home fragment with empty list
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
+
+        }
+    }
+
+    @Override
+    public void onListingGroup(ArrayList<Group> groupArrayList) {
+        if (groupArrayList.size() > 0){
+            // go to Group fragement with list of events
+            Fragment group = new GroupFragment();
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("grouplist", groupArrayList);
+            group.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, group).commit();
+            Log.i(TAG, "sending event list");
+        } else {
+            // go to Group fragment with empty list
         }
     }
 }

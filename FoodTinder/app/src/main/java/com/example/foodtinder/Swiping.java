@@ -77,7 +77,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                 // IDEALLY SHOULDN'T COME TO THIS CHECK SINCE USER CAN ONLY ACCESS SWIPING ACTIVITY ONCE
                 // SEND USER BACK TO HOME IF VISITS AGAIN
                 else {
-                    Intent next = new Intent(Swiping.this, ListEventsActivity.class);
+                    Intent next = new Intent(Swiping.this, SignOutActivity.class);
                     startActivity(next);
                 }
                 completed_ref.setValue(completed_ls);
@@ -181,7 +181,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                     // UPDATE DATABASE VOTES LIST
                     restVote_ref.setValue((listRestVotes));
                     // GO BACK TO HOME PAGE
-                    Intent next = new Intent(Swiping.this, ListEventsActivity.class);
+                    Intent next = new Intent(Swiping.this, SignOutActivity.class);
                     startActivity(next);
                 }
 
@@ -207,7 +207,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                     // UPDATE DATABASE VOTES LIST
                     restVote_ref.setValue((listRestVotes));
                     // GO BACK TO HOME PAGE
-                    Intent next = new Intent(Swiping.this, ListEventsActivity.class);
+                    Intent next = new Intent(Swiping.this, SignOutActivity.class);
                     startActivity(next);
                 }
 

@@ -95,8 +95,10 @@ public class WaitingEventFragment extends Fragment {
 
             }
 
-//            @Override
-//            public void onCallback(Event event){}
+            @Override
+            public void onCallback(Event event){}
+            public void onCallback (Group group){}
+            public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
 
         });
     }
@@ -110,6 +112,7 @@ public class WaitingEventFragment extends Fragment {
     //            GenericTypeIndicator<HashMap<String, Event>> gt = new GenericTypeIndicator<HashMap<String, Event>>() {};
                 GenericTypeIndicator<ArrayList<Event>> gt = new GenericTypeIndicator<ArrayList<Event>>() {};
                 allEvents = snapshot.getValue(gt);
+                Log.i(TAG, allEvents.toString());
 
                 eventsInfoList.clear();
                 for (String i: eventsList) {
@@ -132,9 +135,15 @@ public class WaitingEventFragment extends Fragment {
     void displayList(){
 //        LinearLayout layoutListEvents = findViewById(R.id.listevents_layout);
 //
-        Log.i("displayList", eventsInfoList.toString());
+        Log.i("Event List", eventsInfoList.toString());
 
-        waitingEventFragmentListener.onListingEvents(eventsInfoList);
+        if (waitingEventFragmentListener == null) {
+            Intent test = new Intent(getActivity(), TestEvent.class);
+            startActivity(test);
+        } else {
+            waitingEventFragmentListener.onListingEvents(eventsInfoList);
+        }
+
 
     }
 

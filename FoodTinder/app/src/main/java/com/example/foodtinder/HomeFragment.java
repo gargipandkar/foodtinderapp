@@ -79,10 +79,6 @@ public class HomeFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
 
-        if (savedInstanceState != null ){
-            //Restore the fragment's instance
-        }
-
         Button event_sel_btn = v.findViewById(R.id.event_sel_btn);
         event_sel_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,11 +97,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-
-//        latestEvent();
-//        Log.i(TAG, "latestEvent");
-//        Log.i(TAG, eventsInfoList.get(0).getName());
-
         buildRecycleView(v);
 
         return v;
@@ -114,26 +105,7 @@ public class HomeFragment extends Fragment {
 
     private void buildRecycleView(View v) {
 
-//        if (isList == true ){
-//            recyclerView = v.findViewById(R.id.recycleView);
-//            recyclerView.setHasFixedSize(true);
-////        eventListAdapter = new EventListAdapterFinal(eventItemArrayList, getContext());
-//            // using arraylist of events where list of events are retrieve from firebase
-//            eventListAdapter = new EventListAdapterFinal(eventsInfoList, getContext());
-//            recyclerView.setAdapter(eventListAdapter);
-//            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//
-//            eventListAdapter.setOnItemClickListener(new EventListAdapterFinal.myOnItemClickListener() {
-//                @Override
-//                public void onItemClick(int position) {
-////                eventItemArrayList.get(position).changeText("Clickeddddd");
-////                eventListAdapter.notifyItemChanged(position);
-//                    Intent toEventSelection = new Intent(getActivity(), EventSelectionActivity.class);
-//                    toEventSelection.putExtra("Event Item", eventItemArrayList.get(position));
-//                    startActivity(toEventSelection);
-//                }
-//            });
-//        }
+
         recyclerView = v.findViewById(R.id.recycleView);
         recyclerView.setHasFixedSize(true);
 //        eventListAdapter = new EventListAdapterFinal(eventItemArrayList, getContext());
@@ -147,26 +119,20 @@ public class HomeFragment extends Fragment {
         eventListAdapter.setOnItemClickListener(new EventListAdapterFinal.myOnItemClickListener() {
             @Override
             public void onItemClick(int position) {
+                Log.i(TAG, "here");
+                Log.i(TAG, Integer.toString(position));
 //                eventItemArrayList.get(position).changeText("Clickeddddd");
 //                eventListAdapter.notifyItemChanged(position);
+//                Log.i(TAG, Integer.toString(position));
+//                Log.i(TAG, eventItemArrayList.get(position).toString());
                 Intent toEventSelection = new Intent(getActivity(), EventSelectionActivity.class);
-                toEventSelection.putExtra("Event Item", eventItemArrayList.get(position));
+                toEventSelection.putExtra("Event Item", eventsInfoList.get(position));
                 startActivity(toEventSelection);
             }
         });
 
 
     }
-
-//    private boolean checkEventList(ArrayList<Event> eventList) {
-//        if (eventList.size() == 0) {
-//            isList = false;
-//        } else {
-//            isList = true;
-//        }
-//        return isList;
-//
-//    }
 
 
     @Override
@@ -193,98 +159,9 @@ public class HomeFragment extends Fragment {
             Log.i(TAG, "event list delivered to homefragment");
 
 
-        } else {
-            // retrieve event list from firebase
-//            latestEvent();
-//            Log.i(TAG, "to latestEvent()");
-//            Log.i(TAG, eventsInfoList.get(0).getName());
-//            Log.i("after latestEvent", eventsInfoList.toString());
-
         }
     }
 
-//    private void latestEvent() {
-//        // READ LIST OF EVENTS FROM FIREBASE AND PUT INTO LOCAL USER OBJECT
-//        db = FirebaseDatabase.getInstance().getReference();
-//        events_ref = db.child("USERS").child(User.getId()).child("listOfEvents");
-//
-//        User.setUserEvents(events_ref, new DatabaseCallback() {
-//            @Override
-//            public void onCallback(ArrayList<String> ls) {
-//                eventsList.addAll(ls);
-//                eventCount = eventsList.size();
-//
-//                User.activeEvents.clear();
-//                User.activeEvents.addAll(ls);
-//
-//                infoList();
-//
-//                //LOG
-//                Log.i("Check", ls.toString());
-//                Log.i("Check", User.getId());
-//                Log.i("Check", eventsList.toString());
-//                Log.i("Check", "# of groups = "+ eventCount);
-//
-//            }
-//
-////            @Override
-////            public void onCallback(Event event){}
-//
-//        });
-//    }
-
-//    void infoList(){
-//        Log.i(TAG, "to infoList()");
-//        final DatabaseReference allEvents_ref = db.child("EVENTS");
-//        allEvents_ref.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//    //            GenericTypeIndicator<HashMap<String, Event>> gt = new GenericTypeIndicator<HashMap<String, Event>>() {};
-//                GenericTypeIndicator<ArrayList<Event>> gt = new GenericTypeIndicator<ArrayList<Event>>() {};
-//                allEvents = snapshot.getValue(gt);
-//
-//                eventsInfoList.clear();
-//                for (String i: eventsList) {
-//                    eventsInfoList.add(allEvents.get(Integer.valueOf(i)));
-//                }
-////                Log.i(TAG, eventsInfoList.toString());
-////                Log.i("eventsInfoList name", eventsInfoList.get(0).getName());
-//
-//                displayList();
-////                checkEventList(eventsInfoList);
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) { }
-//        });
-//
-//    }
-
-//    void displayList(){
-////        LinearLayout layoutListEvents = findViewById(R.id.listevents_layout);
-////
-//        Log.i("displayList", eventsInfoList.toString());
-//        if (eventsInfoList.size() > 0) {
-//            isList = true;
-//            Fragment currentFragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-//            homeListener.updateHome(isList, currentFragment);
-//        }
-//
-////
-////        for (int i = 0; i < eventCount; i++) {
-////            TextView listItem = new TextView(this);
-////            listItem.setText(eventsList.get(i)+eventsInfoList.get(i).name);
-////            listItem.setId(i);
-////            layoutListEvents.addView(listItem);
-////        }
-//
-////        for (int i = 0; i < eventCount; i++) {
-////            Log.i(TAG,eventsList.get(i)+eventsInfoList.get(i).name);
-////
-////        }
-//
-//    }
 
     @Override
     public void onAttach(Context context) {
