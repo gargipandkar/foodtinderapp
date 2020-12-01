@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,7 +17,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class IndicatePreferencesActivity extends AppCompatActivity {
+public class IndicatePreferencesActivity_UNUSED extends AppCompatActivity {
 
     Spinner location_pref_options, budget_pref_options;
     Button btnSubmit;
@@ -48,12 +47,12 @@ public class IndicatePreferencesActivity extends AppCompatActivity {
     // intialize spinners
     public void addListenerOnSpinner_budget() {
         budget_pref_options = (Spinner) findViewById(R.id.budget_pref_options);
-        budget_pref_options.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+        budget_pref_options.setOnItemSelectedListener(new CustomOnItemSelectedListener_UNUSED());
     }
 
     public void addListenerOnSpinner_location() {
         location_pref_options = (Spinner) findViewById(R.id.location_pref_options);
-        location_pref_options.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+        location_pref_options.setOnItemSelectedListener(new CustomOnItemSelectedListener_UNUSED());
     }
 
     // get the selected dropdown list value
@@ -110,7 +109,7 @@ public class IndicatePreferencesActivity extends AppCompatActivity {
                     }
                 });
 
-                Intent next = new Intent(IndicatePreferencesActivity.this, ListEventsActivity.class);
+                Intent next = new Intent(IndicatePreferencesActivity_UNUSED.this, ListEventsActivity.class);
                 startActivity(next);
             }
         });

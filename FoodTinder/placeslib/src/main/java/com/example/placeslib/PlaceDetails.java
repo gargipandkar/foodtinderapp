@@ -1,4 +1,4 @@
-package com.example.foodtinder;
+package com.example.placeslib;
 import java.util.ArrayList;
 
 //PlaceDetails implementation of Places API

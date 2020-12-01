@@ -40,7 +40,7 @@ public class SignInActivity extends AppCompatActivity{
     private static GoogleSignInClient mGoogleSignInClient;
 
     DatabaseReference db, users_ref;
-    private ArrayList allUsers = new ArrayList();
+    private ArrayList<String> allUsers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -123,7 +123,6 @@ public class SignInActivity extends AppCompatActivity{
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser(); // can remove if user data is not needed
-                            fillUserDetails(user);
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -146,16 +145,6 @@ public class SignInActivity extends AppCompatActivity{
             Intent toSignIn = new Intent (SignInActivity.this, SignInActivity.class);
             startActivity(toSignIn);
             finish();
-        }
-    }
-
-    private void fillUserDetails(FirebaseUser user){
-        if (user != null) {
-            String id = user.getUid();
-            User currUser = new User(id, user.getDisplayName(), user.getEmail());
-            if (!allUsers.contains(id))
-                users_ref.child(id).setValue(currUser);
-
         }
     }
 

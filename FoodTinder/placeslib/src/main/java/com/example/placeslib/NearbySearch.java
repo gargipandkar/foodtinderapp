@@ -1,4 +1,4 @@
-package com.example.foodtinder;
+package com.example.placeslib;
 
 //NearbySearch implementation of Places API
 //Nearby Search require location (longitude and latitude), radius and api_key as compulsory parameter

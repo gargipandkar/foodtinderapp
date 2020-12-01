@@ -1,4 +1,4 @@
-package com.example.foodtinder;
+package com.example.placeslib;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -28,6 +28,7 @@ public class ListEventsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listevents);
 
+
         // READ LIST OF EVENTS FROM FIREBASE AND PUT INTO LOCAL USER OBJECT
         db = FirebaseDatabase.getInstance().getReference();
         events_ref = db.child("USERS").child(User.getId()).child("listOfEvents");

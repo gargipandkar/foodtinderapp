@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.renderscript.Sampler;
 import android.util.Log;
 import android.view.View;
@@ -73,7 +74,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
         db = FirebaseDatabase.getInstance().getReference();
         events_ref = db.child("EVENTS");
-        eventCount_ref = events_ref.child("eventCount");
+        eventCount_ref = db.child("EVENTCOUNT");
         users_ref = db.child("USERS").child(User.getId());
 
         eventCount_ref.addValueEventListener(new ValueEventListener() {
@@ -112,6 +113,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
         super.onStart();
 
         //TODO check if user's group list is empty, show toast "YOU AREN'T IN ANY GROUPS" and don't come to this form
+
 
         groupPicker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -233,14 +235,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             eventCount++;
             eventCount_ref.setValue(eventCount);
             String eventId = String.valueOf(eventCount);
-
-            //CHECK VALUE OF BUDGET AND LOCATION
-            if (!(budget.equals("To be decided") || location.equals("To be decided"))){ eventStatus = "Ready to swipe";}
-            else {
-                eventStatus = "Waiting for preferences";
-                //if (budget.equals("To be decided")){ //SEND AS EXTRA}
-                //if (location.equals("To be decided")){ //SEND AS EXTRA}
-            }
+            eventStatus = "Created";
 
             //WRITE TO "EVENTS" DATABASE
             currEvent = new Event(Integer.getInteger(eventId), txtName.getText().toString(), group, User.getId(), eventDateTime, location, budget, deadline, eventStatus);
@@ -250,6 +245,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
             users_ref.child("listOfEvents").child(eventId).setValue(true);
             //TODO update all users belonging to the group
+           
 
             //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
             Intent backToHome  = new Intent(CreateEventActivity.this, ListEventsActivity.class);

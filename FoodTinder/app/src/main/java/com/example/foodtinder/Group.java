@@ -62,6 +62,7 @@ public class Group {
         //ADD USER TO GROUP AND GROUP TO USER
         this.ref.child("listOfUsers").child(User.getId()).setValue(true);
         User.addGroup(this.id);
+        this.ref.child("memberCount").setValue(this.memberCount+1);
     }
 
     void addEvent(Event event){
