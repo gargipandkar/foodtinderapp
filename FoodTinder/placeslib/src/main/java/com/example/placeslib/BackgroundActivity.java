@@ -1,4 +1,4 @@
-package com.example.foodtinder;
+package com.example.placeslib;
 
 import android.os.AsyncTask;
 import android.util.Log;

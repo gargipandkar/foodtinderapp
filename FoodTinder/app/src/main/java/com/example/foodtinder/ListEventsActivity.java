@@ -60,6 +60,7 @@ public class ListEventsActivity extends AppCompatActivity {
             @Override
             public void onCallback(Event event){}
             public void onCallback (Group group){}
+            public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
 
         });
 

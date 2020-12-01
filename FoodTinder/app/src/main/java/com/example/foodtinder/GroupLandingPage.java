@@ -55,6 +55,8 @@ public class GroupLandingPage extends AppCompatActivity {
                                     public void onCallback(ArrayList<String> ls) { }
                                     @Override
                                     public void onCallback(Event event) { }
+                                    @Override
+                                    public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
 
                                     @Override
                                     public void onCallback(Group group) {
