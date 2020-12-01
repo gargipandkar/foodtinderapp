@@ -29,6 +29,9 @@ import java.lang.reflect.Array;
 import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -139,9 +142,6 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                 });
 
 
-                //TODO call function to run backend code and update event
-
-
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -151,6 +151,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
     }
 
 
+    // GETS RESTAURANT INFORMATION TO DISPLAY AS NEXT ITEM
     public void select_restaurant(final ArrayList<HashMap<String, String>> arr) {
         Log.i("Check", arr.toString());
         Log.i("Check", listRestVotes.toString());
@@ -180,6 +181,9 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                     number[0]++;
                     // UPDATE DATABASE VOTES LIST
                     restVote_ref.setValue((listRestVotes));
+
+
+
                     // GO BACK TO HOME PAGE
                     Intent next = new Intent(Swiping.this, ListEventsActivity.class);
                     startActivity(next);
@@ -206,6 +210,8 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                     number[0]++;
                     // UPDATE DATABASE VOTES LIST
                     restVote_ref.setValue((listRestVotes));
+                    //CHECK IF ALL MEMBERS HAVE FINISHED SWIPING, IF YES MAKE DECISION
+                    stillSwiping();
                     // GO BACK TO HOME PAGE
                     Intent next = new Intent(Swiping.this, ListEventsActivity.class);
                     startActivity(next);
@@ -221,5 +227,60 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
             Log.i("Check", "Dislike clicked");
         }
 
+    }
+
+    // CHECK WHETHER DEADLINE HAS PASSED OR EVERYONE HAS SWIPED
+    // UPDATE EVENT STATUS TO PROCESSING
+    public void stillSwiping(){
+        DatabaseReference countComplete_ref =selectedEvent.ref.child("RestaurantPreferences").child("listOfCompleted");
+        countComplete_ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long countComplete = snapshot.getChildrenCount();
+                stopSwiping(countComplete);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
+    private void stopSwiping(long count){
+        Group currGroup = new Group(selectedEvent.group);
+        int members = currGroup.memberCount;
+        //if(selectedEvent.passedDeadline() || count==members)
+        if (count == members){
+            selectedEvent.status = "Processing";
+            selectedEvent.ref.child("status").setValue(selectedEvent.status);
+            findMatch();
+        }
+    }
+
+    // GET SWIPING RESULTS AND DETERMINE MOST POPULAR RESTAURANT
+    // UPDATE DECISION TO RESTAURANT NAME AND EVENT STATUS TO MATCH FOUND
+    public void findMatch(){
+        DatabaseReference restVote_ref = selectedEvent.ref.child("RestaurantPreferences").child("listOfVotes");
+        restVote_ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                GenericTypeIndicator<ArrayList<Integer>> gt = new GenericTypeIndicator<ArrayList<Integer>>() {};
+                ArrayList<Integer> listVotes = snapshot.getValue(gt);
+                int maxVotes = 0;
+                int restPos = 0;
+                if (listVotes!=null){
+                    maxVotes = Collections.max(listVotes);
+                    restPos = listVotes.indexOf(maxVotes);
+
+                    String name = selectedEvent.listOfRestaurant.get(restPos).name;
+
+                    selectedEvent.setDecision(name);
+                    selectedEvent.updateEventStatus();
+                }
+                else Log.i("Check", "No list of votes found");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
     }
 }

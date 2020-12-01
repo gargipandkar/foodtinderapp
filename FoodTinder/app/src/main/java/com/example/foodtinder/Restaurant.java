@@ -56,13 +56,14 @@ public class Restaurant {
         ref.child(String.valueOf(count)).setValue(this);
     }
 
-    static public ArrayList<Restaurant> retrieveAllRestaurants(){
+    static public void retrieveAllRestaurants(final DatabaseCallback dbcallback){
         final ArrayList<Restaurant> allInfo = new ArrayList<>();
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot item: snapshot.getChildren())
                     allInfo.add((Restaurant) item.getValue());
+                dbcallback.onCallback(allInfo, true);
             }
 
             @Override
@@ -70,7 +71,6 @@ public class Restaurant {
 
             }
         });
-        return allInfo;
     }
 
     public String getName(){return this.name;}

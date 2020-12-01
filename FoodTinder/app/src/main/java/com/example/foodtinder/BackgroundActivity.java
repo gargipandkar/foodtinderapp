@@ -1,6 +1,7 @@
 package com.example.foodtinder;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -22,12 +23,17 @@ public class BackgroundActivity {
 
     Integer eventId;
     Event currEvent = new Event(eventId);
-    String searchLocation = currEvent.getLocation();
-    Integer searchBudget = currEvent.getBudget().length()+1;
+//    String searchLocation = currEvent.getLocation();
+//    Integer searchBudget = currEvent.getBudget().length()+1;
 
     //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
     // UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
     public void query(){
+        Event currEvent = new Event(eventId);
+        Log.i("Check", currEvent.toString());
+        String searchLocation = currEvent.getLocation();
+        Integer searchBudget = currEvent.getBudget().length()+1;
+
         // OPTIMIZE IF POSSIBLE
         currEvent.listOfRestaurant = new ArrayList<>();
         ArrayList<Restaurant> allInfo = Restaurant.retrieveAllRestaurants();    //TODO may need to add callback
@@ -49,6 +55,7 @@ public class BackgroundActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long countComplete = snapshot.getChildrenCount();
                 stopSwiping(countComplete);
+                findMatch();
             }
 
             @Override
@@ -59,8 +66,6 @@ public class BackgroundActivity {
     private void stopSwiping(long count){
         Group currGroup = new Group(currEvent.group);
         int members = currGroup.memberCount;
-
-
         //if(currEvent.passedDeadline() || count==members)
         if (count == members){
             currEvent.status = "Processing";

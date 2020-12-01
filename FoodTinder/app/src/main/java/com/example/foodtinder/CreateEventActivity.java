@@ -194,6 +194,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onCallback(Event event) { }
             public void onCallback (Group group){}
+            public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
         });
 
     }
@@ -250,14 +251,60 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
             //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
             users_ref.child("listOfEvents").child(eventId).setValue(true);
-            //TODO update all users belonging to the group
-           ArrayList<String> allUsers;
-           Group currGroup = new Group(group);
-           currGroup.updateAllUsers(eventId);
+            final String sendEventId = eventId;
+            ArrayList<String> allUsers;
+            Group currGroup = new Group(group);
+            Group.retrieveGroup(group, new DatabaseCallback() {
+                @Override
+                public void onCallback(ArrayList<String> ls) { }
+                @Override
+                public void onCallback(Event event) { }
 
-            //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
-            Intent backToHome  = new Intent(CreateEventActivity.this, ListEventsActivity.class);
-            startActivity(backToHome);
+                @Override
+                public void onCallback(Group group) {
+                    group.updateAllUsers(sendEventId);
+                }
+
+                @Override
+                public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
+            });
+
+
+            //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
+            // UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
+            final String searchLocation = location;
+            final Integer searchBudget = budget.length()+1;
+
+            currEvent.listOfRestaurant = new ArrayList<>();
+
+            Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
+                @Override
+                public void onCallback(ArrayList<String> ls) { }
+                @Override
+                public void onCallback(Event event) { }
+                @Override
+                public void onCallback(Group group) { }
+
+                @Override
+                public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
+                   for (Restaurant r: allRest){
+                       if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
+                           currEvent.listOfRestaurant.add(r);
+                   }
+
+                    currEvent.ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
+                    currEvent.status = "Ready to swipe";
+                    currEvent.ref.child("status").setValue(currEvent.status);
+
+
+                    //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
+                    Intent backToHome  = new Intent(CreateEventActivity.this, ListEventsActivity.class);
+                    startActivity(backToHome);
+                }
+            });
+
+
+
         }
     }
 

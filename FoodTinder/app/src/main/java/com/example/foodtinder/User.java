@@ -45,7 +45,7 @@ public class User  {
 
     public static void setUserGroups(DatabaseReference userGroups_ref, final DatabaseCallback dbcallback){
         final ArrayList<String> ls = new ArrayList<>();
-        userGroups_ref.addValueEventListener(new ValueEventListener() {
+        userGroups_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot group: snapshot.getChildren())
@@ -62,7 +62,7 @@ public class User  {
 
     public static void setUserEvents (DatabaseReference userEvents_ref, final DatabaseCallback dbcallback){
         final ArrayList<String> ls = new ArrayList<>();
-        userEvents_ref.addValueEventListener(new ValueEventListener() {
+        userEvents_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot event: snapshot.getChildren())

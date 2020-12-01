@@ -23,6 +23,11 @@ public class Dev extends AppCompatActivity {
         super .onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        BackgroundActivity bg = new BackgroundActivity();
+        bg.eventId = 6;
+        bg.query();
+        Log.i("Check", bg.currEvent.listOfRestaurant.toString());
+
         Button enter_btn = findViewById(R.id.enter_btn);
         enter_btn.setOnClickListener(new View.OnClickListener(){
             @Override
