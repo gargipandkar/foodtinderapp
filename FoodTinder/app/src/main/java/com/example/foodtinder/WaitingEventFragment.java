@@ -137,12 +137,14 @@ public class WaitingEventFragment extends Fragment {
 //
         Log.i("Event List", eventsInfoList.toString());
 
-        if (waitingEventFragmentListener == null) {
-            Intent test = new Intent(getActivity(), TestEvent.class);
-            startActivity(test);
-        } else {
-            waitingEventFragmentListener.onListingEvents(eventsInfoList);
-        }
+//        if (waitingEventFragmentListener == null) {
+//            Intent test = new Intent(getActivity(), TestEvent.class);
+//            startActivity(test);
+//        } else {
+//            waitingEventFragmentListener.onListingEvents(eventsInfoList);
+//        }
+        waitingEventFragmentListener.onListingEvents(eventsInfoList);
+
 
 
     }
@@ -160,6 +162,6 @@ public class WaitingEventFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        waitingEventFragmentListener = null;
+//        waitingEventFragmentListener = null;
     }
 }

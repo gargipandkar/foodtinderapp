@@ -198,9 +198,7 @@ public class CreateEventFragment extends Fragment {
                 //TODO update all users belonging to the group
 
 //                listener.onNewEvent(checkEvent, Integer.parseInt(eventId), mName, group, User.getId(), eventDateTimeLong, mLocation, mBudget, eventStatus);
-//                listener.onNewEventUpdate();
-                Intent testing = new Intent(getActivity(), TestEvent.class);
-                startActivity(testing);
+                listener.onNewEventUpdate();
             }
         });
 

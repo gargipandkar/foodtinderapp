@@ -160,9 +160,11 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
     @Override
     public void onNewEventUpdate() {
         Log.i(TAG, "onNewEventUpdate()");
-        Fragment waitingEvent = new WaitingEventFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, waitingEvent).commit();
-        Log.i(TAG, "WaitingEvent Fragment initialised");
+//        Fragment waitingEvent = new WaitingEventFragment();
+//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, waitingEvent).commit();
+//        Log.i(TAG, "WaitingEvent Fragment initialised");
+//        Intent test = new Intent(SignOutActivity.this, TestEvent.class);
+//        startActivity(test);
     }
 
     @Override

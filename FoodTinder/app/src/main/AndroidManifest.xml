@@ -30,14 +30,12 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".ListEventsActivity" />
         <activity android:name=".CreateGroupActivity" />
         <activity android:name=".TestEvent" />
         <activity android:name=".EventSelectionActivity" />
         <activity android:name=".EventFinalActivity" />
         <activity android:name=".DisplayGroupLink"/>
         <activity android:name=".GroupLandingPage"/>
-        <activity android:name=".ListGroupsActivity"/>
         <activity android:name=".Swiping"/>
 
 
