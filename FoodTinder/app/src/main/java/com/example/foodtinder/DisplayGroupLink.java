@@ -27,8 +27,6 @@ public class DisplayGroupLink extends AppCompatActivity {
         Button btn_shareLink = findViewById(R.id.btn_shareLink);
 
         grpLink.setText(currLink);
-        //TODO get and display group link
-
         btn_shareLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

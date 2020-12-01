@@ -90,7 +90,7 @@ public class ListGroupsActivity extends AppCompatActivity {
 
         for (int i = 0; i < groupCount; i++) {
             TextView listItem = new TextView(this);
-            listItem.setText(groupsInfoList.get(i).getName());
+            listItem.setText(groupsInfoList.get(i).getName()+groupsInfoList.get(i).getMemberCount());
             listItem.setId(i);
             layoutListEvents.addView(listItem);
         }

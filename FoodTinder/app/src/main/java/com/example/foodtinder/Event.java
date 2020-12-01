@@ -33,7 +33,7 @@ public class Event {
     String decision;
 
     ArrayList<Restaurant> listOfRestaurant;
-    HashMap<String, ArrayList<String>> RestaurantPreferences;
+    HashMap<String, ArrayList<Object>> RestaurantPreferences;
 
     static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
     DatabaseReference ref = db.child("EVENTS").child(String.valueOf(id));
@@ -194,6 +194,7 @@ public class Event {
     public long getEventDateTime(){return this.eventDateTime;}
     public long getPrefDateTime(){return this.prefDateTime;}
     public Boolean getActive(){return this.active;}
+    public HashMap<String, ArrayList<Object>> getRestaurantPreferences(){return RestaurantPreferences;}
 
     @Exclude
     public ArrayList<String> getDisplayDetails(){

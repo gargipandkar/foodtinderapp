@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".Swiping">
-    <!-- substitute Home for A -->
+
     <ImageView
         android:id="@+id/rest_image"
         android:layout_width="400dp"

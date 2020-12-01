@@ -21,15 +21,11 @@ public class CreateGroupActivity extends AppCompatActivity {
         btn_create_grp = findViewById(R.id.btn_create_group);
         grpName = findViewById(R.id.in_grpName);
 
-
-        //TODO call to build link with grpId as parameter
-
         btn_create_grp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // CREATE GROUP OBJECT AND SEND TO FIREBASE
                 final Group currGroup = Group.createGroup(grpName.getText().toString());
-                //
 
                 Intent displayLink = new Intent(CreateGroupActivity.this, DisplayGroupLink.class);
                 displayLink.putExtra("grpId", currGroup.id);

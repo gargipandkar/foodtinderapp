@@ -1,12 +1,18 @@
 package com.example.foodtinder;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.InputStream;
 
 public class Dev extends AppCompatActivity {
     @Override
@@ -26,3 +32,4 @@ public class Dev extends AppCompatActivity {
 
     }
 }
+

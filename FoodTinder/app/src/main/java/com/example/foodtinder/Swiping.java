@@ -6,6 +6,10 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -25,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.security.Timestamp;
 import java.util.ArrayList;
@@ -129,6 +134,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
         rest_name.setText("Name");
         rest_desc.setText("Address");
         rest_rating.setText("Rating");
+
         //assign default image to ImageView here
 
 
@@ -163,7 +169,6 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                     }
                 });
 
-
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -188,6 +193,8 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
         String convert_rating = String.valueOf(item.get("rating"));
         rest_rating.setText(convert_rating);
         //TODO assign image link to ImageView
+        ArrayList<String> imgLinks = (ArrayList<String>)item.get("images");
+        new DownloadImageTask((ImageView) findViewById(R.id.rest_image)).execute(imgLinks.get(0));
 
         Log.i("Check", "Item "+number[0]);
 
@@ -204,9 +211,8 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                     number[0]++;
                     // UPDATE DATABASE VOTES LIST
                     restVote_ref.setValue((listRestVotes));
-
-
-
+                    //CHECK IF ALL MEMBERS HAVE FINISHED SWIPING, IF YES MAKE DECISION
+                    stillSwiping();
                     // GO BACK TO HOME PAGE
                     Intent next = new Intent(Swiping.this, ListEventsActivity.class);
                     startActivity(next);
@@ -255,6 +261,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
     // CHECK WHETHER DEADLINE HAS PASSED OR EVERYONE HAS SWIPED
     // UPDATE EVENT STATUS TO PROCESSING
     public void stillSwiping(){
+        Log.i("Swiping", "Check who has completed swiping");
         DatabaseReference countComplete_ref =selectedEvent.ref.child("RestaurantPreferences").child("listOfCompleted");
         countComplete_ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -268,21 +275,38 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
         });
     }
 
-    private void stopSwiping(long count){
-        Group currGroup = new Group(selectedEvent.group);
-        int members = currGroup.memberCount;
+    private void stopSwiping(final long count){
+        Log.i("Swiping", "Check if swiping stage over");
 
-        //if(selectedEvent.passedDeadline() || count==members)
-        if (count == members){
-            selectedEvent.status = "Processing";
-            selectedEvent.ref.child("status").setValue(selectedEvent.status);
-            findMatch();
-        }
+        Group.retrieveGroup(selectedEvent.group, new DatabaseCallback() {
+            @Override
+            public void onCallback(ArrayList<String> ls) { }
+            @Override
+            public void onCallback(Event event) { }
+
+            @Override
+            public void onCallback(Group grp) {
+                int members = grp.memberCount;
+
+                Log.i("Swiping", "Needed "+members+"/Have "+count);
+                //if(selectedEvent.passedDeadline() || count==members)
+                if (count == members){
+                    selectedEvent.status = "Processing";
+                    selectedEvent.ref.child("status").setValue(selectedEvent.status);
+                    findMatch();
+                }
+            }
+
+            @Override
+            public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
+        });
+
     }
 
     // GET SWIPING RESULTS AND DETERMINE MOST POPULAR RESTAURANT
     // UPDATE DECISION TO RESTAURANT NAME AND EVENT STATUS TO MATCH FOUND
     public void findMatch(){
+        Log.i("Swiping", "Find a match");
         DatabaseReference restVote_ref = selectedEvent.ref.child("RestaurantPreferences").child("listOfVotes");
         restVote_ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -295,16 +319,43 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
                     maxVotes = Collections.max(listVotes);
                     restPos = listVotes.indexOf(maxVotes);
 
-                    String name = selectedEvent.listOfRestaurant.get(restPos).name;
+                    String name = (String) listRestInfo.get(restPos).get("name");
 
                     selectedEvent.setDecision(name, selectedEvent.getId());
                     selectedEvent.updateEventStatus(selectedEvent.getId());
                 }
                 else Log.i("Check", "No list of votes found");
+
+                Log.i("Swiping", selectedEvent.decision);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
         });
+    }
+}
+
+class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+    ImageView bmImage;
+
+    public DownloadImageTask(ImageView bmImage) {
+        this.bmImage = bmImage;
+    }
+
+    protected Bitmap doInBackground(String... urls) {
+        String urldisplay = urls[0];
+        Bitmap mIcon11 = null;
+        try {
+            InputStream in = new java.net.URL(urldisplay).openStream();
+            mIcon11 = BitmapFactory.decodeStream(in);
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
+        return mIcon11;
+    }
+
+    protected void onPostExecute(Bitmap result) {
+        bmImage.setImageBitmap(result);
     }
 }
