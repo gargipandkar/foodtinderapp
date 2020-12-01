@@ -43,20 +43,42 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
     ImageView rest_image;
 
     String user_id;
+    Integer event_id;
     Event selectedEvent;
 
     final int[] number = {0};   //FOR ITERATING THROUGH RESTAURANT LIST
-    HashMap<String, String> item;
+    HashMap<String, Object> item;
     ArrayList<Integer> listRestVotes;
-    ArrayList<HashMap<String, String>> listRestInfo;
+    ArrayList<HashMap<String, Object>> listRestInfo;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //IDEALLY DON'T COME HERE ONLY IF EVENT STATUS IS READY TO SWIPE
         //TODO receive Event object from clicking in list of events and put it into selectedEvent
         user_id = User.getId();
-        selectedEvent = new Event(3);   //TEMPORARY, USED TO GET EXISTING EVENT
+//        String convertId = getIntent().getStringExtra("eventId");
+//        event_id = Integer.getInteger(convertId);
+
+//        Log.i("Info argument", convertId);
+        //RETRIEVE EVENT TO BE SWIPED FROM FIREBASE
+        /*selectedEvent = new Event();
+        selectedEvent.retrieveEvent(event_id, new DatabaseCallback() {
+            @Override
+            public void onCallback(ArrayList<String> ls) { }
+            @Override
+            public void onCallback(Group grp) { }
+            @Override
+            public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
+
+            @Override
+            public void onCallback(Event event) {
+
+            }
+        });*/
+        selectedEvent = new Event(33);
+
 
         final DatabaseReference completed_ref = selectedEvent.ref.child("RestaurantPreferences/listOfCompleted");
         final DatabaseReference listRest_ref = selectedEvent.ref.child("listOfRestaurant");
@@ -114,8 +136,8 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
         listRest_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<ArrayList<HashMap<String, String>>> gt = new GenericTypeIndicator<ArrayList<HashMap<String, String>>>() {};
-                final ArrayList<HashMap<String, String>> arr = dataSnapshot.getValue(gt);
+                GenericTypeIndicator<ArrayList<HashMap<String, Object>>> gt = new GenericTypeIndicator<ArrayList<HashMap<String, Object>>>() {};
+                final ArrayList<HashMap<String, Object>> arr = dataSnapshot.getValue(gt);
 
                 // RETRIEVE LIST OF VOTES, IF ANY AND CREATE LOCAL COPY
                 restVote_ref.addValueEventListener(new ValueEventListener() {
@@ -152,7 +174,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
 
     // GETS RESTAURANT INFORMATION TO DISPLAY AS NEXT ITEM
-    public void select_restaurant(final ArrayList<HashMap<String, String>> arr) {
+    public void select_restaurant(final ArrayList<HashMap<String, Object>> arr) {
         Log.i("Check", arr.toString());
         Log.i("Check", listRestVotes.toString());
 
@@ -160,10 +182,11 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
         item = arr.get(number[0]);
         //Log.i("restaurant", item.toString());
 
-        rest_name.setText(item.get("name"));
+        rest_name.setText((String)item.get("name"));
         Log.i("name", rest_name.getText().toString());
-        rest_desc.setText(item.get("formatted_address"));
-        rest_rating.setText(item.get("rating"));
+        rest_desc.setText((String)item.get("formattedAddress"));
+        String convert_rating = String.valueOf(item.get("rating"));
+        rest_rating.setText(convert_rating);
         //TODO assign image link to ImageView
 
         Log.i("Check", "Item "+number[0]);
@@ -248,6 +271,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
     private void stopSwiping(long count){
         Group currGroup = new Group(selectedEvent.group);
         int members = currGroup.memberCount;
+
         //if(selectedEvent.passedDeadline() || count==members)
         if (count == members){
             selectedEvent.status = "Processing";
@@ -273,8 +297,8 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
                     String name = selectedEvent.listOfRestaurant.get(restPos).name;
 
-                    selectedEvent.setDecision(name);
-                    selectedEvent.updateEventStatus();
+                    selectedEvent.setDecision(name, selectedEvent.getId());
+                    selectedEvent.updateEventStatus(selectedEvent.getId());
                 }
                 else Log.i("Check", "No list of votes found");
             }

@@ -1,6 +1,7 @@
 package com.example.foodtinder;
 
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -8,6 +9,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Array;
@@ -20,17 +22,17 @@ public class Restaurant {
     static Integer count = 0;
     String name;
     String formatted_address;
-    Integer rating;
+    Long rating;
     String business_status;
-    Integer price_level;
+    Long price_level;
     String location;
     ArrayList<String> images;
     
-    static DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("RESTAURANTS");
+    static DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("RESTAURANT");
     
     Restaurant(){}
     
-    Restaurant(String name, String formatted_address, String business_status, Integer rating, Integer price_level, String location, ArrayList<String> images){
+    Restaurant(String name, String formatted_address, String business_status, Long rating, Long price_level, String location, ArrayList<String> images){
         this.name=name;
         this.rating=rating;
         this.business_status=business_status;
@@ -43,12 +45,24 @@ public class Restaurant {
 
     Restaurant(String name, HashMap<String, Object> info, ArrayList<String> images){
         this.name=name;
-        this.rating=(Integer) info.get("rating");
-        this.business_status=(String)info.get(business_status);
-        this.formatted_address=(String) info.get(formatted_address);
+        this.rating=(Long) info.get("rating");
+        this.business_status=(String)info.get("business_status");
+        this.formatted_address=(String) info.get("formatted_address");
         this.images=images;
-        this.location=(String)info.get(location);
-        this.price_level=(Integer)info.get(price_level);
+        this.location=(String)info.get("location");
+        this.price_level=(Long) info.get("price_level");
+        count++;
+    }
+
+    Restaurant(HashMap<String, Object> info){
+        this.name=(String)info.get("name");
+        this.rating=(Long) info.get("rating");
+        this.business_status=(String)info.get("business_status");
+        this.formatted_address=(String) info.get("formatted_address");
+        this.images = new ArrayList<>();
+        this.images.addAll((ArrayList<String>) info.get("images"));
+        this.location=(String)info.get("location");
+        this.price_level=(Long)info.get("price_level");
         count++;
     }
 
@@ -61,8 +75,13 @@ public class Restaurant {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot item: snapshot.getChildren())
-                    allInfo.add((Restaurant) item.getValue());
+                GenericTypeIndicator<HashMap<String, Object>> gt = new GenericTypeIndicator<HashMap<String, Object>>() {};
+                for(DataSnapshot item: snapshot.getChildren()){
+                    HashMap<String, Object> temp = item.getValue(gt);
+                    Restaurant r = new Restaurant(temp);
+                    allInfo.add(r);
+                }
+                Log.i("Retrieve Restaurants", allInfo.toString());
                 dbcallback.onCallback(allInfo, true);
             }
 
@@ -76,8 +95,8 @@ public class Restaurant {
     public String getName(){return this.name;}
     public String getFormattedAddress(){return this.formatted_address;}
     public String getBusinessStatus(){return this.business_status;}
-    public Integer getRating(){return this.rating;}
+    public Long getRating(){return this.rating;}
     public String getLocation(){return this.location;}
-    public Integer getPriceLevel(){return this.price_level;}
+    public Long getPriceLevel(){return this.price_level;}
     public ArrayList<String> getImages(){return this.images;}
 }

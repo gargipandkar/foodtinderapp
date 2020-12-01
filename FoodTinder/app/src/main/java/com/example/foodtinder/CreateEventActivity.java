@@ -239,7 +239,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
         if (v == btnCreateEvent){
             eventCount++;
             eventCount_ref.setValue(eventCount);
-            String eventId = String.valueOf(eventCount);
+            final String eventId = String.valueOf(eventCount);
             eventStatus = "Created";
 
             //CONVERT CALENDAR TO LONG
@@ -258,54 +258,55 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                 public void onCallback(ArrayList<String> ls) { }
                 @Override
                 public void onCallback(Event event) { }
+                @Override
+                public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
 
                 @Override
                 public void onCallback(Group grp) {
                     Log.i("Check", grp.toString());
                     grp.updateAllUsers(sendEventId, group);
+
+                    //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
+                    //UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
+                    final String searchLocation = location;
+                    final Long searchBudget = new Long(budget.length()+1);
+
+                    Log.i("Query", searchLocation+searchBudget);
+                    final DatabaseReference currEvent_ref = db.child("EVENTS").child(String.valueOf(eventId));
+                    currEvent.listOfRestaurant = new ArrayList<>();
+
+                    Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
+                        @Override
+                        public void onCallback(ArrayList<String> ls) { }
+                        @Override
+                        public void onCallback(Event event) { }
+                        @Override
+                        public void onCallback(Group grp) { }
+
+                        @Override
+                        public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
+                            Log.i("Retrieve Restaurants", allRest.toString());
+                            for (Restaurant r: allRest){
+                                if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
+                                    currEvent.listOfRestaurant.add(r);
+                            }
+
+                            currEvent_ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
+                            currEvent.status = "Ready to swipe";
+                            currEvent_ref.child("status").setValue(currEvent.status);
+                        }
+                    });
+
                 }
 
-                @Override
-                public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
+
             });
 
 
-            //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
-            // UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
-            final String searchLocation = location;
-            final Integer searchBudget = budget.length()+1;
-
-            currEvent.listOfRestaurant = new ArrayList<>();
-
-            Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
-                @Override
-                public void onCallback(ArrayList<String> ls) { }
-                @Override
-                public void onCallback(Event event) { }
-                @Override
-                public void onCallback(Group grp) { }
-
-                @Override
-                public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
-                   for (Restaurant r: allRest){
-                       if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
-                           currEvent.listOfRestaurant.add(r);
-
-                       currEvent.ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
-                       currEvent.status = "Ready to swipe";
-                       currEvent.ref.child("status").setValue(currEvent.status);
-
-
-                       //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
-                       Intent backToHome  = new Intent(CreateEventActivity.this, ListEventsActivity.class);
-                       startActivity(backToHome);
-                   }
-
-
-                }
-            });
-
-
+            //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
+            Intent next  = new Intent(CreateEventActivity.this, Swiping.class);
+            next.putExtra("eventId", eventId);
+            startActivity(next);
 
         }
     }

@@ -42,15 +42,18 @@ public class Event {
 
     Event(){}
 
-    Event(Integer id){
+    Event(final Integer id){
         this.id = id;
-        this.ref = db.child("EVENTS").child(String.valueOf(id));
-        this.ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref = db.child("EVENTS").child(String.valueOf(id));
+        Log.i("Info argument", String.valueOf(id));
+        Log.i("Info argument", ref.toString());
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 GenericTypeIndicator<HashMap<String , Object>> gt = new GenericTypeIndicator<HashMap<String, Object>>() {};
                 HashMap<String, Object> info = snapshot.getValue(gt);
-                updateEvent(info);
+                Log.i("Info argument", info.toString());
+                updateEvent(info, id);
             }
 
             @Override
@@ -62,7 +65,7 @@ public class Event {
 
 
     //SEND EVENT OBJECT VIA CALLBACK
-    public void retrieveEvent(Integer id, final DatabaseCallback dbcallback){
+    public void retrieveEvent(final Integer id, final DatabaseCallback dbcallback){
         this.id = id;
         this.ref = db.child("EVENTS").child(String.valueOf(id));
         this.ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -71,7 +74,7 @@ public class Event {
                 GenericTypeIndicator<HashMap<String , Object>> gt = new GenericTypeIndicator<HashMap<String, Object>>() {};
                 HashMap<String, Object> info = snapshot.getValue(gt);
                 //Log.i("Check", info.toString());
-                Event updated = updateEvent(info);
+                Event updated = updateEvent(info, id);
                 dbcallback.onCallback(updated);
             }
 
@@ -99,12 +102,12 @@ public class Event {
         this.listOfRestaurant = null;
     }
 
-    public Event updateEvent(HashMap<String, Object> info){
-
+    public Event updateEvent(HashMap<String, Object> info, Integer id){
+        this.id = id;
         this.name = (String) info.get("name");
         this.group = (String) info.get("group");
         this.host = (String) info.get("host");
-        updateEventStatus();
+        updateEventStatus(id);
         //checkExpiry();
         this.decision = (String) info.get("decision");
         this.listOfRestaurant = (ArrayList<Restaurant>) info.get("listOfRestaurant");
@@ -150,27 +153,30 @@ public class Event {
 
      */
 
-    public void updateEventStatus(){
+    public void updateEventStatus(final Integer id){
         final String[] chosen = {""};
+        ref = db.child("EVENTS").child(String.valueOf(id));
         ref.child("decision").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 chosen[0]=snapshot.getValue(String.class);
-                setDecision(chosen[0]);
+                setDecision(chosen[0], id);
                 if (!chosen[0].equals("Undecided"))
-                    setStatus("Match found");
+                    setStatus("Match found", id);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
         });
     }
 
-    void setStatus(String status){
+    void setStatus(String status, Integer id){
+        ref = db.child("EVENTS").child(String.valueOf(id));
         this.status = status;
         ref.child("status").setValue(status);
     }
 
-    void setDecision(String decision){
+    void setDecision(String decision, Integer id){
+        ref = db.child("EVENTS").child(String.valueOf(id));
         this.decision = decision;
         ref.child("decision").setValue(decision);
     }
