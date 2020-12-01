@@ -23,23 +23,23 @@ public class User  {
     static ArrayList<String> activeEvents = new ArrayList<>();
     static ArrayList<String> inGroups = new ArrayList<>();
 
+    static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+    static DatabaseReference ref = db.child("USERS").child(id);
+
+
     User(){}
 
     User(String in_id, String in_name, String in_email){
-        id = in_id;
+        id = in_id = "user";
         name = in_name;
         email = in_email;
     }
 
-    @Exclude
     public static String getId(){ return id;}
     public static String getName(){return name;}
     public static String getEmail(){return email;}
 
     public static void addGroup(String groupId){
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = db.child("USERS").child(id);
-
         ref.child("inGroups").child(groupId).setValue(true);
     }
 
@@ -76,4 +76,5 @@ public class User  {
             }
         });
     }
+
 }

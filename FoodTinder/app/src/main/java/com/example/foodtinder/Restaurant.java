@@ -30,7 +30,7 @@ public class Restaurant {
     
     Restaurant(){}
     
-    Restaurant(String name, String formatted_address, Integer rating, String business_status, Integer price_level, String location, ArrayList<String> images){
+    Restaurant(String name, String formatted_address, String business_status, Integer rating, Integer price_level, String location, ArrayList<String> images){
         this.name=name;
         this.rating=rating;
         this.business_status=business_status;

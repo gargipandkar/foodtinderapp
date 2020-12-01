@@ -6,4 +6,6 @@ import java.util.ArrayList;
 
 public interface DatabaseCallback {
     void onCallback(ArrayList<String> ls);
+
+    void onCallback(Event event);
 }

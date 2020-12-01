@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class Dev extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -25,7 +28,7 @@ public class Dev extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i("Check", "Button clicked");
-                Intent toCreateEvent = new Intent(Dev.this, CreateGroupActivity.class);
+                Intent toCreateEvent = new Intent(Dev.this, ListEventsActivity.class);
                 startActivity(toCreateEvent);
             }
         });

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,15 +45,19 @@ public class GroupLandingPage extends AppCompatActivity {
                         }
 
                         if (deepLink != null){
-                            String grpId = deepLink.getQueryParameter("grpId");
+                            final String grpId = deepLink.getQueryParameter("grpId");
                             if (grpId != null) {
+                                final Group joiningGroup = new Group(grpId);
                                 AlertDialog.Builder builder = new AlertDialog.Builder(GroupLandingPage.this);
-                                builder.setMessage("Join group? Grp Id: " + grpId)
+                                builder.setMessage("You have been invited to a group: " + joiningGroup.getName() + "\nDo you want to join the group?")
                                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-                                                //TODO Create group object with id
-                                                //TODO Add user to this group id's list
-                                                //TODO Add intent to go to ListGroupsActivity
+                                                //Add user to this group id's list
+                                               // joiningGroup.addUser(user);//user should be a proper User object of the authenticated user.
+                                                //Add intent to go to newly joined group page
+                                                Intent toGroupPage = new Intent(GroupLandingPage.this, ListGroupsActivity.class);
+                                                startActivity(toGroupPage);
+
                                             }
                                         })
                                         .setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -72,7 +77,7 @@ public class GroupLandingPage extends AppCompatActivity {
                 .addOnFailureListener(GroupLandingPage.this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e("GroupLandingPage", "getDynamicLink failure", e);
+                        Log.e("GroupPage", "getDynamicLink failure", e);
                     }
                 });
     }

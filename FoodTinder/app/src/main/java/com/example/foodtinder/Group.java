@@ -1,6 +1,8 @@
 package com.example.foodtinder;
 
+import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.AndroidRuntimeException;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,6 +12,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,7 @@ public class Group {
     ArrayList<String> membersList;
     ArrayList<String> eventsList;
     DatabaseReference ref;
+    String link;
 
     Group(){}
 
@@ -70,6 +75,25 @@ public class Group {
         //event.ref.child("group").setValue(this.id);
     }
 
+    void updateAllUsers(final String eventId){
+        //GO TO EVERY USER IN THIS GROUP, GO TO THEIR LIST OF EVENTS AND ADD SENT IN EVENT
+        ref.child("listOfMembers").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<String> allUsers = (ArrayList<String>) snapshot.getValue(ArrayList.class);
+                for(String user: allUsers){
+                    DatabaseReference u = db.child("USERS").child(user).child("activeEvents");
+                    u.child(eventId).setValue(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 
     String getName(){
         if (name == null){
@@ -88,7 +112,20 @@ public class Group {
         return this.name;
     }
 
-    String getShareableLink() {return "link_here";}
+    String getShareableLink() {
+        DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse("https://foodtinder.example.com/?grpId="+this.id))
+                .setDomainUriPrefix("https://foodtinder.page.link")
+                // Open links with this app on Android
+                .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                // Open links with com.example.ios on iOS
+                .setIosParameters(new DynamicLink.IosParameters.Builder("com.example.ios").build())
+                .buildDynamicLink();
+
+        String dynamicLinkString = dynamicLink.getUri().toString();
+        this.link = dynamicLinkString;
+        return dynamicLinkString;
+    }
     
     private Integer getMemberCount(){
         return membersList.size();

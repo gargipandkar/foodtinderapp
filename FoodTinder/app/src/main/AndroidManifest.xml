@@ -38,7 +38,19 @@
         <activity android:name=".IndicatePreferencesActivity_UNUSED"/>
         <activity android:name=".CreateGroupActivity"/>
         <activity android:name=".DisplayGroupLink"/>
-        <activity android:name=".GroupPage"/>
+        <activity android:name=".GroupLandingPage">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="foodtinder.example.com"
+                    android:scheme="https"/>
+                <data
+                    android:host="foodtinder.example.com"
+                    android:scheme="http"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

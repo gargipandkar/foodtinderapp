@@ -20,15 +20,12 @@ import java.util.Map;
 
 public class Event {
 
-    static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference ref;
-
     Integer id;     //USE AS KEY FOR DATABASE, BUT STORE COPY ALSO
     String name;
     String group;
     String host;
-    Calendar eventDateTime;
-    Calendar prefDateTime;
+    Long eventDateTime;
+    Long prefDateTime;
     String location;
     String budget;
     String status;
@@ -37,7 +34,12 @@ public class Event {
 
     ArrayList<Restaurant> listOfRestaurant;
 
+    static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference ref = db.child("EVENTS").child(String.valueOf(id));
+
     //preference related variables, if required
+
+    Event(){}
 
     Event(Integer id){
         this.id = id;
@@ -57,32 +59,57 @@ public class Event {
         });
     }
 
-    Event(Integer id, String name, String group, String host, Calendar eventDateTime, String location, String budget, String prefDeadline, String eventStatus){
+
+    //SEND EVENT OBJECT VIA CALLBACK
+    public void retrieveEvent(Integer id, final DatabaseCallback dbcallback){
+        this.id = id;
+        this.ref = db.child("EVENTS").child(String.valueOf(id));
+        this.ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                GenericTypeIndicator<HashMap<String , Object>> gt = new GenericTypeIndicator<HashMap<String, Object>>() {};
+                HashMap<String, Object> info = snapshot.getValue(gt);
+                //Log.i("Check", info.toString());
+                Event updated = updateEvent(info);
+                dbcallback.onCallback(updated);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.i("Check", error.toString());
+            }
+        });
+    }
+
+    Event(Integer id, String name, String group, String host, Long eventDateTime, String location, String budget, String prefDeadline, String eventStatus){
         this.id = id;
         this.name = name;
         this.group = group;
         this.host = host;
         this.eventDateTime = eventDateTime;
-        setPrefDeadline(prefDeadline);
+        //setPrefDeadline(prefDeadline);
         this.location = location;
         this.budget = budget;
         updateEventStatus();
-        checkExpiry();
+        //checkExpiry();
         this.decision = "Undecided";
         this.ref = db.child("EVENTS").child(String.valueOf(this.id));
         this.listOfRestaurant = null;
     }
 
-    public void updateEvent(HashMap<String, Object> info){
+    public Event updateEvent(HashMap<String, Object> info){
+
         this.name = (String) info.get("name");
         this.group = (String) info.get("group");
         this.host = (String) info.get("host");
         updateEventStatus();
-        checkExpiry();
+        //checkExpiry();
         this.decision = (String) info.get("decision");
         this.listOfRestaurant = (ArrayList<Restaurant>) info.get("listOfRestaurant");
+        return this;
     }
 
+    /*
     public void setPrefDeadline(String prefDeadline){
         switch (prefDeadline){
             case "1 day before": this.prefDateTime = (Calendar)this.eventDateTime.clone();
@@ -102,6 +129,7 @@ public class Event {
         }
     }
 
+
     public void checkExpiry(){
         Calendar now = Calendar.getInstance();
         if (this.eventDateTime.after(now))
@@ -115,6 +143,8 @@ public class Event {
             return true;
         return false;
     }
+
+     */
 
     public void updateEventStatus(){
         final String[] chosen = {""};
@@ -151,8 +181,8 @@ public class Event {
     public String getBudget(){return this.budget;}
     public String getStatus(){return this.status;}
     public String getDecision(){return this.decision;}
-    public long getEventDateTime(){return this.eventDateTime.getTimeInMillis();}
-    public long getPrefDateTime(){return this.prefDateTime.getTimeInMillis();}
+    public long getEventDateTime(){return this.eventDateTime;}
+    public long getPrefDateTime(){return this.prefDateTime;}
     public Boolean getActive(){return this.active;}
 
     @Exclude
@@ -162,10 +192,6 @@ public class Event {
         display.add(this.group);
         display.add(this.eventDateTime.toString());
         display.add(this.status);
-        if (!this.status.equals("Decided"))
-            display.add(this.prefDateTime.toString());
-        if (!this.decision.equals("Undecided"))
-            display.add(this.decision);
         return display;
     }
 

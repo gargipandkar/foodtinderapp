@@ -11,12 +11,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class DisplayGroupLink extends AppCompatActivity {
 
+    String grpId;
+    Group currGroup;
+    String currLink;
+
     protected void onCreate(Bundle savedInstance){
         super.onCreate(savedInstance);
         setContentView(R.layout.activity_grouplink);
 
-        String grpId = getIntent().getStringExtra("grpId");
-        Group currGroup = new Group(grpId);
+        grpId = getIntent().getStringExtra("grpId");
+        currGroup = new Group(grpId);
+        currLink = currGroup.getShareableLink();
 
         TextView grpLink = findViewById(R.id.out_groupLink);
         Button btn_shareLink = findViewById(R.id.btn_shareLink);
@@ -35,11 +40,15 @@ public class DisplayGroupLink extends AppCompatActivity {
     private void onShareClicked() {
         Uri link = Uri.parse("https://foodtinder.page.link"); //GET GROUP'S UNIQUE LINK
 
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, link.toString());
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.setType("text/plain");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, currLink);
+        startActivity(Intent.createChooser(sendIntent, "Share Link"));
 
-        startActivity(Intent.createChooser(intent, "Share Link"));
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        startActivity(shareIntent);
+
+
     }
 
 }

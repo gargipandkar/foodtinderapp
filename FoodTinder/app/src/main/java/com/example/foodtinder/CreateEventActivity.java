@@ -190,6 +190,9 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                 Log.i("Check", User.getId());
                 Log.i("Check", groupOptions.toString());
             }
+
+            @Override
+            public void onCallback(Event event) { }
         });
 
     }
@@ -237,15 +240,19 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             String eventId = String.valueOf(eventCount);
             eventStatus = "Created";
 
+            //CONVERT CALENDAR TO LONG
+            Long dt = eventDateTime.getTimeInMillis();
             //WRITE TO "EVENTS" DATABASE
-            currEvent = new Event(Integer.getInteger(eventId), txtName.getText().toString(), group, User.getId(), eventDateTime, location, budget, deadline, eventStatus);
+            currEvent = new Event(Integer.getInteger(eventId), txtName.getText().toString(), group, User.getId(), dt, location, budget, deadline, eventStatus);
             events_ref.child(eventId).setValue(currEvent);
             Log.i("Check", "Event created");
 
             //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
             users_ref.child("listOfEvents").child(eventId).setValue(true);
             //TODO update all users belonging to the group
-           
+           ArrayList<String> allUsers;
+           Group currGroup = new Group(group);
+           currGroup.updateAllUsers(eventId);
 
             //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
             Intent backToHome  = new Intent(CreateEventActivity.this, ListEventsActivity.class);

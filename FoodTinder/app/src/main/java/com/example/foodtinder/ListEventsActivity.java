@@ -10,18 +10,23 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ListEventsActivity extends AppCompatActivity {
 
     DatabaseReference db, events_ref;
 
     ArrayList<String> eventsList = new ArrayList<>();
+    ArrayList<Event> eventsInfoList = new ArrayList<>();
+    HashMap<String, Event> allEvents = new HashMap<>();
     int eventCount;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,16 +38,18 @@ public class ListEventsActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance().getReference();
         events_ref = db.child("USERS").child(User.getId()).child("listOfEvents");
 
-        User.setUserGroups(events_ref, new DatabaseCallback() {
+        User.setUserEvents(events_ref, new DatabaseCallback() {
             @Override
             public void onCallback(ArrayList<String> ls) {
                 eventsList.addAll(ls);
                 eventCount = eventsList.size();
-                displayList();
 
                 User.activeEvents.clear();
                 User.activeEvents.addAll(ls);
 
+                infoList();
+
+                //LOG
                 Log.i("Check", ls.toString());
                 Log.i("Check", User.getId());
                 Log.i("Check", eventsList.toString());
@@ -50,17 +57,45 @@ public class ListEventsActivity extends AppCompatActivity {
 
             }
 
+            @Override
+            public void onCallback(Event event){}
+
         });
 
+
+    }
+
+    void infoList(){
+        final DatabaseReference allEvents_ref = db.child("EVENTS");
+        allEvents_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                GenericTypeIndicator<HashMap<String, Event>> gt = new GenericTypeIndicator<HashMap<String, Event>>() {};
+                allEvents = snapshot.getValue(gt);
+
+                eventsInfoList.clear();
+                for (String i: eventsList) {
+                    eventsInfoList.add(allEvents.get(i));
+                }
+               // Log.i("Check", eventsInfoList.toString());
+                displayList();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
 
     }
 
     void displayList(){
         LinearLayout layoutListEvents = findViewById(R.id.listevents_layout);
 
+        Log.i("Check", eventsInfoList.toString());
+
         for (int i = 0; i < eventCount; i++) {
             TextView listItem = new TextView(this);
-            listItem.setText(eventsList.get(i));
+            listItem.setText(eventsList.get(i)+eventsInfoList.get(i).name);
             listItem.setId(i);
             layoutListEvents.addView(listItem);
         }

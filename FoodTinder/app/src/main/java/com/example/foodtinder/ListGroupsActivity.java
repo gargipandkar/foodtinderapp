@@ -48,6 +48,8 @@ public class ListGroupsActivity extends AppCompatActivity {
 
             }
 
+            @Override
+            public void onCallback(Event event){}
 
         });
 

@@ -1,5 +1,7 @@
 package com.example.foodtinder;
 
+import android.os.AsyncTask;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
@@ -55,10 +57,11 @@ public class BackgroundActivity {
         Group currGroup = new Group(currEvent.group);
         int members = currGroup.memberCount;
 
+        /*
         if(currEvent.passedDeadline() || count==members) {
             currEvent.status = "Processing";
             currEvent.ref.child("status").setValue(currEvent.status);
-        }
+        }*/
     }
 
     // GET SWIPING RESULTS AND DETERMINE MOST POPULAR RESTAURANT
