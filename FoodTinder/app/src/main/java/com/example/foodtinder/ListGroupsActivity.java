@@ -13,14 +13,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ListGroupsActivity extends AppCompatActivity {
     DatabaseReference db, groups_ref;
 
     ArrayList<String> groupsList = new ArrayList<>();
+    HashMap<String, Group> allGroups = new HashMap<>();
+    ArrayList<Group> groupsInfoList = new ArrayList<>();
     int groupCount = 0;
 
 
@@ -36,10 +40,11 @@ public class ListGroupsActivity extends AppCompatActivity {
             public void onCallback(ArrayList<String> ls) {
                 groupsList.addAll(ls);
                 groupCount = groupsList.size();
-                displayList();
 
                 User.inGroups.clear();
                 User.inGroups.addAll(ls);
+
+                infoList();
 
                 Log.i("Check", ls.toString());
                 Log.i("Check", User.getId());
@@ -50,9 +55,32 @@ public class ListGroupsActivity extends AppCompatActivity {
 
             @Override
             public void onCallback(Event event){}
-
+            public void onCallback (Group group){}
         });
 
+    }
+
+    void infoList(){
+        final DatabaseReference allGroups_ref = db.child("GROUPS");
+        allGroups_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                GenericTypeIndicator<HashMap<String, Group>> gt = new GenericTypeIndicator<HashMap<String, Group>>() {};
+                allGroups = snapshot.getValue(gt);
+
+                groupsInfoList.clear();
+                for (String i: groupsList) {
+                    if (allGroups.containsKey(i))
+                        groupsInfoList.add(allGroups.get(i));
+                }
+                Log.i("Check", groupsInfoList.toString());
+                displayList();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
 
     }
 
@@ -61,7 +89,7 @@ public class ListGroupsActivity extends AppCompatActivity {
 
         for (int i = 0; i < groupCount; i++) {
             TextView listItem = new TextView(this);
-            listItem.setText(groupsList.get(i));
+            listItem.setText(groupsInfoList.get(i).getName());
             listItem.setId(i);
             layoutListEvents.addView(listItem);
         }

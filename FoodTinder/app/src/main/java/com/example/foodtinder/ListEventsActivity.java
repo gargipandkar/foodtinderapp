@@ -26,7 +26,7 @@ public class ListEventsActivity extends AppCompatActivity {
 
     ArrayList<String> eventsList = new ArrayList<>();
     ArrayList<Event> eventsInfoList = new ArrayList<>();
-    HashMap<String, Event> allEvents = new HashMap<>();
+    ArrayList<Event> allEvents = new ArrayList<>();
     int eventCount;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +59,7 @@ public class ListEventsActivity extends AppCompatActivity {
 
             @Override
             public void onCallback(Event event){}
+            public void onCallback (Group group){}
 
         });
 
@@ -70,12 +71,12 @@ public class ListEventsActivity extends AppCompatActivity {
         allEvents_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                GenericTypeIndicator<HashMap<String, Event>> gt = new GenericTypeIndicator<HashMap<String, Event>>() {};
+                GenericTypeIndicator<ArrayList<Event>> gt = new GenericTypeIndicator<ArrayList<Event>>() {};
                 allEvents = snapshot.getValue(gt);
 
                 eventsInfoList.clear();
                 for (String i: eventsList) {
-                    eventsInfoList.add(allEvents.get(i));
+                    eventsInfoList.add(allEvents.get(Integer.valueOf(i)));
                 }
                // Log.i("Check", eventsInfoList.toString());
                 displayList();

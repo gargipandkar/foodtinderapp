@@ -30,7 +30,7 @@ public class User  {
     User(){}
 
     User(String in_id, String in_name, String in_email){
-        id = in_id = "user";
+        id = in_id;
         name = in_name;
         email = in_email;
     }

@@ -24,13 +24,19 @@ public class Group {
     String id;
     String name;
     String creator;
-    Integer memberCount;
+    Integer memberCount = 0;
     ArrayList<String> membersList;
     ArrayList<String> eventsList;
     DatabaseReference ref;
     String link;
 
     Group(){}
+
+    Group (Group group){
+        this.id = group.id;
+        this.name = group.name;
+        this.memberCount = group.memberCount;
+    }
 
     Group(String id, String name, String creator, DatabaseReference members, DatabaseReference events){
         this.id = id;
@@ -47,7 +53,21 @@ public class Group {
         this.id = id;
         this.ref = db.child("GROUPS/" + id);
         //update the local object to have latest values since its async
-        getName();
+        retrieveName();
+    }
+
+    public static void retrieveGroup (String id, final DatabaseCallback dbcallback){
+        DatabaseReference grp_ref = db.child("GROUPS/" + id);
+        grp_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Group grp = snapshot.getValue(Group.class);
+                dbcallback.onCallback(grp);
+                Log.i("Check", grp.toString());
+        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
     }
 
     //function to call when user wants to create a brand new group
@@ -65,8 +85,17 @@ public class Group {
 
     void addUser(){
         //ADD USER TO GROUP AND GROUP TO USER
+        this.ref = db.child("GROUPS").child(this.id);
         this.ref.child("listOfUsers").child(User.getId()).setValue(true);
         User.addGroup(this.id);
+        this.ref.child("memberCount").setValue(this.memberCount+1);
+    }
+
+    void addUser(String grpId){
+        //ADD USER TO GROUP AND GROUP TO USER
+        this.ref = db.child("GROUPS").child(grpId);
+        this.ref.child("listOfUsers").child(User.getId()).setValue(true);
+        User.addGroup(grpId);
         this.ref.child("memberCount").setValue(this.memberCount+1);
     }
 
@@ -95,7 +124,7 @@ public class Group {
     }
 
 
-    String getName(){
+    String retrieveName(){
         if (name == null){
             ref.child("name").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -126,10 +155,7 @@ public class Group {
         this.link = dynamicLinkString;
         return dynamicLinkString;
     }
-    
-    private Integer getMemberCount(){
-        return membersList.size();
-    }
+
 
     public ArrayList<String> getGroupMembers(DatabaseReference groupMembers_ref){
         final ArrayList<String> ls = new ArrayList<>();
@@ -165,4 +191,9 @@ public class Group {
         return ls;
     }
 
+    public String getId(){return this.id;}
+    public String getName(){return this.name;}
+    public String getCreator(){return this.creator;}
+    public Integer getMemberCount(){ return membersList.size(); }
+    
 }

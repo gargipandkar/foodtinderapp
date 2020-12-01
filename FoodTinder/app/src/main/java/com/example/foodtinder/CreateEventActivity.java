@@ -193,6 +193,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onCallback(Event event) { }
+            public void onCallback (Group group){}
         });
 
     }

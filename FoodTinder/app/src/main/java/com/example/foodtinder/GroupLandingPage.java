@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 
 public class GroupLandingPage extends AppCompatActivity {
 
@@ -46,25 +48,36 @@ public class GroupLandingPage extends AppCompatActivity {
 
                         if (deepLink != null){
                             final String grpId = deepLink.getQueryParameter("grpId");
+                            Log.i("Check", grpId);
                             if (grpId != null) {
-                                final Group joiningGroup = new Group(grpId);
-                                AlertDialog.Builder builder = new AlertDialog.Builder(GroupLandingPage.this);
-                                builder.setMessage("You have been invited to a group: " + joiningGroup.getName() + "\nDo you want to join the group?")
-                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                //Add user to this group id's list
-                                               // joiningGroup.addUser(user);//user should be a proper User object of the authenticated user.
-                                                //Add intent to go to newly joined group page
-                                                Intent toGroupPage = new Intent(GroupLandingPage.this, ListGroupsActivity.class);
-                                                startActivity(toGroupPage);
+                                Group.retrieveGroup(grpId, new DatabaseCallback() {
+                                    @Override
+                                    public void onCallback(ArrayList<String> ls) { }
+                                    @Override
+                                    public void onCallback(Event event) { }
 
-                                            }
-                                        })
-                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                            }
-                                        });
-                                builder.create().show();
+                                    @Override
+                                    public void onCallback(Group group) {
+                                        final Group joiningGroup = new Group(group);
+                                        Log.i("Check", joiningGroup.toString());
+
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(GroupLandingPage.this);
+                                        builder.setMessage("You have been invited to a group: " + joiningGroup.getName() + "\nDo you want to join the group?")
+                                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        joiningGroup.addUser(grpId);
+                                                        Intent toGroupPage = new Intent(GroupLandingPage.this, ListGroupsActivity.class);
+                                                        startActivity(toGroupPage);
+
+                                                    }
+                                                })
+                                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                    }
+                                                });
+                                        builder.create().show();
+                                    }
+                                });
                             }
                             else{
                                 Toast.makeText(getApplicationContext(),"Invalid link.", Toast.LENGTH_LONG).show();

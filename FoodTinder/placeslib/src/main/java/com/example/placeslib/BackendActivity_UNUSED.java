@@ -1,4 +1,4 @@
-package com.example.foodtinder;
+package com.example.placeslib;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -141,6 +141,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
                 //TODO call function to run backend code and update event
 
+
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {

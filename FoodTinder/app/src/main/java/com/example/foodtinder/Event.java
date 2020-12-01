@@ -33,6 +33,7 @@ public class Event {
     String decision;
 
     ArrayList<Restaurant> listOfRestaurant;
+    HashMap<String, ArrayList<String>> RestaurantPreferences;
 
     static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
     DatabaseReference ref = db.child("EVENTS").child(String.valueOf(id));

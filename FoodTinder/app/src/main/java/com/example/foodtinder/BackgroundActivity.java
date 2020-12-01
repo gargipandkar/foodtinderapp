@@ -10,10 +10,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.util.Calendar.HOUR;
 
 public class BackgroundActivity {
 
@@ -57,11 +60,12 @@ public class BackgroundActivity {
         Group currGroup = new Group(currEvent.group);
         int members = currGroup.memberCount;
 
-        /*
-        if(currEvent.passedDeadline() || count==members) {
+
+        //if(currEvent.passedDeadline() || count==members)
+        if (count == members){
             currEvent.status = "Processing";
             currEvent.ref.child("status").setValue(currEvent.status);
-        }*/
+        }
     }
 
     // GET SWIPING RESULTS AND DETERMINE MOST POPULAR RESTAURANT
