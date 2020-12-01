@@ -9,7 +9,7 @@ public interface DatabaseCallback {
 
     void onCallback(Event event);
 
-    void onCallback (Group group);
+    void onCallback(Group grp);
 
     void onCallback(ArrayList<Restaurant> allRest, boolean done);
 }

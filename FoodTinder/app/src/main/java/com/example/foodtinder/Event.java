@@ -29,7 +29,7 @@ public class Event {
     String location;
     String budget;
     String status;
-    Boolean active;
+    Boolean active = true;
     String decision;
 
     ArrayList<Restaurant> listOfRestaurant;
@@ -88,10 +88,11 @@ public class Event {
         this.group = group;
         this.host = host;
         this.eventDateTime = eventDateTime;
-        //setPrefDeadline(prefDeadline);
+        setPrefDeadline(prefDeadline);
         this.location = location;
         this.budget = budget;
-        updateEventStatus();
+        this.status = eventStatus;
+        //updateEventStatus();
         //checkExpiry();
         this.decision = "Undecided";
         this.ref = db.child("EVENTS").child(String.valueOf(this.id));
@@ -110,28 +111,30 @@ public class Event {
         return this;
     }
 
-    /*
+    
     public void setPrefDeadline(String prefDeadline){
+        Calendar Edt = Calendar.getInstance();
+        Edt.setTimeInMillis(this.eventDateTime);
+        Calendar Pdt = Calendar.getInstance();
+        Pdt.setTimeInMillis(this.eventDateTime);
         switch (prefDeadline){
-            case "1 day before": this.prefDateTime = (Calendar)this.eventDateTime.clone();
-                                    this.prefDateTime.add(Calendar.DATE, -1);
+            case "1 day before": Pdt.add(Calendar.DATE, -1);
                                     break;
 
-            case "1 week before": this.prefDateTime = (Calendar)this.eventDateTime.clone();
-                                    this.prefDateTime.add(Calendar.WEEK_OF_MONTH, - 1);
+            case "1 week before": Pdt.add(Calendar.WEEK_OF_MONTH, - 1);
                                     break;
 
-            case "Today": this.prefDateTime = (Calendar)this.eventDateTime.clone();
-                        this.prefDateTime.set(Calendar.HOUR_OF_DAY, 23);
-                        this.prefDateTime.set(Calendar.MINUTE, 59);
+            case "Today": Pdt.set(Calendar.HOUR_OF_DAY, 23);
+                        Pdt.set(Calendar.MINUTE, 59);
                         break;
 
-            default: this.prefDateTime = (Calendar)this.eventDateTime.clone();
+            default: break;
         }
+        this.prefDateTime = Pdt.getTimeInMillis();
     }
 
 
-    public void checkExpiry(){
+/*    public void checkExpiry(){
         Calendar now = Calendar.getInstance();
         if (this.eventDateTime.after(now))
             active = false;

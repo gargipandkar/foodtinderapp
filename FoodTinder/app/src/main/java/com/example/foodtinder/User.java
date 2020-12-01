@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.concurrent.Future;
 
 public class User  {
-    private static String id = "userId1";
+    private static String id = "eo9446tPPchl5gD1r2s4atE4CJt2";
     private static String name;
     private static String email;
 
-    static ArrayList<String> activeEvents = new ArrayList<>();
+    static ArrayList<String> listOfEvents = new ArrayList<>();
     static ArrayList<String> inGroups = new ArrayList<>();
 
     static DatabaseReference db = FirebaseDatabase.getInstance().getReference();

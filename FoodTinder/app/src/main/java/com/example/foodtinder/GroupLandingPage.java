@@ -59,8 +59,8 @@ public class GroupLandingPage extends AppCompatActivity {
                                     public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
 
                                     @Override
-                                    public void onCallback(Group group) {
-                                        final Group joiningGroup = new Group(group);
+                                    public void onCallback(Group grp) {
+                                        final Group joiningGroup = new Group(grp);
                                         Log.i("Check", joiningGroup.toString());
 
                                         AlertDialog.Builder builder = new AlertDialog.Builder(GroupLandingPage.this);

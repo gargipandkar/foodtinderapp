@@ -175,7 +175,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
         groupPicker.setAdapter(dataAdapter);
         final ArrayList<String> groupOptions = new ArrayList<>();
         dataAdapter.add("-- Assign to group --");
-        User.setUserGroups(users_ref.child("listOfGroups"), new DatabaseCallback() {
+        User.setUserGroups(users_ref.child("inGroups"), new DatabaseCallback() {
             @Override
             public void onCallback(ArrayList<String> ls) {
                 groupOptions.addAll(ls);
@@ -253,7 +253,6 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             users_ref.child("listOfEvents").child(eventId).setValue(true);
             final String sendEventId = eventId;
             ArrayList<String> allUsers;
-            Group currGroup = new Group(group);
             Group.retrieveGroup(group, new DatabaseCallback() {
                 @Override
                 public void onCallback(ArrayList<String> ls) { }
@@ -261,8 +260,9 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                 public void onCallback(Event event) { }
 
                 @Override
-                public void onCallback(Group group) {
-                    group.updateAllUsers(sendEventId);
+                public void onCallback(Group grp) {
+                    Log.i("Check", grp.toString());
+                    grp.updateAllUsers(sendEventId, group);
                 }
 
                 @Override
@@ -283,23 +283,25 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                 @Override
                 public void onCallback(Event event) { }
                 @Override
-                public void onCallback(Group group) { }
+                public void onCallback(Group grp) { }
 
                 @Override
                 public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
                    for (Restaurant r: allRest){
                        if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
                            currEvent.listOfRestaurant.add(r);
+
+                       currEvent.ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
+                       currEvent.status = "Ready to swipe";
+                       currEvent.ref.child("status").setValue(currEvent.status);
+
+
+                       //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
+                       Intent backToHome  = new Intent(CreateEventActivity.this, ListEventsActivity.class);
+                       startActivity(backToHome);
                    }
 
-                    currEvent.ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
-                    currEvent.status = "Ready to swipe";
-                    currEvent.ref.child("status").setValue(currEvent.status);
 
-
-                    //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
-                    Intent backToHome  = new Intent(CreateEventActivity.this, ListEventsActivity.class);
-                    startActivity(backToHome);
                 }
             });
 

@@ -11,11 +11,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.dynamiclinks.DynamicLink;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Group {
@@ -104,14 +106,16 @@ public class Group {
         //event.ref.child("group").setValue(this.id);
     }
 
-    void updateAllUsers(final String eventId){
+    void updateAllUsers(final String eventId, final String grpId){
         //GO TO EVERY USER IN THIS GROUP, GO TO THEIR LIST OF EVENTS AND ADD SENT IN EVENT
-        ref.child("listOfMembers").addListenerForSingleValueEvent(new ValueEventListener() {
+        ref = db.child("GROUPS").child(grpId);
+        ref.child("listOfUsers").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<String> allUsers = (ArrayList<String>) snapshot.getValue(ArrayList.class);
-                for(String user: allUsers){
-                    DatabaseReference u = db.child("USERS").child(user).child("activeEvents");
+                GenericTypeIndicator<HashMap<String, Boolean>> gt = new GenericTypeIndicator<HashMap<String, Boolean>>() {};
+                HashMap<String, Boolean> allUsers = snapshot.getValue(gt);
+                for(String user: allUsers.keySet()){
+                    DatabaseReference u = db.child("USERS").child(user).child("listOfEvents");
                     u.child(eventId).setValue(true);
                 }
             }

@@ -44,8 +44,8 @@ public class ListEventsActivity extends AppCompatActivity {
                 eventsList.addAll(ls);
                 eventCount = eventsList.size();
 
-                User.activeEvents.clear();
-                User.activeEvents.addAll(ls);
+                User.listOfEvents.clear();
+                User.listOfEvents.addAll(ls);
 
                 infoList();
 
@@ -59,7 +59,7 @@ public class ListEventsActivity extends AppCompatActivity {
 
             @Override
             public void onCallback(Event event){}
-            public void onCallback (Group group){}
+            public void onCallback(Group grp){}
             public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
 
         });
