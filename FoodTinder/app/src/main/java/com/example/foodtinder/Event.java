@@ -36,14 +36,14 @@ public class Event {
     HashMap<String, ArrayList<Object>> RestaurantPreferences;
 
     static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference ref = db.child("EVENTS").child(id);
+    DatabaseReference ref = db.child("EVENTS");
 
     Event(){}
 
     Event(final String id){
         this.id = id;
-        ref = db.child("EVENTS").child(String.valueOf(id));
-        Log.i("Info argument", String.valueOf(id));
+        ref = db.child("EVENTS").child(id);
+        Log.i("Info argument", id);
         Log.i("Info argument", ref.toString());
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -65,8 +65,8 @@ public class Event {
     //SEND EVENT OBJECT VIA CALLBACK
     public void retrieveEvent(final String id, final DatabaseCallback dbcallback){
         this.id = id;
-        this.ref = db.child("EVENTS").child(String.valueOf(id));
-        this.ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref = db.child("EVENTS").child(id);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 GenericTypeIndicator<HashMap<String , Object>> gt = new GenericTypeIndicator<HashMap<String, Object>>() {};
@@ -94,7 +94,7 @@ public class Event {
         this.budget = budget;
         this.status = eventStatus;
         //updateEventStatus();
-        //checkExpiry();
+        checkExpiry(id);
         this.decision = "Undecided";
         this.ref = db.child("EVENTS").child(String.valueOf(this.id));
         this.listOfRestaurant = null;
@@ -106,7 +106,7 @@ public class Event {
         this.group = (String) info.get("group");
         this.host = (String) info.get("host");
         updateEventStatus(id);
-        //checkExpiry();
+        checkExpiry(id);
         this.decision = (String) info.get("decision");
         this.listOfRestaurant = (ArrayList<Restaurant>) info.get("listOfRestaurant");
         return this;
@@ -135,16 +135,18 @@ public class Event {
     }
 
 
-    public void checkExpiry(){
+    public void checkExpiry(String id){
         Long now = Calendar.getInstance().getTimeInMillis();
-        if (this.eventDateTime>now){
+        Log.i("Event Class", now+"/"+eventDateTime);
+        if (eventDateTime<now){
             active = false;
             //REMOVE FROM OVERALL EVENTS LIST
+            ref = db.child("EVENTS").child(id);
             ref.removeValue();
             //REMOVE FROM USER'S EVENTS LIST
             db.child("USERS").child(User.getId()).child("listOfEvents").child(id).removeValue();
         }
-        active = true;
+        else {active = true;}
     }
 
 

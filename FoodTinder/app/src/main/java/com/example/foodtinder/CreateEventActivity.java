@@ -62,6 +62,9 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
         txtDate = findViewById(R.id.in_date);
         txtTime = findViewById(R.id.in_time);
 
+//        txtDate.setText("DATE");
+//        txtTime.setText("TIME");
+
         btnDatePicker.setOnClickListener(this);
         btnTimePicker.setOnClickListener(this);
 
@@ -93,20 +96,20 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
  */
 
-        events_ref.addValueEventListener(new ValueEventListener(){
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                eventInfoList.clear();
-                for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()) {
-                    eventInfoList.add(eventSnapshot.getKey());
-                    Log.i("Check", eventInfoList.toString());
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.w("Check", databaseError.toException());
-            }
-        });
+//        events_ref.addValueEventListener(new ValueEventListener(){
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                eventInfoList.clear();
+//                for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()) {
+//                    eventInfoList.add(eventSnapshot.getKey());
+//                    Log.i("Check", eventInfoList.toString());
+//                }
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                Log.w("Check", databaseError.toException());
+//            }
+//        });
 
         setGroupOptions();
 
@@ -240,74 +243,89 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             timePickerDialog.show();
         }
         if (v == btnCreateEvent){
-            eventStatus = "Created";
 
-            //CONVERT CALENDAR TO LONG
-            Long dt = eventDateTime.getTimeInMillis();
-            //WRITE TO "EVENTS" DATABASE
-            final String eventId = db.child("EVENTS").push().getKey();
-            currEvent = new Event(eventId, txtName.getText().toString(), group, User.getId(), dt, location, budget, deadline, eventStatus);
-            events_ref.child(eventId).setValue(currEvent);
-            Log.i("Check", "Event created");
+            //CHECK IF FORM IS FILLED APPROPRIATELY
+            Long now = Calendar.getInstance().getTimeInMillis();
 
-            //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
-            users_ref.child("listOfEvents").child(eventId).setValue(true);
-            ArrayList<String> allUsers;
-            Group.retrieveGroup(group, new DatabaseCallback() {
-                @Override
-                public void onCallback(ArrayList<String> ls) { }
-                @Override
-                public void onCallback(Event event) { }
-                @Override
-                public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
+            if (group.equals("-- Assign to group --") || txtName.getText().equals("Enter event name") ||
+                    eventDateTime == null || txtDate.getText().length()==0 || txtTime.getText().length()==0) {
+                Toast.makeText(getApplicationContext(), "DO NOT LEAVE FIELD BLANK", Toast.LENGTH_LONG).show();
+            }
 
-                @Override
-                public void onCallback(Group grp) {
-                    if (grp == null)
+            else if (eventDateTime.getTimeInMillis()<now){
+                Toast.makeText(getApplicationContext(), "DATE-TIME HAS ALREADY PASSED", Toast.LENGTH_LONG).show();
+            }
 
-                    grp.updateAllUsers(eventId, group);
+            //PROCEED WHEN ALL FORM CONTENT IS VALID
+            else {
+                eventStatus = "Created";
+                //CONVERT CALENDAR TO LONG
+                Long dt = eventDateTime.getTimeInMillis();
+                //WRITE TO "EVENTS" DATABASE
+                final String eventId = db.child("EVENTS").push().getKey();
+                currEvent = new Event(eventId, txtName.getText().toString(), group, User.getId(), dt, location, budget, deadline, eventStatus);
+                events_ref.child(eventId).setValue(currEvent);
+                Log.i("Check", "Event created");
 
-                    //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
-                    //UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
-                    final String searchLocation = location;
-                    final Long searchBudget = new Long(budget.length()+1);
+                //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
+                users_ref.child("listOfEvents").child(eventId).setValue(true);
+                ArrayList<String> allUsers;
+                Group.retrieveGroup(group, new DatabaseCallback() {
+                    @Override
+                    public void onCallback(ArrayList<String> ls) { }
+                    @Override
+                    public void onCallback(Event event) { }
+                    @Override
+                    public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
 
-                    Log.i("Query", searchLocation+searchBudget);
-                    final DatabaseReference currEvent_ref = db.child("EVENTS").child(eventId);
-                    currEvent.listOfRestaurant = new ArrayList<>();
+                    @Override
+                    public void onCallback(Group grp) {
+                        grp.updateAllUsers(eventId, group);
 
-                    Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
-                        @Override
-                        public void onCallback(ArrayList<String> ls) { }
-                        @Override
-                        public void onCallback(Event event) { }
-                        @Override
-                        public void onCallback(Group grp) { }
+                        //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
+                        //UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
+                        final String searchLocation = location;
+                        final Long searchBudget = new Long(budget.length()+1);
 
-                        @Override
-                        public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
-                            Log.i("Retrieve Restaurants", allRest.toString());
-                            for (Restaurant r: allRest){
-                                if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
-                                    currEvent.listOfRestaurant.add(r);
+                        Log.i("Query", searchLocation+searchBudget);
+                        final DatabaseReference currEvent_ref = db.child("EVENTS").child(eventId);
+                        currEvent.listOfRestaurant = new ArrayList<>();
+
+                        Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
+                            @Override
+                            public void onCallback(ArrayList<String> ls) { }
+                            @Override
+                            public void onCallback(Event event) { }
+                            @Override
+                            public void onCallback(Group grp) { }
+
+                            @Override
+                            public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
+                                Log.i("Retrieve Restaurants", allRest.toString());
+                                for (Restaurant r: allRest){
+                                    if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
+                                        currEvent.listOfRestaurant.add(r);
+                                }
+
+                                currEvent_ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
+                                currEvent.status = "Ready to swipe";
+                                currEvent_ref.child("status").setValue(currEvent.status);
                             }
+                        });
 
-                            currEvent_ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
-                            currEvent.status = "Ready to swipe";
-                            currEvent_ref.child("status").setValue(currEvent.status);
-                        }
-                    });
-
-                }
+                    }
 
 
-            });
+                });
 
 
-            //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
-            Intent next  = new Intent(CreateEventActivity.this, ListEventsActivity.class);
-            next.putExtra("eventId", eventId);
-            startActivity(next);
+                //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
+                Intent next  = new Intent(CreateEventActivity.this, ListEventsActivity.class);
+                next.putExtra("eventId", eventId);
+                startActivity(next);
+
+            }
+
 
         }
 
