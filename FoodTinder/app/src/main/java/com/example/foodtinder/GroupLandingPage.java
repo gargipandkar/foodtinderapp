@@ -75,6 +75,8 @@ public class GroupLandingPage extends AppCompatActivity {
                                                 })
                                                 .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int id) {
+                                                        Intent toGroupPage = new Intent(GroupLandingPage.this, ListGroupsActivity.class);
+                                                        startActivity(toGroupPage);
                                                     }
                                                 });
                                         builder.create().show();

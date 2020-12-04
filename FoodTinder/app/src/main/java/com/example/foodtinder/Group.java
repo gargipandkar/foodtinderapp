@@ -81,25 +81,39 @@ public class Group {
 
         //Set group name and add creator to the userlist
         newGroup.ref.child("name").setValue(name);
-        newGroup.addUser();
+        newGroup.addUser(newId);
         return newGroup;
     }
 
-    void addUser(){
+    void addUser(String grpId){
         //ADD USER TO GROUP AND GROUP TO USER
-        this.ref = db.child("GROUPS").child(this.id);
-        this.ref.child("listOfUsers").child(User.getId()).setValue(true);
-        User.addGroup(this.id);
-        this.ref.child("memberCount").setValue(this.memberCount+1);
+        this.ref = db.child("GROUPS").child(grpId);
+        final DatabaseReference userList_ref = this.ref.child("listOfUsers").child(User.getId());
+        //CHECK IF USER IS ALREADY IN GROUP
+        userList_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()){
+                    userList_ref.setValue(true);
+                    User.addGroup(id);
+                    ref.child("memberCount").setValue(memberCount+1);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
     }
 
-    void addUser(String grpId){
+    /*void addUser(String grpId){
         //ADD USER TO GROUP AND GROUP TO USER
         this.ref = db.child("GROUPS").child(grpId);
         this.ref.child("listOfUsers").child(User.getId()).setValue(true);
         User.addGroup(grpId);
         this.ref.child("memberCount").setValue(this.memberCount+1);
     }
+
+     */
 
     void addEvent(Event event){
         this.ref.child("listOfEvents").child(String.valueOf(event.id)).setValue(true);
@@ -198,6 +212,6 @@ public class Group {
     public String getId(){return this.id;}
     public String getName(){return this.name;}
     public String getCreator(){return this.creator;}
-    public Integer getMemberCount(){ return membersList.size(); }
+    public Integer getMemberCount(){ return this.memberCount; }
     
 }

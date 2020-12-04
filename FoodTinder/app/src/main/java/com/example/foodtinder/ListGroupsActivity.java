@@ -38,14 +38,19 @@ public class ListGroupsActivity extends AppCompatActivity {
         User.setUserGroups(groups_ref, new DatabaseCallback() {
             @Override
             public void onCallback(ArrayList<String> ls) {
-                groupsList.addAll(ls);
-                groupCount = groupsList.size();
+                if (ls!=null){
+                    groupsList.addAll(ls);
+                    groupCount = groupsList.size();
 
-                User.inGroups.clear();
-                User.inGroups.addAll(ls);
+                    User.inGroups.clear();
+                    User.inGroups.addAll(ls);
 
-                infoList();
+                    infoList();
+                }
 
+                else { displayList(); }
+
+                //LOG
                 Log.i("Check", ls.toString());
                 Log.i("Check", User.getId());
                 Log.i("Check", groupsList.toString());
@@ -88,12 +93,20 @@ public class ListGroupsActivity extends AppCompatActivity {
     void displayList(){
         LinearLayout layoutListEvents = findViewById(R.id.listevents_layout);
 
-        for (int i = 0; i < groupCount; i++) {
-            TextView listItem = new TextView(this);
-            listItem.setText(groupsInfoList.get(i).getName()+groupsInfoList.get(i).getMemberCount());
-            listItem.setId(i);
-            layoutListEvents.addView(listItem);
+        if (groupCount>0){
+            for (int i = 0; i < groupCount; i++) {
+                TextView listItem = new TextView(this);
+                listItem.setText(groupsInfoList.get(i).getName()+groupsInfoList.get(i).getMemberCount());
+                listItem.setId(i);
+                layoutListEvents.addView(listItem);
+            }
         }
+
+        else {
+            TextView listItem = new TextView(this);
+            listItem.setText("NO GROUPS AVAILABLE");
+        }
+
     }
 
 }

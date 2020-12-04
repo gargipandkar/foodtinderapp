@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class Event {
 
-    Integer id;     //USE AS KEY FOR DATABASE, BUT STORE COPY ALSO
+    String id;     //USE AS KEY FOR DATABASE, BUT STORE COPY ALSO
     String name;
     String group;
     String host;
@@ -36,13 +36,11 @@ public class Event {
     HashMap<String, ArrayList<Object>> RestaurantPreferences;
 
     static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference ref = db.child("EVENTS").child(String.valueOf(id));
-
-    //preference related variables, if required
+    DatabaseReference ref = db.child("EVENTS").child(id);
 
     Event(){}
 
-    Event(final Integer id){
+    Event(final String id){
         this.id = id;
         ref = db.child("EVENTS").child(String.valueOf(id));
         Log.i("Info argument", String.valueOf(id));
@@ -65,7 +63,7 @@ public class Event {
 
 
     //SEND EVENT OBJECT VIA CALLBACK
-    public void retrieveEvent(final Integer id, final DatabaseCallback dbcallback){
+    public void retrieveEvent(final String id, final DatabaseCallback dbcallback){
         this.id = id;
         this.ref = db.child("EVENTS").child(String.valueOf(id));
         this.ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -85,7 +83,7 @@ public class Event {
         });
     }
 
-    Event(Integer id, String name, String group, String host, Long eventDateTime, String location, String budget, String prefDeadline, String eventStatus){
+    Event(String id, String name, String group, String host, Long eventDateTime, String location, String budget, String prefDeadline, String eventStatus){
         this.id = id;
         this.name = name;
         this.group = group;
@@ -102,7 +100,7 @@ public class Event {
         this.listOfRestaurant = null;
     }
 
-    public Event updateEvent(HashMap<String, Object> info, Integer id){
+    public Event updateEvent(HashMap<String, Object> info, String id){
         this.id = id;
         this.name = (String) info.get("name");
         this.group = (String) info.get("group");
@@ -137,23 +135,28 @@ public class Event {
     }
 
 
-/*    public void checkExpiry(){
-        Calendar now = Calendar.getInstance();
-        if (this.eventDateTime.after(now))
+    public void checkExpiry(){
+        Long now = Calendar.getInstance().getTimeInMillis();
+        if (this.eventDateTime>now){
             active = false;
+            //REMOVE FROM OVERALL EVENTS LIST
+            ref.removeValue();
+            //REMOVE FROM USER'S EVENTS LIST
+            db.child("USERS").child(User.getId()).child("listOfEvents").child(id).removeValue();
+        }
         active = true;
     }
 
+
     public boolean passedDeadline(){
-        Calendar now = Calendar.getInstance();
-        if (this.eventDateTime.after(this.prefDateTime))
+        Long now = Calendar.getInstance().getTimeInMillis();
+        if (this.eventDateTime>this.prefDateTime)
             return true;
         return false;
     }
 
-     */
 
-    public void updateEventStatus(final Integer id){
+    public void updateEventStatus(final String id){
         final String[] chosen = {""};
         ref = db.child("EVENTS").child(String.valueOf(id));
         ref.child("decision").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -169,21 +172,20 @@ public class Event {
         });
     }
 
-    void setStatus(String status, Integer id){
+    void setStatus(String status, String id){
         ref = db.child("EVENTS").child(String.valueOf(id));
         this.status = status;
         ref.child("status").setValue(status);
     }
 
-    void setDecision(String decision, Integer id){
+    void setDecision(String decision, String id){
         ref = db.child("EVENTS").child(String.valueOf(id));
         this.decision = decision;
         ref.child("decision").setValue(decision);
     }
 
-    @Exclude
-    public Integer getId(){return id;}
 
+    public String getId(){return id;}
     public String getName(){return this.name;}
     public String getGroup(){return this.group;}
     public String getHost(){return this.host;}

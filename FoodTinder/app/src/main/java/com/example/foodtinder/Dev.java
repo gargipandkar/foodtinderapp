@@ -25,7 +25,7 @@ public class Dev extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i("Check", "Button clicked");
-                Intent toCreateEvent = new Intent(Dev.this, Swiping.class);
+                Intent toCreateEvent = new Intent(Dev.this, ListEventsActivity.class);
                 startActivity(toCreateEvent);
             }
         });

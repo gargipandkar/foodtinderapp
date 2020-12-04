@@ -15,6 +15,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -74,10 +75,10 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
         db = FirebaseDatabase.getInstance().getReference();
         events_ref = db.child("EVENTS");
-        eventCount_ref = db.child("EVENTCOUNT");
+        //eventCount_ref = db.child("EVENTCOUNT");
         users_ref = db.child("USERS").child(User.getId());
 
-        eventCount_ref.addValueEventListener(new ValueEventListener() {
+/*        eventCount_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 eventCount = dataSnapshot.getValue(int.class);
@@ -89,6 +90,8 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                 Log.w("Check", databaseError.toException());
             }
         });
+
+ */
 
         events_ref.addValueEventListener(new ValueEventListener(){
             @Override
@@ -237,21 +240,18 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             timePickerDialog.show();
         }
         if (v == btnCreateEvent){
-            eventCount++;
-            eventCount_ref.setValue(eventCount);
-            final String eventId = String.valueOf(eventCount);
             eventStatus = "Created";
 
             //CONVERT CALENDAR TO LONG
             Long dt = eventDateTime.getTimeInMillis();
             //WRITE TO "EVENTS" DATABASE
-            currEvent = new Event(Integer.getInteger(eventId), txtName.getText().toString(), group, User.getId(), dt, location, budget, deadline, eventStatus);
+            final String eventId = db.child("EVENTS").push().getKey();
+            currEvent = new Event(eventId, txtName.getText().toString(), group, User.getId(), dt, location, budget, deadline, eventStatus);
             events_ref.child(eventId).setValue(currEvent);
             Log.i("Check", "Event created");
 
             //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
             users_ref.child("listOfEvents").child(eventId).setValue(true);
-            final String sendEventId = eventId;
             ArrayList<String> allUsers;
             Group.retrieveGroup(group, new DatabaseCallback() {
                 @Override
@@ -263,8 +263,9 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
                 @Override
                 public void onCallback(Group grp) {
-                    Log.i("Check", grp.toString());
-                    grp.updateAllUsers(sendEventId, group);
+                    if (grp == null)
+
+                    grp.updateAllUsers(eventId, group);
 
                     //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
                     //UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
@@ -272,7 +273,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                     final Long searchBudget = new Long(budget.length()+1);
 
                     Log.i("Query", searchLocation+searchBudget);
-                    final DatabaseReference currEvent_ref = db.child("EVENTS").child(String.valueOf(eventId));
+                    final DatabaseReference currEvent_ref = db.child("EVENTS").child(eventId);
                     currEvent.listOfRestaurant = new ArrayList<>();
 
                     Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
@@ -304,11 +305,12 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
 
             //NEXT -> SEND HOST TO INDICATE PREFERENCES PAGE OR SWIPE PAGE
-            Intent next  = new Intent(CreateEventActivity.this, Swiping.class);
+            Intent next  = new Intent(CreateEventActivity.this, ListEventsActivity.class);
             next.putExtra("eventId", eventId);
             startActivity(next);
 
         }
+
     }
 
 

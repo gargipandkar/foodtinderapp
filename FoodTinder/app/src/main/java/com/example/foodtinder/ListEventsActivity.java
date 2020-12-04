@@ -24,9 +24,9 @@ public class ListEventsActivity extends AppCompatActivity {
 
     DatabaseReference db, events_ref;
 
-    ArrayList<String> eventsList = new ArrayList<>();
-    ArrayList<Event> eventsInfoList = new ArrayList<>();
-    ArrayList<Event> allEvents = new ArrayList<>();
+    ArrayList<String> eventsList = new ArrayList<>();       //EVENT IDS FOR CURRENT USER
+    ArrayList<Event> eventsInfoList = new ArrayList<>();    //RELEVANT
+    HashMap<String, Event> allEvents = new HashMap<>();     //ALL EVENT IDS + EVENT OBJECTS
     int eventCount;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,20 +34,25 @@ public class ListEventsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_listevents);
 
 
-        // READ LIST OF EVENTS FROM FIREBASE AND PUT INTO LOCAL USER OBJECT
+        // READ LIST OF EVENTS OF THIS USER FROM FIREBASE AND PUT INTO LOCAL USER OBJECT
         db = FirebaseDatabase.getInstance().getReference();
         events_ref = db.child("USERS").child(User.getId()).child("listOfEvents");
 
         User.setUserEvents(events_ref, new DatabaseCallback() {
             @Override
             public void onCallback(ArrayList<String> ls) {
-                eventsList.addAll(ls);
-                eventCount = eventsList.size();
+                //CHECK IF USER HAS NO EVENTS
+                if(ls.isEmpty()){
+                    eventsList.addAll(ls);
+                    eventCount = eventsList.size();
 
-                User.listOfEvents.clear();
-                User.listOfEvents.addAll(ls);
+                    User.listOfEvents.clear();
+                    User.listOfEvents.addAll(ls);
 
-                infoList();
+                    infoList();
+                }
+
+                else { displayList(); }
 
                 //LOG
                 Log.i("Check", ls.toString());
@@ -72,12 +77,12 @@ public class ListEventsActivity extends AppCompatActivity {
         allEvents_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                GenericTypeIndicator<ArrayList<Event>> gt = new GenericTypeIndicator<ArrayList<Event>>() {};
+                GenericTypeIndicator<HashMap<String, Event>> gt = new GenericTypeIndicator<HashMap<String, Event>>() {};
                 allEvents = snapshot.getValue(gt);
 
                 eventsInfoList.clear();
                 for (String i: eventsList) {
-                    eventsInfoList.add(allEvents.get(Integer.valueOf(i)));
+                    eventsInfoList.add(allEvents.get(i));
                 }
                // Log.i("Check", eventsInfoList.toString());
                 displayList();
@@ -95,11 +100,19 @@ public class ListEventsActivity extends AppCompatActivity {
 
         Log.i("Check", eventsInfoList.toString());
 
-        for (int i = 0; i < eventCount; i++) {
-            TextView listItem = new TextView(this);
-            listItem.setText(eventsList.get(i)+eventsInfoList.get(i).name);
-            listItem.setId(i);
-            layoutListEvents.addView(listItem);
+        if (eventCount>0){
+            for (int i = 0; i < eventCount; i++) {
+                TextView listItem = new TextView(this);
+                listItem.setText(eventsList.get(i)+eventsInfoList.get(i).name);
+                listItem.setId(i);
+                layoutListEvents.addView(listItem);
+            }
         }
+
+        else {
+            TextView listItem = new TextView(this);
+            listItem.setText("NO EVENTS AVAILABLE");
+        }
+
     }
 }

@@ -82,7 +82,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
             }
         });*/
-        selectedEvent = new Event(33);
+        //selectedEvent = new Event(33);
 
 
         final DatabaseReference completed_ref = selectedEvent.ref.child("RestaurantPreferences/listOfCompleted");
