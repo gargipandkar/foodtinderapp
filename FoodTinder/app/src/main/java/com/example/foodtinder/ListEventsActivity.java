@@ -83,6 +83,7 @@ public class ListEventsActivity extends AppCompatActivity {
 
                 eventsInfoList.clear();
                 for (String i: eventsList) {
+
                     eventsInfoList.add(allEvents.get(i));
                 }
                 // Log.i("Check", eventsInfoList.toString());

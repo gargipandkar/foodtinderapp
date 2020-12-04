@@ -105,4 +105,17 @@ public class ListGroupsActivity extends AppCompatActivity {
         layoutListEvents.addView(listItem);
     }
 
+    //CUT THIS OUT AND COPY INTO BUTTON FOR CREATE EVENTS
+    void checkIfAnyGroups(){
+        groups_ref = db.child(User.getId()).child("inGroups");
+        User.setUserGroups(groups_ref, new DatabaseCallback(){
+            @Override
+            public void onCallback(ArrayList<String> ls) {
+                if (ls.isEmpty()) {
+                    //DONT'T ALLOW EVENT CREATION
+                }
+
+            }
+    });
+    }
 }
