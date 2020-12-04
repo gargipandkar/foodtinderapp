@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,7 +28,7 @@ public class ListEventsActivity extends AppCompatActivity {
     ArrayList<String> eventsList = new ArrayList<>();       //EVENT IDS FOR CURRENT USER
     ArrayList<Event> eventsInfoList = new ArrayList<>();    //RELEVANT
     HashMap<String, Event> allEvents = new HashMap<>();     //ALL EVENT IDS + EVENT OBJECTS
-    int eventCount;
+    int eventCount = 0;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +43,7 @@ public class ListEventsActivity extends AppCompatActivity {
             @Override
             public void onCallback(ArrayList<String> ls) {
                 //CHECK IF USER HAS NO EVENTS
-                if(ls.isEmpty()){
+                if(!ls.isEmpty()){
                     eventsList.addAll(ls);
                     eventCount = eventsList.size();
 
@@ -54,11 +55,11 @@ public class ListEventsActivity extends AppCompatActivity {
 
                 else { displayList(); }
 
-                //LOG
-                Log.i("Check", ls.toString());
-                Log.i("Check", User.getId());
-                Log.i("Check", eventsList.toString());
-                Log.i("Check", "# of groups = "+ eventCount);
+//                //LOG
+//                Log.i("Check", ls.toString());
+//                Log.i("Check", User.getId());
+//                Log.i("Check", eventsList.toString());
+//                Log.i("Check", "# of groups = "+ eventCount);
 
             }
 
@@ -84,7 +85,7 @@ public class ListEventsActivity extends AppCompatActivity {
                 for (String i: eventsList) {
                     eventsInfoList.add(allEvents.get(i));
                 }
-               // Log.i("Check", eventsInfoList.toString());
+                // Log.i("Check", eventsInfoList.toString());
                 displayList();
 
             }
@@ -98,21 +99,40 @@ public class ListEventsActivity extends AppCompatActivity {
     void displayList(){
         LinearLayout layoutListEvents = findViewById(R.id.listevents_layout);
 
-        Log.i("Check", eventsInfoList.toString());
+//      Log.i("Check", eventsInfoList.toString());
+        TextView listItem = new TextView(this);
 
         if (eventCount>0){
             for (int i = 0; i < eventCount; i++) {
-                TextView listItem = new TextView(this);
                 listItem.setText(eventsList.get(i)+eventsInfoList.get(i).name);
                 listItem.setId(i);
-                layoutListEvents.addView(listItem);
             }
         }
 
         else {
-            TextView listItem = new TextView(this);
             listItem.setText("NO EVENTS AVAILABLE");
         }
 
+        layoutListEvents.addView(listItem);
+
+    }
+
+    //COPY THIS CHECK INTO CLICKING ON EVENT IN EVENT LIST
+    void checkIfEventExists(String eventId){
+        events_ref = db.child("EVENTS").child(eventId);
+        events_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()){
+                    Toast.makeText(getApplicationContext(), "EVENT HAS EXPIRED", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
     }
 }
+
+
+
