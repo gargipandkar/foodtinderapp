@@ -127,64 +127,20 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
         //assign default image to ImageView here
 
-
-//        // RETRIEVE LIST OF RESTAURANT OPTIONS
-//        listRest_ref.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                GenericTypeIndicator<ArrayList<HashMap<String, Object>>> gt = new GenericTypeIndicator<ArrayList<HashMap<String, Object>>>() {};
-//                final ArrayList<HashMap<String, Object>> arr = dataSnapshot.getValue(gt);
-//
-//                // RETRIEVE LIST OF VOTES, IF ANY AND CREATE LOCAL COPY
-//                restVote_ref.addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//                        GenericTypeIndicator<ArrayList<Integer>> gt = new GenericTypeIndicator<ArrayList<Integer>>() {};
-//                        try {
-//                            listRestVotes =  dataSnapshot.getValue(gt);
-//                            Log.i("Check", listRestVotes.toString());
-//                        } catch (NullPointerException ex) {
-//                            listRestVotes = new ArrayList<>();
-//                            for (int i=0; i<arr.size(); i++){listRestVotes.add(i, 0);}
-//                        }
-//
-//                        listRestInfo = arr;
-//                        if (number[0]<arr.size())
-//                            select_restaurant(arr);
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//                    }
-//                });
-//
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//            }
-//        });
-
-
         // RETRIEVE LIST OF RESTAURANT OPTIONS DETAILS AND IMAGES
         event_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//               Log.i("place", String.valueOf(dataSnapshot.getChildrenCount()));
                 GenericTypeIndicator<HashMap<String, HashMap<String, Object>>> gt = new GenericTypeIndicator<HashMap<String, HashMap<String, Object>>>() {};
                 GenericTypeIndicator<HashMap<String, ArrayList<String>>> gtPhotos = new GenericTypeIndicator<HashMap<String, ArrayList<String>>>() {};
-//                GenericTypeIndicator<ArrayList<String>> gtNames = new GenericTypeIndicator<ArrayList<String>>() {};
 
                 final HashMap<String, HashMap<String, Object>> arr = new HashMap<>();
                 final HashMap<String, ArrayList<String>> arrPhotos= new HashMap<>();
-//                final ArrayList<String> arrNames = new ArrayList<>();
+
 
                 for (DataSnapshot prop: dataSnapshot.getChildren()){
-//                    Log.i("place", prop.toString());
                     if (prop.getKey().equals("placeDetails")){
                         arr.putAll(prop.getValue(gt));
-//                        for (DataSnapshot name: prop.getChildren())
-//                            arrNames.add(name.getKey());
                     }
                     if (prop.getKey().equals(("placeDetailsPhotos")))
                         arrPhotos.putAll((prop.getValue(gtPhotos)));
@@ -244,16 +200,6 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
             itemPhotos = listRestPhotos.get(rest);
             new DownloadImageTask((ImageView) findViewById(R.id.rest_image)).execute(itemPhotos.get(0));
         }
-
-
-
-//        Log.i("name", rest_name.getText().toString());
-//        rest_desc.setText((String)item.get("formattedAddress"));
-//        String convert_rating = String.valueOf(item.get("rating"));
-//        rest_rating.setText(convert_rating);
-//        //TODO assign image link to ImageView
-//        ArrayList<String> imgLinks = (ArrayList<String>)item.get("images");
-//        new DownloadImageTask((ImageView) findViewById(R.id.rest_image)).execute(imgLinks.get(0));
 
         Log.i("Check", "Item "+number[0]);
 
