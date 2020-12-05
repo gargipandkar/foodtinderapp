@@ -300,38 +300,6 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                     @Override
                     public void onCallback(Group grp) {
                         grp.updateAllUsers(eventId, group);
-
-//                        //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
-//                        //UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
-//                        final String searchLocation = location;
-//                        final Long searchBudget = new Long(budget.length()+1);
-//
-//                        Log.i("Query", searchLocation+searchBudget);
-//                        final DatabaseReference currEvent_ref = db.child("EVENTS").child(eventId);
-//                        currEvent.listOfRestaurant = new ArrayList<>();
-//
-//                        Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
-//                            @Override
-//                            public void onCallback(ArrayList<String> ls) { }
-//                            @Override
-//                            public void onCallback(Event event) { }
-//                            @Override
-//                            public void onCallback(Group grp) { }
-//
-//                            @Override
-//                            public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
-//                                Log.i("Retrieve Restaurants", allRest.toString());
-//                                for (Restaurant r: allRest){
-//                                    if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
-//                                        currEvent.listOfRestaurant.add(r);
-//                                }
-//
-//                                currEvent_ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
-//                                currEvent.status = "Ready to swipe";
-//                                currEvent_ref.child("status").setValue(currEvent.status);
-//                            }
-//                        });
-
                     }
 
 
