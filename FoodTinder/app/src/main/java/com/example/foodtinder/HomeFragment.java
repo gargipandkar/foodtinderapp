@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,15 +24,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import com.example.cardItems.EventItem;
-//import com.example.cardItems.EventListAdapter;
 import com.example.cardItems.EventListAdapterFinal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -40,37 +40,18 @@ public class HomeFragment extends Fragment {
     private FloatingActionButton create_event_btn;
     private FragmentHomeListener homeListener;
     private RecyclerView recyclerView;
-    private ArrayList<Event> eventItemArrayList = new ArrayList<>();;
     EventListAdapterFinal eventListAdapter;
     private static final String TAG = "HomeFragment";
-
-    Integer eventId;
-    String eventName, eventGroup, eventUserId, eventLocation, eventBudget, eventStatus;
-    Long eventDT;
-
-    boolean isList = false;
-    int count;
-
-    // listing of events variables
-    DatabaseReference db, events_ref;
-    ArrayList<String> eventsList = new ArrayList<>();
     ArrayList<Event> eventsInfoList = new ArrayList<>();
-    ArrayList<Event> allEvents = new ArrayList<>();
-    int eventCount;
-
+    boolean checkEvent = false;
+    Boolean isInGroup = false;
+    DatabaseReference db, groups_ref, events_ref;
 
 
     public interface FragmentHomeListener {
         void onCreateEvent();
-        void updateHome(boolean checkListNotEmpty, Fragment curFrag);
+        void selectRestaurant(String Id, boolean firstEntry);
     }
-
-
-    public void updateEvent(Integer eventId, String name, String group, String userId, Long dateTime, String budget, String location, String status){
-        eventItemArrayList.add(new Event(eventId, name, group, userId, dateTime, location, budget, status));
-    }
-
-
 
 
     @Nullable
@@ -78,26 +59,34 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
-
-        Button event_sel_btn = v.findViewById(R.id.event_sel_btn);
-        event_sel_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent toSwiping = new Intent(getActivity(), Swiping.class);
-                startActivity(toSwiping);
-            }
-        });
-
+        if (checkEvent == false){
+            // no new upcoming events
+            TextView noEventText = v.findViewById(R.id.no_event_label);
+            TextView createEventText = v.findViewById(R.id.create_event_label);
+            noEventText.setText("No upcoming events");
+            createEventText.setText("Create new event");
+        } else {
+            buildRecycleView(v);
+        }
         create_event_btn = v.findViewById(R.id.create_event_btn);
         create_event_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                homeListener.onCreateEvent();
+                // TODO: If user is not in any group, give a toast
+                if (isInGroup == true){
+                    homeListener.onCreateEvent();
+                } else {
+                    Log.i(TAG, "you are not in group");
+                    Context context = getContext();
+                    CharSequence text = "You are not in any group.";
+                    int duration = Toast.LENGTH_SHORT;
 
+                    Toast informUser = Toast.makeText(context, text, duration);
+                    informUser.show();
+                }
             }
         });
 
-        buildRecycleView(v);
 
         return v;
     }
@@ -108,14 +97,10 @@ public class HomeFragment extends Fragment {
 
         recyclerView = v.findViewById(R.id.recycleView);
         recyclerView.setHasFixedSize(true);
-//        eventListAdapter = new EventListAdapterFinal(eventItemArrayList, getContext());
-        // using arraylist of events where list of events are retrieve from firebase
-        Log.i(TAG, "buildRecycleView");
-//        Log.i(TAG, eventsInfoList.get(0).getName());
         eventListAdapter = new EventListAdapterFinal(eventsInfoList, getContext());
         recyclerView.setAdapter(eventListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+        Log.i(TAG, eventsInfoList.toString());
         eventListAdapter.setOnItemClickListener(new EventListAdapterFinal.myOnItemClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -123,14 +108,30 @@ public class HomeFragment extends Fragment {
                 Log.i(TAG, Integer.toString(position));
 //                eventItemArrayList.get(position).changeText("Clickeddddd");
 //                eventListAdapter.notifyItemChanged(position);
-//                Log.i(TAG, Integer.toString(position));
-//                Log.i(TAG, eventItemArrayList.get(position).toString());
-                Intent toEventSelection = new Intent(getActivity(), EventSelectionActivity.class);
-                toEventSelection.putExtra("Event Item", eventsInfoList.get(position));
-                startActivity(toEventSelection);
+                Log.i(TAG, eventsInfoList.get(position).getId());
+                String eventId = eventsInfoList.get(position).getId();
+                events_ref = db.child("EVENTS").child(eventId);
+                events_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!snapshot.exists()){
+                            Toast.makeText(getContext(), "EVENT HAS EXPIRED", Toast.LENGTH_SHORT).show();
+                        } else {
+                            String status = eventsInfoList.get(position).getStatus();
+                            if (status.equals("Ready to swipe")){
+                                boolean firstEntry = true;
+                                homeListener.selectRestaurant(eventsInfoList.get(position).getId(), firstEntry);
+                            } else {
+                                Toast.makeText(getContext(), "You have chosen your preference", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) { }
+                });
             }
         });
-
 
     }
 
@@ -141,25 +142,27 @@ public class HomeFragment extends Fragment {
 
         Bundle bundle = this.getArguments();
         if (bundle != null){
-//            eventId = bundle.getInt("eventId");
-//            eventName = bundle.getString("name");
-//            eventGroup = bundle.getString("group");
-//            eventUserId = bundle.getString("userId");
-//            eventLocation = bundle.getString("location");
-//            eventDT = bundle.getLong("dateTime");
-//            eventStatus = bundle.getString("status");
-//            Log.i(TAG, "reached");
-//            Log.i(TAG, eventName);
-//            Log.i(TAG, eventStatus);
-//            updateEvent(eventId, eventName, eventGroup, eventUserId, eventDT, eventBudget, eventLocation, eventStatus);
-//            Log.i(TAG, "to latestEvent()");
 
             eventsInfoList = bundle.getParcelableArrayList("eventlist");
-            Log.i(TAG, eventsInfoList.toString());
-            Log.i(TAG, "event list delivered to homefragment");
-
-
+            checkEvent = true;
+        } else {
+            checkEvent = false;
         }
+
+        Log.i("check", User.getId());
+        db = FirebaseDatabase.getInstance().getReference();
+
+        groups_ref = db.child("USERS").child(User.getId());
+        groups_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot prop: snapshot.getChildren())
+                    if (prop.getKey().equals("inGroups")){ isInGroup = true;}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
     }
 
 

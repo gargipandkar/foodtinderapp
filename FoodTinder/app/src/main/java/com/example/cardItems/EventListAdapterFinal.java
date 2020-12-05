@@ -1,5 +1,6 @@
 package com.example.cardItems;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,12 +47,11 @@ public class EventListAdapterFinal extends RecyclerView.Adapter<EventListAdapter
         return new MyViewHolder(v, mListener);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull EventListAdapterFinal.MyViewHolder holder, int position) {
-//        Log.i(TAG, eventArrayList.get(0).getName());
         holder.eventName.setText(eventArrayList.get(position).getName());
-        holder.eventDT.setText("date");
-//        holder.eventDT.setText(Long.toString(eventArrayList.get(position).getEventDateTime()));
+        holder.eventDT.setText("Date: " + eventArrayList.get(position).getDateTimeString());
         holder.eventDecision.setText("Location: " + eventArrayList.get(position).getDecision());
         holder.eventStatus.setText("Status: " + eventArrayList.get(position).getStatus());
     }

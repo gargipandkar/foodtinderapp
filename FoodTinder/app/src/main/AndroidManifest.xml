@@ -25,18 +25,27 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
+        <activity android:name=".SwipeActivity" />
         <activity android:name=".SignOutActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateGroupActivity" />
-        <activity android:name=".TestEvent" />
         <activity android:name=".EventSelectionActivity" />
         <activity android:name=".EventFinalActivity" />
-        <activity android:name=".DisplayGroupLink"/>
-        <activity android:name=".GroupLandingPage"/>
-        <activity android:name=".Swiping"/>
+        <activity android:name=".GroupLandingPage">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="foodtinder.example.com"
+                    android:scheme="https"/>
+                <data
+                    android:host="foodtinder.example.com"
+                    android:scheme="http"/>
+            </intent-filter>
+        </activity>
 
 
     </application>

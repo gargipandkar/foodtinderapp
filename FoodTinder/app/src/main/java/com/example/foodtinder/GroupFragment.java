@@ -1,12 +1,14 @@
 package com.example.foodtinder;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,8 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cardItems.EventItem;
 //import com.example.cardItems.EventListAdapter;
+import com.example.cardItems.EventListAdapterFinal;
 import com.example.cardItems.GroupItem;
-import com.example.cardItems.GroupListAdapter;
+//import com.example.cardItems.GroupListAdapter;
 import com.example.cardItems.GroupListAdapterFinal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -29,6 +32,7 @@ public class GroupFragment extends Fragment {
     private ArrayList<Group> groupItemArrayList;
     GroupListAdapterFinal groupListAdapter;
     ArrayList<Group> groupsInfoList = new ArrayList<>();
+    boolean checkGroup = false;
 
     public static final String TAG = "GroupFragment";
 
@@ -43,13 +47,21 @@ public class GroupFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_group, container, false);
 
-//        createGroupList();
-        buildRecycleView(v);
+        if (checkGroup == false){
+            // no new upcoming groups
+            TextView noEventText = v.findViewById(R.id.no_group_label);
+            TextView createEventText = v.findViewById(R.id.create_group_label);
+            noEventText.setText("No upcoming groups");
+            createEventText.setText("Create new group");
+        } else {
+            buildRecycleView(v);
+        }
 
         FloatingActionButton createGroup_btn = v.findViewById(R.id.create_group_btn);
         createGroup_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i(TAG, "group fragment create_group_btn clicked");
                 groupListener.onCreateGroup();
             }
         });
@@ -62,9 +74,10 @@ public class GroupFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle bundle = this.getArguments();
         if (bundle != null){
-            groupsInfoList = bundle.getParcelableArrayList("grouplist");
+            groupsInfoList = (ArrayList<Group>) bundle.getSerializable("grouplist");
             Log.i(TAG, groupsInfoList.toString());
             Log.i(TAG, "group list delivered to groupfragment");
+            checkGroup = true;
         }
     }
 
@@ -81,6 +94,27 @@ public class GroupFragment extends Fragment {
         groupListAdapter = new GroupListAdapterFinal(groupsInfoList, getContext());
         recyclerView.setAdapter(groupListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        groupListAdapter.setOnGroupItemClickListener(new GroupListAdapterFinal.myOnGroupItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Log.i(TAG, "here");
+                Log.i(TAG, Integer.toString(position));
+//                eventItemArrayList.get(position).changeText("Clickeddddd");
+//                eventListAdapter.notifyItemChanged(position);
+//                Log.i(TAG, Integer.toString(position));
+//                Log.i(TAG, eventItemArrayList.get(position).toString());
+//                Intent toEventSelection = new Intent(getActivity(), EventSelectionActivity.class);
+//                toEventSelection.putExtra("Event Item", eventsInfoList.get(position));
+//                startActivity(toEventSelection);
+                //        Uri link = Uri.parse(currLink); //GET GROUP'S UNIQUE LINK
+
+                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                sendIntent.setType("text/plain");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, groupsInfoList.get(position).getLink());
+                startActivity(Intent.createChooser(sendIntent, "Share Link"));
+            }
+        });
     }
 
 

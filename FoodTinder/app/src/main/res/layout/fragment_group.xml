@@ -29,6 +29,21 @@
         android:scrollbars="vertical" />
 
 
+    <TextView
+        android:id="@+id/no_group_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+    <TextView
+        android:id="@+id/create_group_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/no_event_label" />
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -40,17 +40,16 @@
                 android:text="Group Name" />
 
             <TextView
+                android:id="@+id/card_group_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shareable link" />
+
+            <TextView
                 android:id="@+id/card_group_events"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="List of events" />
-
-
-            <TextView
-                android:id="@+id/card_group_users"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="List of users" />
 
 
         </LinearLayout>

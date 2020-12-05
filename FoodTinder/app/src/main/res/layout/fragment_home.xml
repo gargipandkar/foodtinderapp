@@ -30,6 +30,19 @@
         android:padding="4dp"
         android:scrollbars="vertical" />
 
+    <TextView
+        android:id="@+id/no_event_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+    <TextView
+        android:id="@+id/create_event_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/no_event_label" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -49,15 +62,6 @@
             app:fabSize="normal"
             app:backgroundTint="@color/colorPrimary"/>
 
-        <Button
-            android:id="@+id/event_sel_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="100dp"
-            android:layout_marginLeft="100dp"
-            android:text="Event Selection" />
 
     </RelativeLayout>
 

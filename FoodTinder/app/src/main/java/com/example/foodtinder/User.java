@@ -1,38 +1,3 @@
-//package com.example.foodtinder;
-//
-//public class User {
-//    private String name, email;
-//
-//    User(String name, String email, String photoString){
-//        this.name = name;
-//        this.email = email;
-////        this.photoString = photoString;
-//    }
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public String getEmail() {
-//        return email;
-//    }
-//
-//
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-//
-//    public void setEmail(String email) {
-//        this.email = email;
-//    }
-//
-//
-//
-//}
-
-
-
-
 package com.example.foodtinder;
 
 import android.provider.ContactsContract;
@@ -55,7 +20,7 @@ public class User  {
     public static String name;
     public static String email;
 
-    static ArrayList<String> activeEvents = new ArrayList<>();
+    static ArrayList<String> listOfEvents = new ArrayList<>();
     static ArrayList<String> inGroups = new ArrayList<>();
 
     User(){}
@@ -101,7 +66,7 @@ public class User  {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot event: snapshot.getChildren())
-                    ls.add(event.getKey());
+                    if (!ls.contains(event.getKey())) {ls.add(event.getKey());}
                 dbcallback.onCallback(ls);
             }
 

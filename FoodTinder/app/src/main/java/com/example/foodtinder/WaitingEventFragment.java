@@ -25,6 +25,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 //import com.example.cardItems.EventListAdapter;
 
@@ -41,7 +42,7 @@ public class WaitingEventFragment extends Fragment {
     DatabaseReference db, events_ref;
     ArrayList<String> eventsList = new ArrayList<>();
     ArrayList<Event> eventsInfoList = new ArrayList<>();
-    ArrayList<Event> allEvents = new ArrayList<>();
+    HashMap<String, Event> allEvents = new HashMap<String, Event>();
     int eventCount;
 
 
@@ -59,70 +60,79 @@ public class WaitingEventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_waiting_event, container, false);
 
-
         latestEvent();
-//        Log.i(TAG, "latestEvent");
-//        Log.i(TAG, eventsInfoList.get(0).getName());
+
 
         return v;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle bundle = this.getArguments();
 
-
-
+        if (bundle != null){
+            eventsInfoList = bundle.getParcelableArrayList("eventlist");
+        }
+    }
 
     private void latestEvent() {
         // READ LIST OF EVENTS FROM FIREBASE AND PUT INTO LOCAL USER OBJECT
         db = FirebaseDatabase.getInstance().getReference();
+        Log.i(TAG, "waiting event fragment user id");
+
         events_ref = db.child("USERS").child(User.getId()).child("listOfEvents");
 
         User.setUserEvents(events_ref, new DatabaseCallback() {
             @Override
             public void onCallback(ArrayList<String> ls) {
-                eventsList.addAll(ls);
-                eventCount = eventsList.size();
-
-                User.activeEvents.clear();
-                User.activeEvents.addAll(ls);
-
-                infoList();
-
-                //LOG
-                Log.i("Check", ls.toString());
-                Log.i("Check", User.getId());
-                Log.i("Check", eventsList.toString());
-                Log.i("Check", "# of groups = "+ eventCount);
+                //CHECK IF USER HAS NO EVENTS
+                if(!ls.isEmpty()){
+                    eventsList.addAll(ls);
+                    eventCount = eventsList.size();
+                    Log.i(TAG,User.listOfEvents.toString());
+                    User.listOfEvents.clear();
+                    User.listOfEvents.addAll(ls);
+                    Log.i(TAG,User.listOfEvents.toString());
+                    infoList();
+                } else {
+                    displayList();
+                }
 
             }
 
             @Override
             public void onCallback(Event event){}
-            public void onCallback (Group group){}
+            public void onCallback(Group grp){}
             public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
 
         });
     }
 
     void infoList(){
-        Log.i(TAG, "to infoList()");
         final DatabaseReference allEvents_ref = db.child("EVENTS");
         allEvents_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-    //            GenericTypeIndicator<HashMap<String, Event>> gt = new GenericTypeIndicator<HashMap<String, Event>>() {};
-                GenericTypeIndicator<ArrayList<Event>> gt = new GenericTypeIndicator<ArrayList<Event>>() {};
+                GenericTypeIndicator<HashMap<String, Event>> gt = new GenericTypeIndicator<HashMap<String, Event>>() {};
                 allEvents = snapshot.getValue(gt);
-                Log.i(TAG, allEvents.toString());
 
                 eventsInfoList.clear();
                 for (String i: eventsList) {
-                    eventsInfoList.add(allEvents.get(Integer.valueOf(i)));
-                }
-//                Log.i(TAG, eventsInfoList.toString());
-//                Log.i("eventsInfoList name", eventsInfoList.get(0).getName());
+                    try {
+                        Event e = allEvents.get(i);
+                        e.checkExpiry(i);
+                        if (e.decision.equals("Undecided"))
+                            e.passedDeadline();
+                        if (e.active)
+                            eventsInfoList.add(e);
+                        eventCount = eventsInfoList.size();
+                    }
+                    catch(NullPointerException ex){}
 
+                }
+                // Log.i("Check", eventsInfoList.toString());
                 displayList();
-//                checkEventList(eventsInfoList);
 
             }
 
@@ -133,19 +143,7 @@ public class WaitingEventFragment extends Fragment {
     }
 
     void displayList(){
-//        LinearLayout layoutListEvents = findViewById(R.id.listevents_layout);
-//
-        Log.i("Event List", eventsInfoList.toString());
-
-//        if (waitingEventFragmentListener == null) {
-//            Intent test = new Intent(getActivity(), TestEvent.class);
-//            startActivity(test);
-//        } else {
-//            waitingEventFragmentListener.onListingEvents(eventsInfoList);
-//        }
         waitingEventFragmentListener.onListingEvents(eventsInfoList);
-
-
 
     }
 

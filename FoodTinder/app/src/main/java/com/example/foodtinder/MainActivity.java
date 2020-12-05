@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
             // User is signed in
 
             User currUser = new User(currentUser.getUid(), currentUser.getDisplayName(), currentUser.getEmail());
+//            Intent toHome = new Intent (MainActivity.this, SwipeActivity.class);
             Intent toHome = new Intent (MainActivity.this, SignOutActivity.class);
             startActivity(toHome);
             finish();

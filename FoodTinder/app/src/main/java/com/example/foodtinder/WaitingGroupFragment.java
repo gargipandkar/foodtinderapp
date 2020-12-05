@@ -54,10 +54,7 @@ public class WaitingGroupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_waiting_group, container, false);
 
-
         latestEvent();
-//        Log.i(TAG, "latestEvent");
-//        Log.i(TAG, eventsInfoList.get(0).getName());
 
         return v;
     }
@@ -121,12 +118,7 @@ public class WaitingGroupFragment extends Fragment {
     }
 
     void displayList(){
-//        LinearLayout layoutListEvents = findViewById(R.id.listevents_layout);
-//
-        Log.i("displayList", groupsInfoList.toString());
-
         waitingGroupFragmentListener.onListingGroup(groupsInfoList);
-
     }
 
     @Override
@@ -142,6 +134,6 @@ public class WaitingGroupFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        waitingGroupFragmentListener = null;
+//        waitingGroupFragmentListener = null;
     }
 }

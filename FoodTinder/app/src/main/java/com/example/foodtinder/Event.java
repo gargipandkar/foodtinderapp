@@ -17,14 +17,23 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Event implements Parcelable {
 
-    String name, group, host, location, budget, status;
+    String name;
+    String group;
+    String host;
+    String location;
+    String budget;
+    String status;
+
+
+    String dateTimeString;
     long eventDateTime, prefDateTime;
-    int id;     //USE AS KEY FOR DATABASE, BUT STORE COPY ALSO
+    String id;     //USE AS KEY FOR DATABASE, BUT STORE COPY ALSO
     Boolean active;
 
 
@@ -32,25 +41,25 @@ public class Event implements Parcelable {
     DatabaseReference ref;
     String decision;
 
-
-    HashMap<String, ArrayList<String>> RestaurantPreferences = null;
-
-
-    ArrayList<Restaurant> listOfRestaurant;
-
+    HashMap<String, Restaurant> placeDetails;      //USE IN PLACE OF listOfRestaurants
+    HashMap<String, ArrayList<String>> placeDetailsPhotos;
+    HashMap<String, Object> RestaurantPreferences;
     Event(){}
 
 
-    // for swiping.java debugging
-    Event(Integer id){
+    Event(final String id){
         this.id = id;
-        this.ref = db.child("EVENTS").child(String.valueOf(id));
-        this.ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        Log.i("event: ", id);
+        ref = db.child("EVENTS").child(id);
+//        Log.i("Info argument", id);
+//        Log.i("Info argument", ref.toString());
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 GenericTypeIndicator<HashMap<String , Object>> gt = new GenericTypeIndicator<HashMap<String, Object>>() {};
                 HashMap<String, Object> info = snapshot.getValue(gt);
-                updateEvent(info);
+                Log.i("Info argument", info.toString());
+                updateEvent(info, id);
             }
 
             @Override
@@ -60,21 +69,21 @@ public class Event implements Parcelable {
         });
     }
 
-
-
-    Event(int id, String name, String group, String host, Long eventDateTime, String location, String budget, String eventStatus){
+    Event(String  id, String name, String group, String host, Long eventDateTime, String dateTimeString, String location, String budget, String eventStatus){
         this.id = id;
         this.name = name;
         this.group = group;
         this.host = host;
         this.eventDateTime = eventDateTime;
+        this.dateTimeString = dateTimeString;
         this.location = location;
         this.budget = budget;
         this.status = eventStatus;
         this.decision = "Undecided";
         this.ref = db.child("EVENTS").child(String.valueOf(this.id));
-        this.listOfRestaurant = null;
+        this.placeDetails = null;
     }
+
 
     protected Event(Parcel in) {
         name = in.readString();
@@ -83,9 +92,13 @@ public class Event implements Parcelable {
         location = in.readString();
         budget = in.readString();
         status = in.readString();
-//        byte tmpActive = in.readByte();
-//        active = tmpActive == 0 ? null : tmpActive == 1;
-//        decision = in.readString();
+        eventDateTime = in.readLong();
+        dateTimeString = in.readString();
+        prefDateTime = in.readLong();
+        id = in.readString();
+        byte tmpActive = in.readByte();
+        active = tmpActive == 0 ? null : tmpActive == 1;
+        decision = in.readString();
     }
 
     public static final Creator<Event> CREATOR = new Creator<Event>() {
@@ -103,7 +116,7 @@ public class Event implements Parcelable {
     public void createEvent(){}
 
 
-    public int getId() {
+    public String getId() {
         return id;
     }
     public String getName(){return this.name;}
@@ -114,14 +127,12 @@ public class Event implements Parcelable {
     public String getStatus(){return this.status;}
     public String getDecision(){return this.decision;}
     public long getEventDateTime(){return this.eventDateTime;}
+    public String getDateTimeString() {
+        return dateTimeString;
+    }
     public long getPrefDateTime(){return this.prefDateTime;}
     public Boolean getActive(){return this.active;}
-    public ArrayList<Restaurant> getListOfRestaurant() {
-        return listOfRestaurant;
-    }
-    public HashMap<String, ArrayList<String>> getRestaurantPreferences() {
-        return RestaurantPreferences;
-    }
+
 
 
 
@@ -132,13 +143,136 @@ public class Event implements Parcelable {
         display.add(this.group);
         display.add(Long.toString(this.eventDateTime));
         display.add(this.status);
-//        if (!this.status.equals("Decided"))
-//            display.add(this.prefDateTime.toString());
-//        if (!this.decision.equals("Undecided"))
-//            display.add(this.decision);
         return display;
     }
 
+
+
+    public Event updateEvent(HashMap<String, Object> info, String id){
+        this.id = id;
+        this.name = (String) info.get("name");
+        this.group = (String) info.get("group");
+        this.host = (String) info.get("host");
+        this.eventDateTime = (Long) info.get("eventDateTime");
+        this.prefDateTime = (Long) info.get("prefDateTime");
+        updateEventStatus(id);
+        checkExpiry(id);
+        this.decision = (String) info.get("decision");
+        this.placeDetails = (HashMap<String, Restaurant>) info.get("placeDetails");
+        return this;
+    }
+
+    public void updateEventStatus(final String id){
+        final String[] chosen = {""};
+        ref = db.child("EVENTS").child(String.valueOf(id));
+        ref.child("decision").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                chosen[0]=snapshot.getValue(String.class);
+                setDecision(chosen[0], id);
+                if (!chosen[0].equals("Undecided"))
+                    setStatus("Match found", id);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
+    void setStatus(String status, String id){
+        ref = db.child("EVENTS").child(String.valueOf(id));
+        this.status = status;
+        ref.child("status").setValue(status);
+    }
+
+    void setDecision(String decision, String id){
+        ref = db.child("EVENTS").child(String.valueOf(id));
+        this.decision = decision;
+        ref.child("decision").setValue(decision);
+    }
+
+    public void setPrefDeadline(String prefDeadline){
+        Calendar Edt = Calendar.getInstance();
+        Edt.setTimeInMillis(this.eventDateTime);
+        Calendar Pdt = Calendar.getInstance();
+        Pdt.setTimeInMillis(this.eventDateTime);
+        switch (prefDeadline){
+            case "1 day before": Pdt.add(Calendar.DATE, -1);
+                break;
+
+            case "1 week before": Pdt.add(Calendar.WEEK_OF_MONTH, - 1);
+                break;
+
+            case "Today": Pdt.set(Calendar.HOUR_OF_DAY, 23);
+                Pdt.set(Calendar.MINUTE, 59);
+                break;
+
+            default: break;
+        }
+
+        //CHECK IF DEADLINE IS BEFORE EVENT BUT AFTER EVENT CREATION
+        //IF CHECK FAILS, SET DEADLINE TO 1 HOUR BEFORE EVENT BY DEFAULT
+        Calendar Cdt = Calendar.getInstance();
+        if (Pdt.after(Edt) || Pdt.before(Cdt)){
+            Pdt.setTimeInMillis(this.eventDateTime);
+            Pdt.add(Calendar.HOUR_OF_DAY, -1);
+        }
+        this.prefDateTime = Pdt.getTimeInMillis();
+    }
+
+    public void checkExpiry(String id){
+        Long now = Calendar.getInstance().getTimeInMillis();
+        Log.i("Event Class", "EXPIRY="+now+"/"+eventDateTime);
+        if (eventDateTime<now){
+            active = false;
+            //REMOVE FROM OVERALL EVENTS LIST
+            ref = db.child("EVENTS").child(id);
+            ref.removeValue();
+            //REMOVE FROM USER'S EVENTS LIST
+            db.child("USERS").child(User.getId()).child("listOfEvents").child(id).removeValue();
+        }
+        else {active = true;}
+    }
+
+
+    public void passedDeadline(){
+        Long now = Calendar.getInstance().getTimeInMillis();
+        Log.i("Event Class", "PREF="+now+"/"+prefDateTime);
+        if (now>prefDateTime){
+            pseudoMatch(id);
+        }
+    }
+
+    public void pseudoMatch(final String id){
+        ref = db.child("EVENTS").child(id);
+        DatabaseReference restVote_ref = ref.child("RestaurantPreferences/listOfVotes");
+        restVote_ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                GenericTypeIndicator<HashMap<String, Integer>> gt = new GenericTypeIndicator<HashMap<String, Integer>>() {};
+                HashMap<String, Integer> listVotes = snapshot.getValue(gt);
+
+                Map.Entry<String, Integer> maxEntry = null;
+                if (listVotes!=null){
+                    int max = Collections.max(listVotes.values());
+
+                    for(Map.Entry<String, Integer> entry : listVotes.entrySet()) {
+                        Integer value = entry.getValue();
+                        if(null != value && max == value)
+                            maxEntry = entry;
+
+                    }
+
+                    String rest = maxEntry.getKey();
+                    setDecision(rest, id);
+                    updateEventStatus(id);
+                }
+                else Log.i("Check", "No list of votes found");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
 
     @Override
     public int describeContents() {
@@ -153,49 +287,12 @@ public class Event implements Parcelable {
         parcel.writeString(location);
         parcel.writeString(budget);
         parcel.writeString(status);
-//        parcel.writeByte((byte) (active == null ? 0 : active ? 1 : 2));
+        parcel.writeLong(eventDateTime);
+        parcel.writeString(dateTimeString);
+        parcel.writeLong(prefDateTime);
+        parcel.writeString(id);
+        parcel.writeByte((byte) (active == null ? 0 : active ? 1 : 2));
         parcel.writeString(decision);
     }
 
-    public void updateEvent(HashMap<String, Object> info){
-        this.name = (String) info.get("name");
-        this.group = (String) info.get("group");
-        this.host = (String) info.get("host");
-//        updateEventStatus();
-        checkExpiry();
-        this.decision = (String) info.get("decision");
-        this.listOfRestaurant = (ArrayList<Restaurant>) info.get("listOfRestaurant");
-    }
-
-//    public void updateEventStatus(){
-//        final String[] chosen = {""};
-//        ref.child("decision").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                chosen[0]=snapshot.getValue(String.class);
-//                setDecision(chosen[0]);
-//                if (!chosen[0].equals("Undecided"))
-//                    setStatus("Match found");
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) { }
-//        });
-//    }
-
-    public void checkExpiry(){
-//        Calendar now = Calendar.getInstance();
-//        if (this.eventDateTime.after(now))
-//            active = false;
-//        active = true;
-    }
-
-//    void setStatus(String status){
-//        this.status = status;
-//        ref.child("status").setValue(status);
-//    }
-
-//    void setDecision(String decision){
-//        this.decision = decision;
-//        ref.child("decision").setValue(decision);
-//    }
 }

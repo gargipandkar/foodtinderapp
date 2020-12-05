@@ -31,12 +31,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
-public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener, CreateEventFragment.CreateEventFragmentListener, WaitingEventFragment.FragmentWaitingEventListener, WaitingGroupFragment.FragmentWaitingGroupListener{
+public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener, CreateEventFragment.CreateEventFragmentListener, WaitingEventFragment.FragmentWaitingEventListener, WaitingGroupFragment.FragmentWaitingGroupListener, CreateGroupFragment.CreateGroupFragmentListener, WaitingRestaurantFragment.FragmentWaitingRestaurantListener, SwipeTestFragment.FragmentSwipeListener, SwipingFragment.SwipingFragmentListener {
 
-//    public static Fragment selectedFragment = new HomeFragment();
 
     public static final String TAG = "SignOutActivity";
 
@@ -48,36 +49,29 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
-//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
+//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingRestaurantFragment()).commit();
 
 
     }
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Fragment selectedFragment = null;
-                    String fragTag;
 
                     switch (item.getItemId()){
                         case R.id.navigation_home:
                             selectedFragment = new WaitingEventFragment();
-//                            selectedFragment = new HomeFragment();
-                            fragTag = "home";
                             break;
                         case R.id.navigation_group:
                             selectedFragment = new WaitingGroupFragment();
-//                            selectedFragment = new GroupFragment();
-                            fragTag = "group";
                             break;
                         case R.id.navigation_profile:
                             selectedFragment = new ProfileFragment();
-                            fragTag = "profile";
                             break;
-                        default:
-                            fragTag = "home";
                     }
 
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
@@ -96,93 +90,59 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
     @Override
     public void onCreateEvent() {
-        Fragment creatEventFrag = new CreateEventFragment();
-        Log.i(TAG, "Fragment initialising");
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, creatEventFrag).addToBackStack(null).commit();
-        Log.i(TAG, "Fragment initialised");
-//        Intent toCreateEvent = new Intent(SignOutActivity.this, CreateEventActivity.class);
-//        startActivity(toCreateEvent);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CreateEventFragment()).addToBackStack(null).commit();
     }
 
+
+
+
+
     @Override
-    public void updateHome(boolean checkListNotEmpty, Fragment curFrag) {
-        if (checkListNotEmpty == true){
-            // detach and reattach fragment to reload home fragment
-//            Fragment frg = null;
-//            frg = getSupportFragmentManager().findFragmentByTag("home");
-//            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//            ft.detach(frg);
-//            ft.attach(frg);
-//            ft.commit();
-//            if (currentFragment instanceof "NAME OF YOUR FRAGMENT CLASS") {
-//                FragmentTransaction fragTransaction =   (getActivity()).getFragmentManager().beginTransaction();
-//                fragTransaction.detach(currentFragment);
-//                fragTransaction.attach(currentFragment);
-//                fragTransaction.commit();}
-            getSupportFragmentManager().beginTransaction().remove(curFrag).commit();
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
-        }
-
-
-
+    public void onListingRestaurant(int[] number, HashMap<String, Integer> listRestVotes, HashMap<String, HashMap<String, Object>> listRestInfo, ArrayList<String> restAddr, ArrayList<String> restName) {
+        Fragment toSwipe = new SwipingFragment();
+        Bundle bundle = new Bundle();
+        bundle.putIntArray("num", number);
+        bundle.putSerializable("votes", (Serializable) listRestVotes);
+        bundle.putStringArrayList("name", restName);
+        bundle.putStringArrayList("addr", restAddr);
+        toSwipe.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
+        Log.i(TAG, "received rest name: "+ restName.toString());
+        Log.i(TAG, "received rest addr: " + restAddr.toString());
+//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
+//        Intent toTest = new Intent(SignOutActivity.this, SwipeActivity.class);
+//        startActivity(toTest);
     }
 
     @Override
     public void onCreateGroup() {
-        Intent toCreateGroup = new Intent(SignOutActivity.this, CreateGroupActivity.class);
-        startActivity(toCreateGroup);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CreateGroupFragment()).commit();
     }
 
-
-//    @Override
-//    public void onNewEvent(boolean bool, int eventId, String name, String group, String userId, Long dateTime, String budget, String location, String status) {
-//        if (bool == true){
-//            Log.i(TAG, name);
-//            Fragment home = new HomeFragment();
-//            Bundle bundle = new Bundle();
-//            bundle.putInt("eventId", eventId);
-//            bundle.putString("name", name);
-//            bundle.putString("group", group);
-//            bundle.putString("userId", userId);
-//            bundle.putLong("dateTime", dateTime);
-//            bundle.putString("budget", budget);
-//            bundle.putString("location", location);
-//            bundle.putString("status", status);
-//            home.setArguments(bundle);
-//            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, home).commit();
-//            Log.i(TAG, "sending event details");
-//        }
-//        else {
-//            Toast.makeText(getApplicationContext(), "Ensure all details are filled up", Toast.LENGTH_SHORT).show();
-//        }
-//    }
 
     @Override
     public void onNewEventUpdate() {
         Log.i(TAG, "onNewEventUpdate()");
-//        Fragment waitingEvent = new WaitingEventFragment();
-//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, waitingEvent).commit();
-//        Log.i(TAG, "WaitingEvent Fragment initialised");
-//        Intent test = new Intent(SignOutActivity.this, TestEvent.class);
-//        startActivity(test);
     }
 
     @Override
     public void onListingEvents(ArrayList<Event> eventArrayList) {
         if (eventArrayList.size() > 0){
-            Log.i(TAG, "onListingEvents");
             // go to Home fragement with list of events
             Fragment home = new HomeFragment();
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList("eventlist", eventArrayList);
             home.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, home).commit();
-            Log.i(TAG, "sending event list");
-        } else {
-            // go to Home fragment with empty list
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
-
+            Log.i(TAG, "sending list to waiting fragment");
+            Log.i(TAG, eventArrayList.toString());
         }
+        else {
+            // go to Home fragment with empty list
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+        }
+
+
     }
 
     @Override
@@ -191,12 +151,71 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
             // go to Group fragement with list of events
             Fragment group = new GroupFragment();
             Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("grouplist", groupArrayList);
+            bundle.putSerializable("grouplist", groupArrayList);
             group.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, group).commit();
-            Log.i(TAG, "sending event list");
         } else {
             // go to Group fragment with empty list
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GroupFragment()).commit();
         }
+
     }
+
+    @Override
+    public void onNewGroupUpdate(String groupId, Group grp) {
+    }
+
+    @Override
+    public void selectRestaurant(String eventId, boolean firstEntry) {
+        // Go to Retrieving Restaurant Fragment
+        Fragment toRetrieveRest = new SwipingFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("eventId", eventId);
+        bundle.putBoolean("firstEntry", firstEntry);
+        toRetrieveRest.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toRetrieveRest).commit();
+
+//        Fragment toSwipe = new SwipingFragment();
+//        Bundle bundle = new Bundle();
+//        bundle.putString("eventId", eventId);
+//        toSwipe.setArguments(bundle);
+//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
+////        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SwipeTestFragment()).commit();
+    }
+
+    @Override
+    public void updateRest(String event_id, int number, HashMap<String, Integer> listRestVotes, boolean checkLastItem) {
+        if (number < listRestVotes.size() - 1) {
+//            Log.i(TAG, number.toString());
+            Log.i(TAG, listRestVotes.toString());
+            Fragment toSwipe = new SwipingFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("eventId", event_id);
+            bundle.putInt("num", number);
+            bundle.putSerializable("votes", listRestVotes);
+            bundle.putBoolean("checkLastItem", checkLastItem);
+            toSwipe.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
+            Log.i(TAG, "sending new swipe details");
+//            Log.i(TAG, "numbr: " + number.toString());
+            Log.i(TAG, "number: " + number);
+        } else if (number == listRestVotes.size() - 1) {
+            checkLastItem = true;
+            Fragment toSwipe = new SwipingFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("eventId", event_id);
+            bundle.putInt("num", number);
+            bundle.putSerializable("votes", listRestVotes);
+            bundle.putBoolean("checkLastItem", checkLastItem);
+            toSwipe.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
+//            Log.i(TAG, "numbr: " + number.toString());
+            Log.i(TAG, "number: " + number);
+        } else {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
+        }
+
+    }
+
+
 }
