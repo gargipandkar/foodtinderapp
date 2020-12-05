@@ -34,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
@@ -55,6 +56,8 @@ public class CreateEventFragment extends Fragment {
 
     Button btnCreateEvent;
     DatabaseReference db, eventCount_ref, events_ref, users_ref;
+    HashMap<String, String> grpNameId = new HashMap<>();
+    String groupId;
 
     public int eventCount;      //ENCAP INTO EVENT CLASS
     public ArrayList<String> eventInfoList = new ArrayList<>();
@@ -204,7 +207,8 @@ public class CreateEventFragment extends Fragment {
                     Log.i(TAG, mName);
                     //WRITE TO "EVENTS" DATABASE
                     final String eventId = db.child("EVENTS").push().getKey();
-                    currEvent = new Event(eventId, mName, group, User.getId(), eventDateTimeLong, dateTimeString, mLocation, mBudget, eventStatus);
+                    groupId = grpNameId.get(group);
+                    currEvent = new Event(eventId, mName, groupId, User.getId(), eventDateTimeLong, dateTimeString, mLocation, mBudget, eventStatus);
                     events_ref.child(eventId).setValue(currEvent);
                     Log.i("Check", "Event created");
 
@@ -222,7 +226,8 @@ public class CreateEventFragment extends Fragment {
 
                     //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
                     users_ref.child("listOfEvents").child(eventId).setValue(true);
-                    Group.retrieveGroup(group, new DatabaseCallback() {
+
+                    Group.retrieveGroup(groupId, new DatabaseCallback() {
                         @Override
                         public void onCallback(ArrayList<String> ls) { }
                         @Override
@@ -232,7 +237,9 @@ public class CreateEventFragment extends Fragment {
 
                         @Override
                         public void onCallback(Group grp) {
-                            grp.updateAllUsers(eventId, group);
+                            grp.updateAllUsers(eventId, groupId);
+//                            grpNameId.put(grp.name, groupId);
+//                            dataAdapter.add(grp.name);
                         }
 
 
@@ -293,6 +300,7 @@ public class CreateEventFragment extends Fragment {
                         public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
                         @Override
                         public void onCallback(Group grp) {
+                            grpNameId.put(grp.name, grpId);
                             dataAdapter.add(grp.name);
                         }
                     });

@@ -29,10 +29,9 @@ import com.yuyakaido.android.cardstackview.SwipeableMethod;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SwipeTestFragment extends Fragment implements GestureDetector.OnGestureListener {
+public class SwipeTestFragment extends Fragment {
 
     private static final String TAG = "SwipeTestFragment";
-    private GestureDetector gestureDetector;
     private FragmentSwipeListener swipeListener;
     private CardStackView cardStackView;
     private CardStackLayoutManager manager;
@@ -136,37 +135,6 @@ public class SwipeTestFragment extends Fragment implements GestureDetector.OnGes
 
 
         return v;
-    }
-
-
-    @Override
-    public boolean onDown(MotionEvent motionEvent) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent motionEvent) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent motionEvent) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent motionEvent) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        return false;
     }
 
 
