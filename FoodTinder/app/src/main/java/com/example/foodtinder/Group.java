@@ -31,6 +31,7 @@ public class Group {
     ArrayList<String> eventsList;
     DatabaseReference ref;
     String link;
+    HashMap<String, Boolean> listOfUsers;
 
     Group(){}
 
@@ -38,6 +39,8 @@ public class Group {
         this.id = group.id;
         this.name = group.name;
         this.memberCount = group.memberCount;
+        this.link = group.link;
+        this.listOfUsers.putAll(group.listOfUsers);
     }
 
     Group(String id, String name, String creator, DatabaseReference members, DatabaseReference events){
@@ -60,9 +63,11 @@ public class Group {
 
     public static void retrieveGroup (String id, final DatabaseCallback dbcallback){
         DatabaseReference grp_ref = db.child("GROUPS/" + id);
+        Log.i("Group node", id);
         grp_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.i("Group node", String.valueOf(snapshot.getChildrenCount()));
                 Group grp = snapshot.getValue(Group.class);
                 dbcallback.onCallback(grp);
                 Log.i("Check", grp.toString());
@@ -213,5 +218,7 @@ public class Group {
     public String getName(){return this.name;}
     public String getCreator(){return this.creator;}
     public Integer getMemberCount(){ return this.memberCount; }
+    public HashMap<String, Boolean> getListOfUsers(){return this.listOfUsers;}
+    public String getLink(){return this.link;}
     
 }

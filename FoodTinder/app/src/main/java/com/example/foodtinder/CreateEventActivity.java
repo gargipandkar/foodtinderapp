@@ -30,8 +30,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class CreateEventActivity extends AppCompatActivity implements View.OnClickListener {
+
+    HashMap<String, String> grpNameId= new HashMap<>();
+    String groupId;
 
     static final Parser parser = Parser.getParser();
     Event currEvent;
@@ -81,36 +85,6 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
         events_ref = db.child("EVENTS");
         //eventCount_ref = db.child("EVENTCOUNT");
         users_ref = db.child("USERS").child(User.getId());
-
-/*        eventCount_ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                eventCount = dataSnapshot.getValue(int.class);
-                Log.i("Check", "# of events : "+eventCount);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.w("Check", databaseError.toException());
-            }
-        });
-
- */
-
-//        events_ref.addValueEventListener(new ValueEventListener(){
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                eventInfoList.clear();
-//                for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()) {
-//                    eventInfoList.add(eventSnapshot.getKey());
-//                    Log.i("Check", eventInfoList.toString());
-//                }
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                Log.w("Check", databaseError.toException());
-//            }
-//        });
 
         setGroupOptions();
 
@@ -187,7 +161,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             public void onCallback(ArrayList<String> ls) {
                 groupOptions.addAll(ls);
 //                ArrayList<String> groupNames = new ArrayList<>();
-                for(String grpId: groupOptions){
+                for(final String grpId: groupOptions){
                     Group.retrieveGroup(grpId, new DatabaseCallback() {
                         @Override
                         public void onCallback(ArrayList<String> ls) { }
@@ -197,6 +171,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                         public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
                         @Override
                         public void onCallback(Group grp) {
+                            grpNameId.put(grp.name, grpId);
                             dataAdapter.add(grp.name);
                         }
                     });
@@ -205,15 +180,6 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                     User.inGroups.clear();
                     User.inGroups.addAll(ls);
                 }
-
-//                dataAdapter.addAll(groupNames);
-//                dataAdapter.notifyDataSetChanged();
-//                User.inGroups.clear();
-//                User.inGroups.addAll(ls);
-
-//                Log.i("Check", ls.toString());
-//                Log.i("Check", User.getId());
-//                Log.i("Check", groupOptions.toString());
             }
 
             @Override
@@ -306,8 +272,8 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
                 //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
                 users_ref.child("listOfEvents").child(eventId).setValue(true);
-//                ArrayList<String> allUsers;
-                Group.retrieveGroup(group, new DatabaseCallback() {
+                groupId = grpNameId.get(group);
+                Group.retrieveGroup(groupId, new DatabaseCallback() {
                     @Override
                     public void onCallback(ArrayList<String> ls) { }
                     @Override
@@ -317,7 +283,7 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
 
                     @Override
                     public void onCallback(Group grp) {
-                        grp.updateAllUsers(eventId, group);
+                        grp.updateAllUsers(eventId, groupId);
                     }
 
 
