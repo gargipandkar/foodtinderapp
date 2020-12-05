@@ -84,9 +84,12 @@ public class ListEventsActivity extends AppCompatActivity {
                 eventsInfoList.clear();
                 for (String i: eventsList) {
                      try {
-                         allEvents.get(i).checkExpiry(i);
-                         if (allEvents.get(i).active)
-                             eventsInfoList.add(allEvents.get(i));
+                         Event e = allEvents.get(i);
+                         e.checkExpiry(i);
+                         if (e.decision.equals("Undecided"))
+                            e.passedDeadline();
+                         if (e.active)
+                             eventsInfoList.add(e);
                          eventCount = eventsInfoList.size();
                      }
                      catch(NullPointerException ex){}

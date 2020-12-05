@@ -65,16 +65,10 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        //IDEALLY DON'T COME HERE ONLY IF EVENT STATUS IS READY TO SWIPE
-        //TODO receive Event object from clicking in list of events and put it into selectedEvent
-//        String convertId = getIntent().getStringExtra("eventId");
-//        event_id = Integer.getInteger(convertId);
-
         user_id = User.getId();
-        event_id = "-MNl0PsLNSJVK5oZcnCe";        //SHOULD BE RECEIVED FROM CLICKING ON EVENT
+        event_id = "-MNlhhtoHbS9P-iNA-_o";        //SHOULD BE RECEIVED FROM CLICKING ON EVENT
         selectedEvent = new Event(event_id);
         final DatabaseReference completed_ref = selectedEvent.ref.child("RestaurantPreferences/listOfCompleted");
-//        final DatabaseReference listRest_ref = selectedEvent.ref.child("listOfRestaurant");
         final DatabaseReference restVote_ref = selectedEvent.ref.child("RestaurantPreferences").child("listOfVotes");
         final DatabaseReference event_ref = selectedEvent.ref;
 

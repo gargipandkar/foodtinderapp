@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,7 +141,7 @@ public class Event {
         Calendar Cdt = Calendar.getInstance();
         if (Pdt.after(Edt) || Pdt.before(Cdt)){
             Pdt.setTimeInMillis(this.eventDateTime);
-            Pdt.add(Calendar.HOUR_OF_DAY, -1);
+            Pdt.add(Calendar.HOUR_OF_DAY, -2);
         }
         this.prefDateTime = Pdt.getTimeInMillis();
     }
@@ -148,7 +149,7 @@ public class Event {
 
     public void checkExpiry(String id){
         Long now = Calendar.getInstance().getTimeInMillis();
-        Log.i("Event Class", now+"/"+eventDateTime);
+        Log.i("Event Class", "EXPIRY="+now+"/"+eventDateTime);
         if (eventDateTime<now){
             active = false;
             //REMOVE FROM OVERALL EVENTS LIST
@@ -161,11 +162,12 @@ public class Event {
     }
 
 
-    public boolean passedDeadline(){
+    public void passedDeadline(){
         Long now = Calendar.getInstance().getTimeInMillis();
-        if (this.eventDateTime>this.prefDateTime)
-            return true;
-        return false;
+        Log.i("Event Class", "PREF="+now+"/"+prefDateTime);
+        if (now>prefDateTime){
+            pseudoMatch(id);
+        }
     }
 
 
@@ -186,15 +188,47 @@ public class Event {
     }
 
     void setStatus(String status, String id){
-        ref = db.child("EVENTS").child(String.valueOf(id));
+        ref = db.child("EVENTS").child(id);
         this.status = status;
         ref.child("status").setValue(status);
     }
 
     void setDecision(String decision, String id){
-        ref = db.child("EVENTS").child(String.valueOf(id));
+        ref = db.child("EVENTS").child(id);
         this.decision = decision;
         ref.child("decision").setValue(decision);
+    }
+
+    public void pseudoMatch(final String id){
+        ref = db.child("EVENTS").child(id);
+        DatabaseReference restVote_ref = ref.child("RestaurantPreferences/listOfVotes");
+        restVote_ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                GenericTypeIndicator<HashMap<String, Integer>> gt = new GenericTypeIndicator<HashMap<String, Integer>>() {};
+                HashMap<String, Integer> listVotes = snapshot.getValue(gt);
+
+                Map.Entry<String, Integer> maxEntry = null;
+                if (listVotes!=null){
+                    int max = Collections.max(listVotes.values());
+
+                    for(Map.Entry<String, Integer> entry : listVotes.entrySet()) {
+                        Integer value = entry.getValue();
+                        if(null != value && max == value)
+                            maxEntry = entry;
+
+                    }
+
+                    String rest = maxEntry.getKey();
+                    setDecision(rest, id);
+                    updateEventStatus(id);
+                }
+                else Log.i("Check", "No list of votes found");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
     }
 
 
@@ -212,19 +246,5 @@ public class Event {
     public HashMap<String, Restaurant> getPlaceDetails(){return this.placeDetails;}
     public HashMap<String, ArrayList<String>> getPlaceDetailsPhotos() {return this.placeDetailsPhotos;}
     public HashMap<String, Object> getRestaurantPreferences(){return RestaurantPreferences;}
-
-    @Exclude
-    public ArrayList<String> getDisplayDetails(){
-        ArrayList<String> display = new ArrayList<>();
-        display.add(this.name);
-        display.add(this.group);
-        display.add(this.eventDateTime.toString());
-        display.add(this.status);
-        return display;
-    }
-
-
-
-
 
 }

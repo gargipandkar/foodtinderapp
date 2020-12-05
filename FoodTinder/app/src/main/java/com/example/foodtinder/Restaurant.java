@@ -93,10 +93,10 @@ public class Restaurant {
     }
 
     public String getName(){return this.name;}
-    public String getFormattedAddress(){return this.formatted_address;}
-    public String getBusinessStatus(){return this.business_status;}
+    public String getFormatted_address(){return this.formatted_address;}
+    public String getBusiness_status(){return this.business_status;}
     public String getRating(){return this.rating;}
     public String getLocation(){return this.location;}
-    public String getPriceLevel(){return this.price_level;}
+    public String getPrice_level(){return this.price_level;}
     public ArrayList<String> getImages(){return this.images;}
 }

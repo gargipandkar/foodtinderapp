@@ -132,6 +132,9 @@ public class fetchData extends AsyncTask<Void,Void,Void> {
                         db.child("placeDetails").setValue(parser.placeDetails);
                         db.child("placeDetailsPhotos").setValue(parser.placeDetailsPhotos);
                         db.child("status").setValue("Ready to swipe");
+                        //INTITIALIZE ALL VOTES TO ZERO
+                        for(String rest: parser.placeDetails.keySet())
+                            db.child("RestaurantPreferences/listOfVotes").child(rest).setValue(0);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
