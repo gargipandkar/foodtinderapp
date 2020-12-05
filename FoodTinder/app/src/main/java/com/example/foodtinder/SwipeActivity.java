@@ -87,9 +87,9 @@ public class SwipeActivity extends AppCompatActivity {
         manager.setCanScrollHorizontal(true);
         manager.setSwipeableMethod(SwipeableMethod.Manual);
         manager.setOverlayInterpolator(new LinearInterpolator());
-        adapter = new CardStackAdapterFinal(addList());
+//        adapter = new CardStackAdapterFinal(addList());
         cardStackView.setLayoutManager(manager);
-        cardStackView.setAdapter(adapter);
+//        cardStackView.setAdapter(adapter);
         cardStackView.setItemAnimator(new DefaultItemAnimator());
 
 

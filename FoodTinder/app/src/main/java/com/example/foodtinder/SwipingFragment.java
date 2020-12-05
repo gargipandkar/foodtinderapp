@@ -67,15 +67,6 @@ public class SwipingFragment extends Fragment implements View.OnClickListener{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = this.getArguments();
-//        if (bundle != null){
-//            number = bundle.getIntArray("num");
-//            listRestVotes = (HashMap<String, Integer>) bundle.getSerializable("votes");
-//            restName = bundle.getStringArrayList("name");
-//            restAddr = bundle.getStringArrayList("addr");
-//            Log.i(TAG, "received bundle info");
-//            Log.i(TAG, restName.toString());
-//            Log.i(TAG, restAddr.toString());
-//        }
         firstEntry = bundle.getBoolean("firstEntry");
         if (firstEntry == true){
             event_id = bundle.getString("eventId");

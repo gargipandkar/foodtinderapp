@@ -35,7 +35,7 @@ public class CardStackAdapter extends RecyclerView.Adapter<CardStackAdapter.MyVi
         this.context = context;
     }
 
-    public CardStackAdapter(ArrayList<String> restName, Context context) {
+    public CardStackAdapter(ArrayList<String> restName) {
         Log.i(TAG, "listing rest name: " + restName.toString());
         this.restName = restName;
     }

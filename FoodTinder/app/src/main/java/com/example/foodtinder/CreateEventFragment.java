@@ -200,7 +200,7 @@ public class CreateEventFragment extends Fragment {
 
                 //PROCEED WHEN ALL FORM CONTENT IS VALID
                 else {
-                    eventStatus = "Created";
+                    eventStatus = "Ready to swipe";
                     //CONVERT CALENDAR TO LONG
                     Long dt = eventDateTime.getTimeInMillis();
                     mName = txtName.getText().toString();

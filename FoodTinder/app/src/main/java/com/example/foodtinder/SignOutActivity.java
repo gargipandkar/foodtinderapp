@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener, CreateEventFragment.CreateEventFragmentListener, WaitingEventFragment.FragmentWaitingEventListener, WaitingGroupFragment.FragmentWaitingGroupListener, CreateGroupFragment.CreateGroupFragmentListener, WaitingRestaurantFragment.FragmentWaitingRestaurantListener, SwipeTestFragment.FragmentSwipeListener, SwipingFragment.SwipingFragmentListener {
+public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener, CreateEventFragment.CreateEventFragmentListener, WaitingEventFragment.FragmentWaitingEventListener, WaitingGroupFragment.FragmentWaitingGroupListener, CreateGroupFragment.CreateGroupFragmentListener, WaitingRestaurantFragment.FragmentWaitingRestaurantListener, SwipingFragment.SwipingFragmentListener, SwipeTestFragment.SwipeTestFragmentListener {
 
 
     public static final String TAG = "SignOutActivity";
@@ -98,13 +98,15 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
 
     @Override
-    public void onListingRestaurant(int[] number, HashMap<String, Integer> listRestVotes, HashMap<String, HashMap<String, Object>> listRestInfo, ArrayList<String> restAddr, ArrayList<String> restName) {
-        Fragment toSwipe = new SwipingFragment();
+    public void onListingRestaurant(String event_id, ArrayList<String> restAddr, ArrayList<String> restName, HashMap<String, ArrayList<String>> listRestPhotos, Object[] listRestNames, HashMap<String, Integer> listRestVotes) {
+        Fragment toSwipe = new SwipeTestFragment();
         Bundle bundle = new Bundle();
-        bundle.putIntArray("num", number);
-        bundle.putSerializable("votes", (Serializable) listRestVotes);
+        bundle.putString("eventId", event_id);
         bundle.putStringArrayList("name", restName);
         bundle.putStringArrayList("addr", restAddr);
+        bundle.putSerializable("photos", listRestPhotos);
+        bundle.putSerializable("listRestNames", listRestNames);
+        bundle.putSerializable("listRestVotes", listRestVotes);
         toSwipe.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
         Log.i(TAG, "received rest name: "+ restName.toString());
@@ -116,7 +118,7 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
     @Override
     public void onCreateGroup() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CreateGroupFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CreateGroupFragment()).addToBackStack(null).commit();
     }
 
 
@@ -169,19 +171,27 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
     @Override
     public void selectRestaurant(String eventId, boolean firstEntry) {
         // Go to Retrieving Restaurant Fragment
-        Fragment toRetrieveRest = new SwipingFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("eventId", eventId);
-        bundle.putBoolean("firstEntry", firstEntry);
-        toRetrieveRest.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toRetrieveRest).commit();
+        // TODO: uncomment this later
+//        Fragment toRetrieveRest = new SwipingFragment();
+//        Bundle bundle = new Bundle();
+//        bundle.putString("eventId", eventId);
+//        bundle.putBoolean("firstEntry", firstEntry);
+//        toRetrieveRest.setArguments(bundle);
+//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toRetrieveRest).commit();
 
+        // TODO: testing Swiping
 //        Fragment toSwipe = new SwipingFragment();
 //        Bundle bundle = new Bundle();
 //        bundle.putString("eventId", eventId);
 //        toSwipe.setArguments(bundle);
 //        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
-////        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SwipeTestFragment()).commit();
+
+        Fragment toWaiting = new WaitingRestaurantFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("eventId", eventId);
+        bundle.putBoolean("firstEntry", firstEntry);
+        toWaiting.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toWaiting).commit();
     }
 
     @Override
@@ -219,4 +229,8 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
     }
 
 
+    @Override
+    public void finishSwipe() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
+    }
 }

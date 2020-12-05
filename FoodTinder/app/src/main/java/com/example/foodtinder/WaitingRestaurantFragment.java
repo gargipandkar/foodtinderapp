@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,21 +29,27 @@ public class WaitingRestaurantFragment extends Fragment {
 
     private FragmentWaitingRestaurantListener waitingRestaurantFragmentListener;
     private static final String TAG = "WaitingRestFragment";
-    private String event_id;
+
+    TextView rest_name,rest_desc,rest_rating;
+    ImageView rest_image;
+
     String user_id;
+    String event_id;
     Event selectedEvent;
-    final int[] number = {0};   //FOR ITERATING THROUGH RESTAURANT LIST
+
+    int[] number = {0};   //FOR ITERATING THROUGH RESTAURANT LIST
     HashMap<String, Object> item;
     ArrayList<String> itemPhotos;
     HashMap<String, Integer> listRestVotes;
     HashMap<String, HashMap<String, Object>> listRestInfo;
     HashMap<String, ArrayList<String>> listRestPhotos;
     Object[] listRestNames;
+    boolean firstEntry;
     boolean checkLastItem = false;
 
 
     public interface FragmentWaitingRestaurantListener {
-        void onListingRestaurant(int[] number, HashMap<String, Integer> listRestVotes, HashMap<String, HashMap<String, Object>> listRestInfo, ArrayList<String> restAddr, ArrayList<String> restName);
+        void onListingRestaurant(String event_id, ArrayList<String> restAddr, ArrayList<String> restName, HashMap<String, ArrayList<String>> listRestPhotos, Object[] listRestNames,HashMap<String, Integer> listRestVotes);
     }
 
 
@@ -49,8 +57,22 @@ public class WaitingRestaurantFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = this.getArguments();
-        event_id = bundle.getString("eventId");
-        Log.i(TAG, event_id);
+        firstEntry = bundle.getBoolean("firstEntry");
+        if (firstEntry == true){
+            event_id = bundle.getString("eventId");
+            firstEntry = false;
+            Log.i(TAG, "listRestVotes is null");
+        } else {
+            event_id = bundle.getString("eventId");
+            int num = bundle.getInt("num");
+            number[0] = num;
+            Log.i(TAG, "received in swiping fragment");
+            Log.i(TAG, number.toString());
+            Log.i(TAG, String.valueOf(num));
+            listRestVotes = (HashMap<String, Integer>) bundle.getSerializable("votes");
+            checkLastItem = bundle.getBoolean("checkLastItem");
+            firstEntry = false;
+        }
     }
 
     @Nullable
@@ -61,7 +83,6 @@ public class WaitingRestaurantFragment extends Fragment {
         user_id = User.getId();
 
         selectedEvent = new Event(event_id);
-
         final DatabaseReference completed_ref = selectedEvent.ref.child("RestaurantPreferences/listOfCompleted");
         final DatabaseReference restVote_ref = selectedEvent.ref.child("RestaurantPreferences").child("listOfVotes");
         final DatabaseReference event_ref = selectedEvent.ref;
@@ -84,7 +105,7 @@ public class WaitingRestaurantFragment extends Fragment {
                 // IDEALLY SHOULDN'T COME TO THIS CHECK SINCE USER CAN ONLY ACCESS SWIPING ACTIVITY ONCE
                 // SEND USER BACK TO HOME IF VISITS AGAIN
                 else {
-                    // TODO: Give a toast in SignOutActivity
+                    //TODO: PREVENT USER FROM COMING BACK
 //                    Intent next = new Intent(Swiping.this, ListEventsActivity.class);
 //                    startActivity(next);
                 }
@@ -130,15 +151,13 @@ public class WaitingRestaurantFragment extends Fragment {
                         GenericTypeIndicator<HashMap<String, Integer>> gt = new GenericTypeIndicator<HashMap<String, Integer>>() {};
                         try {
                             listRestVotes =  dataSnapshot.getValue(gt);
-                            Log.i("Check", listRestVotes.toString());
                         } catch (NullPointerException ex) {
                             listRestVotes = new HashMap<>();
                             for (Object i: listRestNames){listRestVotes.put((String)i, 0);}
                         }
 
-
-                        if (number[0]<arr.size() && !arr.isEmpty()) {
-                            select_restaurant(arr);
+                        if (number[0]<arr.size() && !arr.isEmpty()){
+//                            select_restaurant(arr, v);
                             displayList();
                         }
                     }
@@ -159,35 +178,23 @@ public class WaitingRestaurantFragment extends Fragment {
 
 
     // GETS RESTAURANT INFORMATION TO DISPLAY AS NEXT ITEM
-    public void select_restaurant(final HashMap<String, HashMap<String, Object>> arr) {
-        Log.i("Check", arr.toString());
-        Log.i("Check", listRestVotes.toString());
-
+    public void select_restaurant(final HashMap<String, HashMap<String, Object>> arr, View v) {
         String rest = (String) listRestNames[number[0]];
         item = arr.get(rest);
-//        rest_desc.setText((String)item.get("formatted_address"));
-//        rest_rating.setText((String)item.get("rating"));
-//        if (listRestPhotos.containsKey(rest)){
-//            itemPhotos = listRestPhotos.get(rest);
-//            new DownloadImageTask((ImageView) findViewById(R.id.rest_image)).execute(itemPhotos.get(0));
-//        }
-
-        Log.i("Check", "Item "+number[0]);
-
+        rest_name.setText(rest);
+        rest_desc.setText((String)item.get("formatted_address"));
+        rest_rating.setText((String)item.get("rating"));
+        if (listRestPhotos.containsKey(rest)){
+            itemPhotos = listRestPhotos.get(rest);
+            new DownloadImageTask((ImageView) v.findViewById(R.id.rest_image)).execute(itemPhotos.get(0));
+        }
     }
 
-
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-    }
 
     void displayList(){
         Log.i(TAG, "listing in display list:" + listRestInfo.toString());
         Log.i(TAG, "Size: " + listRestInfo.size());
+        Log.i(TAG, "photos: " + listRestPhotos.toString());
         ArrayList<String> restName = new ArrayList<>();
         ArrayList<String> restAddr = new ArrayList<>();
         for (int i = 0; i<listRestInfo.size(); i++){
@@ -196,7 +203,9 @@ public class WaitingRestaurantFragment extends Fragment {
             restAddr.add(String.valueOf(listRestInfo.get(rest).get("formatted_address")));
         }
         Log.i(TAG, "Rest name: "+ restName.toString());
-        waitingRestaurantFragmentListener.onListingRestaurant(number, listRestVotes, listRestInfo, restAddr, restName);
+        Log.i(TAG, "Rest addr: "+ restAddr.toString());
+
+        waitingRestaurantFragmentListener.onListingRestaurant(event_id, restAddr, restName, listRestPhotos, listRestNames, listRestVotes);
     }
 
     @Override
