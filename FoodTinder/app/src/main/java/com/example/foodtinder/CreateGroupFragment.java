@@ -42,10 +42,10 @@ public class CreateGroupFragment extends Fragment {
 
     private CreateGroupFragmentListener listener;
     public interface CreateGroupFragmentListener {
-        void onNewGroupUpdate(String groupId, Group grp);
+        void onNewGroupUpdate();
     }
 
-//    public CreateEventFragment() {
+//    public CreateGroupFragment() {
 //        // Required empty public constructor
 //    }
 
@@ -87,7 +87,7 @@ public class CreateGroupFragment extends Fragment {
 //                displayLink.putExtra("grpId", currGroup.id);
 //                startActivity(displayLink);
 
-                listener.onNewGroupUpdate(currGroup.id, currentGroup);
+                listener.onNewGroupUpdate();
 
 
             }

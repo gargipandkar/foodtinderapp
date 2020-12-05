@@ -355,6 +355,8 @@ public class Group implements Parcelable {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Group grp = snapshot.getValue(Group.class);
+                Log.i(TAG, "Checking snapshot");
+                Log.i(TAG, snapshot.toString());
                 dbcallback.onCallback(grp);
                 Log.i("Check", grp.toString());
             }

@@ -122,7 +122,7 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
     @Override
     public void onNewEventUpdate() {
-        Log.i(TAG, "onNewEventUpdate()");
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
     }
 
     @Override
@@ -162,7 +162,8 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
     }
 
     @Override
-    public void onNewGroupUpdate(String groupId, Group grp) {
+    public void onNewGroupUpdate() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingGroupFragment()).commit();
     }
 
     @Override
