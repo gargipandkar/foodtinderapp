@@ -208,7 +208,7 @@ public class CreateEventFragment extends Fragment {
                     //WRITE TO "EVENTS" DATABASE
                     final String eventId = db.child("EVENTS").push().getKey();
                     groupId = grpNameId.get(group);
-                    currEvent = new Event(eventId, mName, groupId, User.getId(), eventDateTimeLong, dateTimeString, mLocation, mBudget, eventStatus);
+                    currEvent = new Event(eventId, mName, groupId, User.getId(), eventDateTimeLong, dateTimeString, mLocation, mBudget, deadline, eventStatus);
                     events_ref.child(eventId).setValue(currEvent);
                     Log.i("Check", "Event created");
 

@@ -69,13 +69,14 @@ public class Event implements Parcelable {
         });
     }
 
-    Event(String  id, String name, String group, String host, Long eventDateTime, String dateTimeString, String location, String budget, String eventStatus){
+    Event(String  id, String name, String group, String host, Long eventDateTime, String dateTimeString, String location, String budget,  String prefDeadline, String eventStatus){
         this.id = id;
         this.name = name;
         this.group = group;
         this.host = host;
         this.eventDateTime = eventDateTime;
         this.dateTimeString = dateTimeString;
+        setPrefDeadline(prefDeadline);
         this.location = location;
         this.budget = budget;
         this.status = eventStatus;
