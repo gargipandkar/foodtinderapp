@@ -186,16 +186,34 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onCallback(ArrayList<String> ls) {
                 groupOptions.addAll(ls);
-                //dataAdapter.clear();
-                dataAdapter.addAll(groupOptions);
-                dataAdapter.notifyDataSetChanged();
+//                ArrayList<String> groupNames = new ArrayList<>();
+                for(String grpId: groupOptions){
+                    Group.retrieveGroup(grpId, new DatabaseCallback() {
+                        @Override
+                        public void onCallback(ArrayList<String> ls) { }
+                        @Override
+                        public void onCallback(Event event) { }
+                        @Override
+                        public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
+                        @Override
+                        public void onCallback(Group grp) {
+                            dataAdapter.add(grp.name);
+                        }
+                    });
 
-                User.inGroups.clear();
-                User.inGroups.addAll(ls);
+                    dataAdapter.notifyDataSetChanged();
+                    User.inGroups.clear();
+                    User.inGroups.addAll(ls);
+                }
 
-                Log.i("Check", ls.toString());
-                Log.i("Check", User.getId());
-                Log.i("Check", groupOptions.toString());
+//                dataAdapter.addAll(groupNames);
+//                dataAdapter.notifyDataSetChanged();
+//                User.inGroups.clear();
+//                User.inGroups.addAll(ls);
+
+//                Log.i("Check", ls.toString());
+//                Log.i("Check", User.getId());
+//                Log.i("Check", groupOptions.toString());
             }
 
             @Override

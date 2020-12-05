@@ -141,7 +141,7 @@ public class Event {
         Calendar Cdt = Calendar.getInstance();
         if (Pdt.after(Edt) || Pdt.before(Cdt)){
             Pdt.setTimeInMillis(this.eventDateTime);
-            Pdt.add(Calendar.HOUR_OF_DAY, -2);
+            Pdt.add(Calendar.HOUR_OF_DAY, -1);
         }
         this.prefDateTime = Pdt.getTimeInMillis();
     }
