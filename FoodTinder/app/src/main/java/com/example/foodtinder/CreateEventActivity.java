@@ -33,6 +33,7 @@ import java.util.Calendar;
 
 public class CreateEventActivity extends AppCompatActivity implements View.OnClickListener {
 
+    static final Parser parser = Parser.getParser();
     Event currEvent;
 
     Button btnDatePicker, btnTimePicker;
@@ -245,15 +246,21 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
         if (v == btnCreateEvent){
 
             //CHECK IF FORM IS FILLED APPROPRIATELY
-            Long now = Calendar.getInstance().getTimeInMillis();
+            Calendar now = Calendar.getInstance();
+            Calendar buffer = Calendar.getInstance();
+            buffer.add(Calendar.HOUR_OF_DAY, 2);
 
             if (group.equals("-- Assign to group --") || txtName.getText().equals("Enter event name") ||
                     eventDateTime == null || txtDate.getText().length()==0 || txtTime.getText().length()==0) {
                 Toast.makeText(getApplicationContext(), "DO NOT LEAVE FIELD BLANK", Toast.LENGTH_LONG).show();
             }
 
-            else if (eventDateTime.getTimeInMillis()<now){
+            else if (eventDateTime.getTimeInMillis()<=now.getTimeInMillis()){
                 Toast.makeText(getApplicationContext(), "DATE-TIME HAS ALREADY PASSED", Toast.LENGTH_LONG).show();
+            }
+
+            else if (eventDateTime.getTimeInMillis()<buffer.getTimeInMillis()){
+                Toast.makeText(getApplicationContext(), "PICK A LATER DATE-TIME", Toast.LENGTH_LONG).show();
             }
 
             //PROCEED WHEN ALL FORM CONTENT IS VALID
@@ -267,9 +274,21 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                 events_ref.child(eventId).setValue(currEvent);
                 Log.i("Check", "Event created");
 
+                //Call API to get restaurants and update status when ready
+                parser.setEventId(eventId);
+                parser.queryInfo.put("min_price", "1");
+                parser.queryInfo.put("max_price", String.valueOf(budget.length()));
+
+                fetchData process = new fetchData();
+                URLGenerator urlGenerator = new URLGenerator();
+                String urlStr = urlGenerator.generateFindPlaceURL(location, "1", "4");
+                process.setType("findplace");
+                process.setUrl(urlStr);
+                process.execute();
+
                 //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
                 users_ref.child("listOfEvents").child(eventId).setValue(true);
-                ArrayList<String> allUsers;
+//                ArrayList<String> allUsers;
                 Group.retrieveGroup(group, new DatabaseCallback() {
                     @Override
                     public void onCallback(ArrayList<String> ls) { }
@@ -282,36 +301,36 @@ public class CreateEventActivity extends AppCompatActivity implements View.OnCli
                     public void onCallback(Group grp) {
                         grp.updateAllUsers(eventId, group);
 
-                        //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
-                        //UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
-                        final String searchLocation = location;
-                        final Long searchBudget = new Long(budget.length()+1);
-
-                        Log.i("Query", searchLocation+searchBudget);
-                        final DatabaseReference currEvent_ref = db.child("EVENTS").child(eventId);
-                        currEvent.listOfRestaurant = new ArrayList<>();
-
-                        Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
-                            @Override
-                            public void onCallback(ArrayList<String> ls) { }
-                            @Override
-                            public void onCallback(Event event) { }
-                            @Override
-                            public void onCallback(Group grp) { }
-
-                            @Override
-                            public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
-                                Log.i("Retrieve Restaurants", allRest.toString());
-                                for (Restaurant r: allRest){
-                                    if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
-                                        currEvent.listOfRestaurant.add(r);
-                                }
-
-                                currEvent_ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
-                                currEvent.status = "Ready to swipe";
-                                currEvent_ref.child("status").setValue(currEvent.status);
-                            }
-                        });
+//                        //RETRIEVE ALL RESTAURANTS INFO FROM FIREBASE AND QUERY DATA
+//                        //UPDATE EVENT'S POSSIBLE CHOICES AND EVENT STATUS TO READY TO SWIPE
+//                        final String searchLocation = location;
+//                        final Long searchBudget = new Long(budget.length()+1);
+//
+//                        Log.i("Query", searchLocation+searchBudget);
+//                        final DatabaseReference currEvent_ref = db.child("EVENTS").child(eventId);
+//                        currEvent.listOfRestaurant = new ArrayList<>();
+//
+//                        Restaurant.retrieveAllRestaurants(new DatabaseCallback() {
+//                            @Override
+//                            public void onCallback(ArrayList<String> ls) { }
+//                            @Override
+//                            public void onCallback(Event event) { }
+//                            @Override
+//                            public void onCallback(Group grp) { }
+//
+//                            @Override
+//                            public void onCallback(ArrayList<Restaurant> allRest, boolean done) {
+//                                Log.i("Retrieve Restaurants", allRest.toString());
+//                                for (Restaurant r: allRest){
+//                                    if (r.location.equals(searchLocation) && r.price_level.equals(searchBudget))
+//                                        currEvent.listOfRestaurant.add(r);
+//                                }
+//
+//                                currEvent_ref.child("listOfRestaurant").setValue(currEvent.listOfRestaurant);
+//                                currEvent.status = "Ready to swipe";
+//                                currEvent_ref.child("status").setValue(currEvent.status);
+//                            }
+//                        });
 
                     }
 

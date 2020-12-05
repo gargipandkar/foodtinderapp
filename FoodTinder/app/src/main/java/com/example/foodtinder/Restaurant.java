@@ -22,9 +22,9 @@ public class Restaurant {
     static Integer count = 0;
     String name;
     String formatted_address;
-    Long rating;
+    String rating;
     String business_status;
-    Long price_level;
+    String price_level;
     String location;
     ArrayList<String> images;
     
@@ -32,7 +32,7 @@ public class Restaurant {
     
     Restaurant(){}
     
-    Restaurant(String name, String formatted_address, String business_status, Long rating, Long price_level, String location, ArrayList<String> images){
+    Restaurant(String name, String formatted_address, String business_status, String rating, String price_level, String location, ArrayList<String> images){
         this.name=name;
         this.rating=rating;
         this.business_status=business_status;
@@ -45,24 +45,24 @@ public class Restaurant {
 
     Restaurant(String name, HashMap<String, Object> info, ArrayList<String> images){
         this.name=name;
-        this.rating=(Long) info.get("rating");
+        this.rating=(String) info.get("rating");
         this.business_status=(String)info.get("business_status");
         this.formatted_address=(String) info.get("formatted_address");
         this.images=images;
         this.location=(String)info.get("location");
-        this.price_level=(Long) info.get("price_level");
+        this.price_level=(String) info.get("price_level");
         count++;
     }
 
     Restaurant(HashMap<String, Object> info){
         this.name=(String)info.get("name");
-        this.rating=(Long) info.get("rating");
+        this.rating=(String) info.get("rating");
         this.business_status=(String)info.get("business_status");
         this.formatted_address=(String) info.get("formatted_address");
         this.images = new ArrayList<>();
         this.images.addAll((ArrayList<String>) info.get("images"));
         this.location=(String)info.get("location");
-        this.price_level=(Long)info.get("price_level");
+        this.price_level=(String)info.get("price_level");
         count++;
     }
 
@@ -95,8 +95,8 @@ public class Restaurant {
     public String getName(){return this.name;}
     public String getFormattedAddress(){return this.formatted_address;}
     public String getBusinessStatus(){return this.business_status;}
-    public Long getRating(){return this.rating;}
+    public String getRating(){return this.rating;}
     public String getLocation(){return this.location;}
-    public Long getPriceLevel(){return this.price_level;}
+    public String getPriceLevel(){return this.price_level;}
     public ArrayList<String> getImages(){return this.images;}
 }

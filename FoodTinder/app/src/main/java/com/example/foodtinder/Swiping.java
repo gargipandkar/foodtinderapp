@@ -37,9 +37,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
@@ -47,14 +50,16 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
     TextView rest_name,rest_desc,rest_rating;
     ImageView rest_image;
 
-    String user_id;
-    Integer event_id;
+    String user_id, event_id;
     Event selectedEvent;
 
     final int[] number = {0};   //FOR ITERATING THROUGH RESTAURANT LIST
     HashMap<String, Object> item;
-    ArrayList<Integer> listRestVotes;
-    ArrayList<HashMap<String, Object>> listRestInfo;
+    ArrayList<String> itemPhotos;
+    HashMap<String, Integer> listRestVotes;
+    HashMap<String, HashMap<String, Object>> listRestInfo;
+    HashMap<String, ArrayList<String>> listRestPhotos;
+    Object[] listRestNames;
 
 
     @Override
@@ -62,32 +67,17 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
         //IDEALLY DON'T COME HERE ONLY IF EVENT STATUS IS READY TO SWIPE
         //TODO receive Event object from clicking in list of events and put it into selectedEvent
-        user_id = User.getId();
 //        String convertId = getIntent().getStringExtra("eventId");
 //        event_id = Integer.getInteger(convertId);
 
-//        Log.i("Info argument", convertId);
-        //RETRIEVE EVENT TO BE SWIPED FROM FIREBASE
-        /*selectedEvent = new Event();
-        selectedEvent.retrieveEvent(event_id, new DatabaseCallback() {
-            @Override
-            public void onCallback(ArrayList<String> ls) { }
-            @Override
-            public void onCallback(Group grp) { }
-            @Override
-            public void onCallback(ArrayList<Restaurant> allRest, boolean done) { }
-
-            @Override
-            public void onCallback(Event event) {
-
-            }
-        });*/
-        //selectedEvent = new Event(33);
-
-
+        user_id = User.getId();
+        event_id = "-MNl0PsLNSJVK5oZcnCe";        //SHOULD BE RECEIVED FROM CLICKING ON EVENT
+        selectedEvent = new Event(event_id);
         final DatabaseReference completed_ref = selectedEvent.ref.child("RestaurantPreferences/listOfCompleted");
-        final DatabaseReference listRest_ref = selectedEvent.ref.child("listOfRestaurant");
+//        final DatabaseReference listRest_ref = selectedEvent.ref.child("listOfRestaurant");
         final DatabaseReference restVote_ref = selectedEvent.ref.child("RestaurantPreferences").child("listOfVotes");
+        final DatabaseReference event_ref = selectedEvent.ref;
+
 
         // ADD USER TO LIST OF THOSE WHO HAVE FINISHED SWIPING
         completed_ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -138,29 +128,91 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
         //assign default image to ImageView here
 
 
-        // RETRIEVE LIST OF RESTAURANT OPTIONS
-        listRest_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//        // RETRIEVE LIST OF RESTAURANT OPTIONS
+//        listRest_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                GenericTypeIndicator<ArrayList<HashMap<String, Object>>> gt = new GenericTypeIndicator<ArrayList<HashMap<String, Object>>>() {};
+//                final ArrayList<HashMap<String, Object>> arr = dataSnapshot.getValue(gt);
+//
+//                // RETRIEVE LIST OF VOTES, IF ANY AND CREATE LOCAL COPY
+//                restVote_ref.addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                        GenericTypeIndicator<ArrayList<Integer>> gt = new GenericTypeIndicator<ArrayList<Integer>>() {};
+//                        try {
+//                            listRestVotes =  dataSnapshot.getValue(gt);
+//                            Log.i("Check", listRestVotes.toString());
+//                        } catch (NullPointerException ex) {
+//                            listRestVotes = new ArrayList<>();
+//                            for (int i=0; i<arr.size(); i++){listRestVotes.add(i, 0);}
+//                        }
+//
+//                        listRestInfo = arr;
+//                        if (number[0]<arr.size())
+//                            select_restaurant(arr);
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//                    }
+//                });
+//
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//            }
+//        });
+
+
+        // RETRIEVE LIST OF RESTAURANT OPTIONS DETAILS AND IMAGES
+        event_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<ArrayList<HashMap<String, Object>>> gt = new GenericTypeIndicator<ArrayList<HashMap<String, Object>>>() {};
-                final ArrayList<HashMap<String, Object>> arr = dataSnapshot.getValue(gt);
+//               Log.i("place", String.valueOf(dataSnapshot.getChildrenCount()));
+                GenericTypeIndicator<HashMap<String, HashMap<String, Object>>> gt = new GenericTypeIndicator<HashMap<String, HashMap<String, Object>>>() {};
+                GenericTypeIndicator<HashMap<String, ArrayList<String>>> gtPhotos = new GenericTypeIndicator<HashMap<String, ArrayList<String>>>() {};
+//                GenericTypeIndicator<ArrayList<String>> gtNames = new GenericTypeIndicator<ArrayList<String>>() {};
+
+                final HashMap<String, HashMap<String, Object>> arr = new HashMap<>();
+                final HashMap<String, ArrayList<String>> arrPhotos= new HashMap<>();
+//                final ArrayList<String> arrNames = new ArrayList<>();
+
+                for (DataSnapshot prop: dataSnapshot.getChildren()){
+//                    Log.i("place", prop.toString());
+                    if (prop.getKey().equals("placeDetails")){
+                        arr.putAll(prop.getValue(gt));
+//                        for (DataSnapshot name: prop.getChildren())
+//                            arrNames.add(name.getKey());
+                    }
+                    if (prop.getKey().equals(("placeDetailsPhotos")))
+                        arrPhotos.putAll((prop.getValue(gtPhotos)));
+
+                }
+
+                Log.i("placeDetails", arr.toString());
+                Log.i("placeDetailPhotos", arrPhotos.toString());
+
+                listRestInfo = arr;
+                listRestPhotos = arrPhotos;
+                listRestNames = arr.keySet().toArray();
 
                 // RETRIEVE LIST OF VOTES, IF ANY AND CREATE LOCAL COPY
                 restVote_ref.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                        GenericTypeIndicator<ArrayList<Integer>> gt = new GenericTypeIndicator<ArrayList<Integer>>() {};
+                        GenericTypeIndicator<HashMap<String, Integer>> gt = new GenericTypeIndicator<HashMap<String, Integer>>() {};
                         try {
                             listRestVotes =  dataSnapshot.getValue(gt);
                             Log.i("Check", listRestVotes.toString());
                         } catch (NullPointerException ex) {
-                            listRestVotes = new ArrayList<>();
-                            for (int i=0; i<arr.size(); i++){listRestVotes.add(i, 0);}
+                            listRestVotes = new HashMap<>();
+                            for (Object i: listRestNames){listRestVotes.put((String)i, 0);}
                         }
 
-                        listRestInfo = arr;
-                        if (number[0]<arr.size())
+
+                        if (number[0]<arr.size() && !arr.isEmpty())
                             select_restaurant(arr);
                     }
 
@@ -174,27 +226,34 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-
     }
 
 
     // GETS RESTAURANT INFORMATION TO DISPLAY AS NEXT ITEM
-    public void select_restaurant(final ArrayList<HashMap<String, Object>> arr) {
+    public void select_restaurant(final HashMap<String, HashMap<String, Object>> arr) {
         Log.i("Check", arr.toString());
         Log.i("Check", listRestVotes.toString());
 
-        // arr RECEIVED AS PARAMETER
-        item = arr.get(number[0]);
-        //Log.i("restaurant", item.toString());
-
-        rest_name.setText((String)item.get("name"));
+        String rest = (String) listRestNames[number[0]];
+        item = arr.get(rest);
+        rest_name.setText(rest);
         Log.i("name", rest_name.getText().toString());
-        rest_desc.setText((String)item.get("formattedAddress"));
-        String convert_rating = String.valueOf(item.get("rating"));
-        rest_rating.setText(convert_rating);
-        //TODO assign image link to ImageView
-        ArrayList<String> imgLinks = (ArrayList<String>)item.get("images");
-        new DownloadImageTask((ImageView) findViewById(R.id.rest_image)).execute(imgLinks.get(0));
+        rest_desc.setText((String)item.get("formatted_address"));
+        rest_rating.setText((String)item.get("rating"));
+        if (listRestPhotos.containsKey(rest)){
+            itemPhotos = listRestPhotos.get(rest);
+            new DownloadImageTask((ImageView) findViewById(R.id.rest_image)).execute(itemPhotos.get(0));
+        }
+
+
+
+//        Log.i("name", rest_name.getText().toString());
+//        rest_desc.setText((String)item.get("formattedAddress"));
+//        String convert_rating = String.valueOf(item.get("rating"));
+//        rest_rating.setText(convert_rating);
+//        //TODO assign image link to ImageView
+//        ArrayList<String> imgLinks = (ArrayList<String>)item.get("images");
+//        new DownloadImageTask((ImageView) findViewById(R.id.rest_image)).execute(imgLinks.get(0));
 
         Log.i("Check", "Item "+number[0]);
 
@@ -203,13 +262,15 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         DatabaseReference restVote_ref = selectedEvent.ref.child("RestaurantPreferences").child("listOfVotes");
+        String rest = (String) listRestNames[number[0]];
 
         if (v==like_btn){
-            if (rest_name.getText().toString().equals(item.get("name")) && number[0]<listRestVotes.size()){
+            if (rest_name.getText().toString().equals(rest) && number[0]<listRestVotes.size()){
                 if (number[0]==(listRestVotes.size() - 1)){
                     // MAKE NUMBER GO OUT OF RANGE NOW
                     number[0]++;
                     // UPDATE DATABASE VOTES LIST
+                    //TODO LAST RESTAURANT VOTES NOT BEING UPDATED, CHANGE LOGIC
                     restVote_ref.setValue((listRestVotes));
                     //CHECK IF ALL MEMBERS HAVE FINISHED SWIPING, IF YES MAKE DECISION
                     stillSwiping();
@@ -220,8 +281,8 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
                 if (number[0]<listRestVotes.size()){
                     // UPDATE VOTE FOR DISPLAYED ITEM
-                    int currVal = listRestVotes.get(number[0]);
-                    listRestVotes.set(number[0], currVal+1);
+                    int currVal = listRestVotes.get(rest);
+                    listRestVotes.put(rest, currVal+1);
                     //MOVE TO NEXT ITEM
                     number[0]++;
                     select_restaurant(listRestInfo);
@@ -233,7 +294,7 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
 
 
         else if (v==dislike_btn){
-            if (rest_name.getText().toString().equals(item.get("name"))) {
+            if (rest_name.getText().toString().equals(rest)) {
                 if (number[0]==(listRestVotes.size() - 1)){
                     // MAKE NUMBER GO OUT OF RANGE NOW
                     number[0]++;
@@ -311,17 +372,22 @@ public class Swiping extends AppCompatActivity implements View.OnClickListener {
         restVote_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                GenericTypeIndicator<ArrayList<Integer>> gt = new GenericTypeIndicator<ArrayList<Integer>>() {};
-                ArrayList<Integer> listVotes = snapshot.getValue(gt);
-                int maxVotes = 0;
-                int restPos = 0;
+                GenericTypeIndicator<HashMap<String, Integer>> gt = new GenericTypeIndicator<HashMap<String, Integer>>() {};
+                HashMap<String, Integer> listVotes = snapshot.getValue(gt);
+
+                Map.Entry<String, Integer> maxEntry = null;
                 if (listVotes!=null){
-                    maxVotes = Collections.max(listVotes);
-                    restPos = listVotes.indexOf(maxVotes);
+                    int max = Collections.max(listVotes.values());
 
-                    String name = (String) listRestInfo.get(restPos).get("name");
+                    for(Map.Entry<String, Integer> entry : listVotes.entrySet()) {
+                        Integer value = entry.getValue();
+                        if(null != value && max == value)
+                            maxEntry = entry;
 
-                    selectedEvent.setDecision(name, selectedEvent.getId());
+                    }
+
+                    String rest = maxEntry.getKey();
+                    selectedEvent.setDecision(rest, selectedEvent.getId());
                     selectedEvent.updateEventStatus(selectedEvent.getId());
                 }
                 else Log.i("Check", "No list of votes found");

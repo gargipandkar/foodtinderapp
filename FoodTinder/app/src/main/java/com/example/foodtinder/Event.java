@@ -32,8 +32,9 @@ public class Event {
     Boolean active = true;
     String decision;
 
-    ArrayList<Restaurant> listOfRestaurant;
-    HashMap<String, ArrayList<Object>> RestaurantPreferences;
+    HashMap<String, Restaurant> placeDetails;      //USE IN PLACE OF listOfRestaurants
+    HashMap<String, ArrayList<String>> placeDetailsPhotos;
+    HashMap<String, Object> RestaurantPreferences;
 
     static DatabaseReference db = FirebaseDatabase.getInstance().getReference();
     DatabaseReference ref = db.child("EVENTS");
@@ -43,8 +44,8 @@ public class Event {
     Event(final String id){
         this.id = id;
         ref = db.child("EVENTS").child(id);
-        Log.i("Info argument", id);
-        Log.i("Info argument", ref.toString());
+//        Log.i("Info argument", id);
+//        Log.i("Info argument", ref.toString());
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -97,7 +98,7 @@ public class Event {
         checkExpiry(id);
         this.decision = "Undecided";
         this.ref = db.child("EVENTS").child(String.valueOf(this.id));
-        this.listOfRestaurant = null;
+        this.placeDetails = null;
     }
 
     public Event updateEvent(HashMap<String, Object> info, String id){
@@ -105,10 +106,12 @@ public class Event {
         this.name = (String) info.get("name");
         this.group = (String) info.get("group");
         this.host = (String) info.get("host");
+        this.eventDateTime = (Long) info.get("eventDateTime");
+        this.prefDateTime = (Long) info.get("prefDateTime");
         updateEventStatus(id);
         checkExpiry(id);
         this.decision = (String) info.get("decision");
-        this.listOfRestaurant = (ArrayList<Restaurant>) info.get("listOfRestaurant");
+        this.placeDetails = (HashMap<String, Restaurant>) info.get("placeDetails");
         return this;
     }
 
@@ -130,6 +133,14 @@ public class Event {
                         break;
 
             default: break;
+        }
+
+        //CHECK IF DEADLINE IS BEFORE EVENT BUT AFTER EVENT CREATION
+        //IF CHECK FAILS, SET DEADLINE TO 1 HOUR BEFORE EVENT BY DEFAULT
+        Calendar Cdt = Calendar.getInstance();
+        if (Pdt.after(Edt) || Pdt.before(Cdt)){
+            Pdt.setTimeInMillis(this.eventDateTime);
+            Pdt.add(Calendar.HOUR_OF_DAY, -1);
         }
         this.prefDateTime = Pdt.getTimeInMillis();
     }
@@ -198,7 +209,9 @@ public class Event {
     public long getEventDateTime(){return this.eventDateTime;}
     public long getPrefDateTime(){return this.prefDateTime;}
     public Boolean getActive(){return this.active;}
-    public HashMap<String, ArrayList<Object>> getRestaurantPreferences(){return RestaurantPreferences;}
+    public HashMap<String, Restaurant> getPlaceDetails(){return this.placeDetails;}
+    public HashMap<String, ArrayList<String>> getPlaceDetailsPhotos() {return this.placeDetailsPhotos;}
+    public HashMap<String, Object> getRestaurantPreferences(){return RestaurantPreferences;}
 
     @Exclude
     public ArrayList<String> getDisplayDetails(){
