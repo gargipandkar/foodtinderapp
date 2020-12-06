@@ -40,6 +40,7 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
 
     public static final String TAG = "SignOutActivity";
+    private boolean fromDynamicLink = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -51,7 +52,10 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
 //        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingRestaurantFragment()).commit();
-
+        fromDynamicLink = getIntent().getBooleanExtra("EXTRA_JOINED_GROUP", false);
+        if (fromDynamicLink == true){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingGroupFragment()).commit();
+        }
 
     }
 
@@ -119,6 +123,14 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
     @Override
     public void onCreateGroup() {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CreateGroupFragment()).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onShareLink(String link) {
+//                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+//                sendIntent.setType("text/plain");
+//                sendIntent.putExtra(Intent.EXTRA_TEXT, link);
+//                startActivity(Intent.createChooser(sendIntent, "Share Link"));
     }
 
 

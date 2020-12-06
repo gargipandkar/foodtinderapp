@@ -16,18 +16,20 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".SignInActivity">
             <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
         <activity android:name=".SwipeActivity" />
         <activity android:name=".SignOutActivity">
             <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
@@ -36,6 +38,7 @@
         <activity android:name=".GroupLandingPage">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data

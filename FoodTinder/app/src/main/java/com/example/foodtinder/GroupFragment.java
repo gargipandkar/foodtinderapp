@@ -39,6 +39,7 @@ public class GroupFragment extends Fragment {
 
     public interface FragmentGroupListener {
         void onCreateGroup();
+        void onShareLink(String link);
     }
 
     @Nullable
@@ -109,6 +110,7 @@ public class GroupFragment extends Fragment {
 //                startActivity(toEventSelection);
                 //        Uri link = Uri.parse(currLink); //GET GROUP'S UNIQUE LINK
 
+//                groupListener.onShareLink(groupsInfoList.get(position).getLink());
                 Intent sendIntent = new Intent(Intent.ACTION_SEND);
                 sendIntent.setType("text/plain");
                 sendIntent.putExtra(Intent.EXTRA_TEXT, groupsInfoList.get(position).getLink());

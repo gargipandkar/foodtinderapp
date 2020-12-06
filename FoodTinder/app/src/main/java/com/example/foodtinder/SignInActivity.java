@@ -51,6 +51,12 @@ public class SignInActivity extends AppCompatActivity{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_signin);
 
+        boolean fromDynamicLink = getIntent().getBooleanExtra("EXTRA_NOT_SIGNEDIN_DL", false);
+        if (fromDynamicLink == true){
+            Intent toDynamicLink = new Intent(SignInActivity.this, GroupLandingPage.class);
+            toDynamicLink.putExtra("EXTRA_NOT_SIGNEDIN_DL_SIGNED", true);
+            startActivity(toDynamicLink);
+        }
 
         SignInButton googleSignInButton = findViewById(R.id.sign_in_button);
 

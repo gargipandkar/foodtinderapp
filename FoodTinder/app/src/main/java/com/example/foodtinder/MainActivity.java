@@ -30,11 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private Handler handler;
-
-//    SharedPreferences prefs;
-//    private static final String SHARED_PREF_NAME = "prefs";
-//    private static final String KEY_NAME = "name";
-//    private static final String KEY_EMAIL = "email";
+    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -59,12 +55,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI(FirebaseUser currentUser) {
+        boolean fromDynamicLink = getIntent().getBooleanExtra("EXTRA_FROM_DL", false);
+        Log.i(TAG, String.valueOf(fromDynamicLink));
+        if (currentUser != null && fromDynamicLink == true) {
+            Intent toDynamicLink = new Intent(MainActivity.this, GroupLandingPage.class);
+            toDynamicLink.putExtra("EXTRA_SIGNED_DL", true);
+            startActivity(toDynamicLink);
+            finish();
+        } else if (currentUser == null && fromDynamicLink == true){
+            Intent toSignIn = new Intent(MainActivity.this, SignInActivity.class);
+            toSignIn.putExtra("EXTRA_NOT_SIGNEDIN_DL", true);
+            startActivity(toSignIn);
+            finish();
+        }
 
         if (currentUser != null){
             // User is signed in
-
             User currUser = new User(currentUser.getUid(), currentUser.getDisplayName(), currentUser.getEmail());
-//            Intent toHome = new Intent (MainActivity.this, SwipeActivity.class);
             Intent toHome = new Intent (MainActivity.this, SignOutActivity.class);
             startActivity(toHome);
             finish();
