@@ -140,7 +140,7 @@ public class SwipeTestFragment extends Fragment {
                 String rest = listRestName.get(number);
                 Log.i(TAG, "rest name: " + rest);
                 if (direction == Direction.Right){
-                    Toast.makeText(getContext(), "Direction Right", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Yes!", Toast.LENGTH_SHORT).show();
                     //like
                     if (number==(listRestVotes.size() - 1)){
                         // MAKE NUMBER GO OUT OF RANGE NOW
@@ -148,6 +148,7 @@ public class SwipeTestFragment extends Fragment {
                         restVote_ref.setValue((listRestVotes));
                         //CHECK IF ALL MEMBERS HAVE FINISHED SWIPING, IF YES MAKE DECISION
                         stillSwiping();
+                        Log.i(TAG, "last");
                         // GO BACK TO HOME PAGE
                     }
 
@@ -155,8 +156,11 @@ public class SwipeTestFragment extends Fragment {
                         // UPDATE VOTE FOR DISPLAYED ITEM
                         Log.i(TAG, "listrestvotes: "+ listRestVotes.toString());
                         Log.i(TAG, "item num" + number);
+                        Log.i("checkvote ", listRestVotes.get(rest).toString());
                         int currVal = listRestVotes.get(rest);
                         listRestVotes.put(rest, currVal+1);
+                        Log.i("checkafter ", listRestVotes.get(rest).toString());
+                        Log.i("checkafter ", listRestVotes.toString());
                         //MOVE TO NEXT ITEM
                         number++;
 
@@ -167,7 +171,7 @@ public class SwipeTestFragment extends Fragment {
                     Toast.makeText(getContext(), "Direction Top", Toast.LENGTH_SHORT).show();
                 }
                 if (direction == Direction.Left){
-                    Toast.makeText(getContext(), "Direction Left", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Nope!", Toast.LENGTH_SHORT).show();
                     //dislike
                     if (number==(listRestVotes.size() - 1)){
                         // MAKE NUMBER GO OUT OF RANGE NOW
@@ -243,6 +247,7 @@ public class SwipeTestFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long countComplete = snapshot.getChildrenCount();
+                Log.i(TAG, "checking count: " + countComplete);
                 stopSwiping(countComplete);
             }
 

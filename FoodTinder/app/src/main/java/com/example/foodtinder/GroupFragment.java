@@ -49,9 +49,9 @@ public class GroupFragment extends Fragment {
 
         if (checkGroup == false){
             // no new upcoming groups
-            TextView noEventText = v.findViewById(R.id.no_group_label);
+            TextView noGroupText = v.findViewById(R.id.no_group_label);
             TextView createEventText = v.findViewById(R.id.create_group_label);
-            noEventText.setText("No upcoming groups");
+            noGroupText.setText("Not in any group");
             createEventText.setText("Create new group");
         } else {
             buildRecycleView(v);
