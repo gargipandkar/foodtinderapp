@@ -12,15 +12,13 @@
     <string-array name="money_prefer">
         <item>Select Budget</item>
         <item>$</item>
-        <item>$$</item>
-        <item>$$$</item>
+<!--        <item>$$</item>-->
+<!--        <item>$$$</item>-->
     </string-array>
     <string-array name="location_prefer">
         <item>Select Location</item>
         <item>Tampines</item>
-        <item>Orchard</item>
-        <item>Jurong East</item>
+<!--        <item>Orchard</item>-->
+<!--        <item>Jurong East</item>-->
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

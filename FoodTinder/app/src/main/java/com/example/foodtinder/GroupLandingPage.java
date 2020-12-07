@@ -90,7 +90,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -98,9 +97,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
+
 import java.util.ArrayList;
 
 public class GroupLandingPage extends AppCompatActivity {
@@ -113,8 +110,9 @@ public class GroupLandingPage extends AppCompatActivity {
 
         boolean fromSignedIn = getIntent().getBooleanExtra("EXTRA_SIGNED_DL", false);
         boolean fromNewUser = getIntent().getBooleanExtra("EXTRA_NOT_SIGNEDIN_DL_SIGNED", false);
+
         // If user is not signed in or the app is not in the background, redirect user to sign in
-        // else dynamic link will be shown and user can choose to be added into the group
+        // Else dynamic link will be shown and user can choose to be added into the group
         if (User.getId() == null && fromSignedIn == false && fromNewUser == false) {
             Intent directToSignIn = new Intent (GroupLandingPage.this, MainActivity.class);
             directToSignIn.putExtra("EXTRA_FROM_DL", true);
@@ -126,8 +124,8 @@ public class GroupLandingPage extends AppCompatActivity {
 
     }
 
-    //Function to check for Grp Invitation Dynamic Links
-    //Call this function in OnCreate/OnStart for the activity receiving the dynamic link intent
+    // Function to check for Group invitation via Dynamic Link
+    // Call this function in OnCreate/OnStart for the activity receiving the dynamic link intent
     private void checkForDynamicLinks(Boolean isSignIn){
         FirebaseDynamicLinks.getInstance()
                 .getDynamicLink(getIntent())
@@ -172,6 +170,9 @@ public class GroupLandingPage extends AppCompatActivity {
                                                     })
                                                     .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int id) {
+                                                            // Reload the app to home page
+                                                            Intent toHomePage = new Intent(GroupLandingPage.this, MainActivity.class);
+                                                            startActivity(toHomePage);
                                                         }
                                                     });
                                             builder.create().show();

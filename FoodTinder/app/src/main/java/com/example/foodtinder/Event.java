@@ -21,19 +21,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+
+// Event class to create and access Event object to update Firebase Realtime Database
+// Implements parcelable to send objects between fragments
 public class Event implements Parcelable {
 
-    String name;
-    String group;
-    String host;
-    String location;
-    String budget;
-    String status;
+    // TAG for debugging purposes
+    public static final String TAG = "Event object";
 
-
-    String dateTimeString;
+    String name, group, host, location, budget, status, dateTimeString, id;
     long eventDateTime, prefDateTime;
-    String id;     //USE AS KEY FOR DATABASE, BUT STORE COPY ALSO
+
     Boolean active;
 
 
@@ -44,21 +42,19 @@ public class Event implements Parcelable {
     HashMap<String, Restaurant> placeDetails;      //USE IN PLACE OF listOfRestaurants
     HashMap<String, ArrayList<String>> placeDetailsPhotos;
     HashMap<String, Object> RestaurantPreferences;
+
+
     Event(){}
 
-
     Event(final String id){
-        this.id = id;
-        Log.i("event: ", id);
+        this.id = id; // Use as key for Firebase Database and store a copy of it here
         ref = db.child("EVENTS").child(id);
-//        Log.i("Info argument", id);
-//        Log.i("Info argument", ref.toString());
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 GenericTypeIndicator<HashMap<String , Object>> gt = new GenericTypeIndicator<HashMap<String, Object>>() {};
                 HashMap<String, Object> info = snapshot.getValue(gt);
-                Log.i("Info argument", info.toString());
+                Log.i(TAG, info.toString());
                 updateEvent(info, id);
             }
 
@@ -114,8 +110,6 @@ public class Event implements Parcelable {
         }
     };
 
-    public void createEvent(){}
-
 
     public String getId() {
         return id;
@@ -133,20 +127,6 @@ public class Event implements Parcelable {
     }
     public long getPrefDateTime(){return this.prefDateTime;}
     public Boolean getActive(){return this.active;}
-
-
-
-
-    @Exclude
-    public ArrayList<String> getDisplayDetails(){
-        ArrayList<String> display = new ArrayList<>();
-        display.add(this.name);
-        display.add(this.group);
-        display.add(Long.toString(this.eventDateTime));
-        display.add(this.status);
-        return display;
-    }
-
 
 
     public Event updateEvent(HashMap<String, Object> info, String id){
@@ -169,7 +149,7 @@ public class Event implements Parcelable {
         ref.child("decision").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                chosen[0]=snapshot.getValue(String.class);
+                chosen[0] = snapshot.getValue(String.class);
                 setDecision(chosen[0], id);
                 if (!chosen[0].equals("Undecided"))
                     setStatus("Match found", id);
@@ -210,8 +190,8 @@ public class Event implements Parcelable {
             default: break;
         }
 
-        //CHECK IF DEADLINE IS BEFORE EVENT BUT AFTER EVENT CREATION
-        //IF CHECK FAILS, SET DEADLINE TO 1 HOUR BEFORE EVENT BY DEFAULT
+        // Check if deadline is before but after event creation
+        // If check fails, set deadline to 1-hour before event by default
         Calendar Cdt = Calendar.getInstance();
         if (Pdt.after(Edt) || Pdt.before(Cdt)){
             Pdt.setTimeInMillis(this.eventDateTime);
@@ -222,13 +202,13 @@ public class Event implements Parcelable {
 
     public void checkExpiry(String id){
         Long now = Calendar.getInstance().getTimeInMillis();
-        Log.i("Event Class", "EXPIRY="+now+"/"+eventDateTime);
-        if (eventDateTime<now){
+        Log.i("Event Class", "EXPIRY=" + now + "/" + eventDateTime);
+        if (eventDateTime < now){
             active = false;
-            //REMOVE FROM OVERALL EVENTS LIST
+            // Remove from all occurrence of this event from Firebase Realtime Database
+            // including from User's list of events
             ref = db.child("EVENTS").child(id);
             ref.removeValue();
-            //REMOVE FROM USER'S EVENTS LIST
             db.child("USERS").child(User.getId()).child("listOfEvents").child(id).removeValue();
         }
         else {active = true;}
@@ -237,8 +217,8 @@ public class Event implements Parcelable {
 
     public void passedDeadline(){
         Long now = Calendar.getInstance().getTimeInMillis();
-        Log.i("Event Class", "PREF="+now+"/"+prefDateTime);
-        if (now>prefDateTime){
+        Log.i(TAG, "PREF="+now+"/"+prefDateTime);
+        if (now > prefDateTime){
             pseudoMatch(id);
         }
     }
@@ -253,7 +233,7 @@ public class Event implements Parcelable {
                 HashMap<String, Integer> listVotes = snapshot.getValue(gt);
 
                 Map.Entry<String, Integer> maxEntry = null;
-                if (listVotes!=null){
+                if (listVotes != null){
                     int max = Collections.max(listVotes.values());
 
                     for(Map.Entry<String, Integer> entry : listVotes.entrySet()) {
@@ -267,7 +247,7 @@ public class Event implements Parcelable {
                     setDecision(rest, id);
                     updateEventStatus(id);
                 }
-                else Log.i("Check", "No list of votes found");
+                else Log.i(TAG, "No list of votes found");
             }
 
             @Override

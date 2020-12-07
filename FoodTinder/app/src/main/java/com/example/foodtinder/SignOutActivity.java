@@ -38,33 +38,34 @@ import java.util.HashMap;
 
 public class SignOutActivity extends AppCompatActivity implements ProfileFragment.FragmentProfileListener, HomeFragment.FragmentHomeListener, GroupFragment.FragmentGroupListener, CreateEventFragment.CreateEventFragmentListener, WaitingEventFragment.FragmentWaitingEventListener, WaitingGroupFragment.FragmentWaitingGroupListener, CreateGroupFragment.CreateGroupFragmentListener, WaitingRestaurantFragment.FragmentWaitingRestaurantListener, SwipingFragment.SwipingFragmentListener, SwipeTestFragment.SwipeTestFragmentListener {
 
-
+    // TAG for debugging purposes
     public static final String TAG = "SignOutActivity";
-    private boolean fromDynamicLink = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super .onCreate(savedInstanceState);
         setContentView(R.layout.activity_signout);
 
+        // Set bottom navigation view in this activity
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
+        // Default Fragment to display when in this activity
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
-//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingRestaurantFragment()).commit();
-        fromDynamicLink = getIntent().getBooleanExtra("EXTRA_JOINED_GROUP", false);
+
+        boolean fromDynamicLink = getIntent().getBooleanExtra("EXTRA_JOINED_GROUP", false);
         if (fromDynamicLink == true){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingGroupFragment()).commit();
         }
 
     }
 
-
+    // Decides what each bottom navigation navigates to
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Fragment selectedFragment = null;
+                    Fragment selectedFragment = new WaitingEventFragment();
 
                     switch (item.getItemId()){
                         case R.id.navigation_home:
@@ -84,6 +85,8 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
                 }
             };
 
+
+    // Function to call from Profile Fragment to sign out user
     @Override
     public void onLogout() {
         FirebaseAuth.getInstance().signOut();
@@ -92,15 +95,16 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
         finish();
     }
 
+    // Function to call from Home Fragment when user click the button to create an event form
+    // Opens CreateEventFragment to display event creation form
     @Override
     public void onCreateEvent() {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CreateEventFragment()).addToBackStack(null).commit();
     }
 
-
-
-
-
+    // Function to call from WaitingRestaurant Fragment to get the list of restaurants from Google Places API and Firebase Realtime Database
+    // Prevents the app from crashing by retrieving the list before proceeding to Swiping Fragment where user swipe to choose their restaurant preference
+    // Opens SwipeTest Fragment
     @Override
     public void onListingRestaurant(String event_id, ArrayList<String> restAddr, ArrayList<String> restName, HashMap<String, ArrayList<String>> listRestPhotos, Object[] listRestNames, HashMap<String, Integer> listRestVotes) {
         Fragment toSwipe = new SwipeTestFragment();
@@ -113,32 +117,29 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
         bundle.putSerializable("listRestVotes", listRestVotes);
         toSwipe.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
-        Log.i(TAG, "received rest name: "+ restName.toString());
-        Log.i(TAG, "received rest addr: " + restAddr.toString());
-//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
-//        Intent toTest = new Intent(SignOutActivity.this, SwipeActivity.class);
-//        startActivity(toTest);
     }
 
+
+    // Function to call from Group Fragment when user click the button to create a group form
+    // Opens CreateGroup Fragment
     @Override
     public void onCreateGroup() {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CreateGroupFragment()).addToBackStack(null).commit();
     }
 
-    @Override
-    public void onShareLink(String link) {
-//                Intent sendIntent = new Intent(Intent.ACTION_SEND);
-//                sendIntent.setType("text/plain");
-//                sendIntent.putExtra(Intent.EXTRA_TEXT, link);
-//                startActivity(Intent.createChooser(sendIntent, "Share Link"));
-    }
 
-
+    // Function to call from CreateEvent Fragment when user creates an event from the event creation form
+    // Proceeds to WaitingEvent Fragment which updates the new event onto Firebase before returning back to Home Fragment which list the updated list of events
+    // Opens WaitingEvent Fragment
     @Override
     public void onNewEventUpdate() {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
     }
 
+
+    // Function to call from WaitingEvent Fragment to get the list of events from Firebase Realtime Database
+    // Prevents the app from crashing by retrieving the list before proceeding to Home Fragment
+    // Opens Home Fragment
     @Override
     public void onListingEvents(ArrayList<Event> eventArrayList) {
         if (eventArrayList.size() > 0){
@@ -159,6 +160,9 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
     }
 
+    // Function to call from WaitingGroup Fragment to get the list of groups from Firebase Realtime Database
+    // Prevents the app from crashing by retrieving the list before proceeding to Group Fragment
+    // Opens Group Fragment
     @Override
     public void onListingGroup(ArrayList<Group> groupArrayList) {
         if (groupArrayList.size() > 0){
@@ -175,15 +179,22 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 
     }
 
+    // Function to call from CreateGroup Fragment when user creates a group from the group creation form
+    // Proceeds to WaitingGroup Fragment which updates the new group onto Firebase before returning back to Group Fragment which list the updated list of groups
+    // Opens WaitingEvent Fragment
     @Override
     public void onNewGroupUpdate() {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingGroupFragment()).commit();
     }
 
+
+    // Function to call from Home Fragment when user clicks on an event in Home Fragment
+    // Opens WaitingRestaurant Fragment to retrieve all restaurant from Google Places API and Firebase Realtime Database
+    // before proceeding to SwipeTest Fragment
     @Override
     public void selectRestaurant(String eventId, boolean firstEntry) {
         // Go to Retrieving Restaurant Fragment
-        // TODO: uncomment this later
+        // TODO: Remove this if button clicking to select restaurant preference is not used
 //        Fragment toRetrieveRest = new SwipingFragment();
 //        Bundle bundle = new Bundle();
 //        bundle.putString("eventId", eventId);
@@ -191,12 +202,6 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
 //        toRetrieveRest.setArguments(bundle);
 //        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toRetrieveRest).commit();
 
-        // TODO: testing Swiping
-//        Fragment toSwipe = new SwipingFragment();
-//        Bundle bundle = new Bundle();
-//        bundle.putString("eventId", eventId);
-//        toSwipe.setArguments(bundle);
-//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
 
         Fragment toWaiting = new WaitingRestaurantFragment();
         Bundle bundle = new Bundle();
@@ -206,11 +211,10 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toWaiting).commit();
     }
 
+    // TODO: Remove this if button clicking to select restaurant preference is not used
     @Override
     public void updateRest(String event_id, int number, HashMap<String, Integer> listRestVotes, boolean checkLastItem) {
         if (number < listRestVotes.size() - 1) {
-//            Log.i(TAG, number.toString());
-            Log.i(TAG, listRestVotes.toString());
             Fragment toSwipe = new SwipingFragment();
             Bundle bundle = new Bundle();
             bundle.putString("eventId", event_id);
@@ -219,9 +223,6 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
             bundle.putBoolean("checkLastItem", checkLastItem);
             toSwipe.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
-            Log.i(TAG, "sending new swipe details");
-//            Log.i(TAG, "numbr: " + number.toString());
-            Log.i(TAG, "number: " + number);
         } else if (number == listRestVotes.size() - 1) {
             checkLastItem = true;
             Fragment toSwipe = new SwipingFragment();
@@ -232,17 +233,19 @@ public class SignOutActivity extends AppCompatActivity implements ProfileFragmen
             bundle.putBoolean("checkLastItem", checkLastItem);
             toSwipe.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, toSwipe).commit();
-//            Log.i(TAG, "numbr: " + number.toString());
-            Log.i(TAG, "number: " + number);
         } else {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
         }
 
     }
 
-
+    // Function to call from SwipeTest Fragment when user has completed swiping through all restaurants
+    // Opens WaitingEvent Fragment to retrieve the updated list of events user is in
+    // before proceeding to Home Fragment
     @Override
     public void finishSwipe() {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new WaitingEventFragment()).commit();
     }
+
+
 }

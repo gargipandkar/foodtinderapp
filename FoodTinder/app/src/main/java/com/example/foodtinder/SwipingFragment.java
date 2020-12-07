@@ -33,6 +33,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+
+// TODO: Remove this if button clicking to select restaurant preference is not used
+
 public class SwipingFragment extends Fragment implements View.OnClickListener{
 
     public static final String TAG = "SwipingFragment";
@@ -94,12 +97,8 @@ public class SwipingFragment extends Fragment implements View.OnClickListener{
 
         Toolbar toolbar = v.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-//        ((AppCompatActivity)getActivity()).setDisplayHomeAsUpEnabled(true);
-//        ((AppCompatActivity)getActivity()).setDisplayShowHomeEnabled(true);
         ((AppCompatActivity)getActivity()).setTitle("Restaurant Preference");
 
-        //IDEALLY DON'T COME HERE ONLY IF EVENT STATUS IS READY TO SWIPE
-        //TODO receive Event object from clicking in list of events and put it into selectedEvent
         user_id = User.getId();
 
         selectedEvent = new Event(event_id);
@@ -121,13 +120,6 @@ public class SwipingFragment extends Fragment implements View.OnClickListener{
                 }
                 else if (!completed_ls.contains(user_id)) {
                     completed_ls.add(user_id);
-                }
-                // IDEALLY SHOULDN'T COME TO THIS CHECK SINCE USER CAN ONLY ACCESS SWIPING ACTIVITY ONCE
-                // SEND USER BACK TO HOME IF VISITS AGAIN
-                else {
-                    //TODO: PREVENT USER FROM COMING BACK
-//                    Intent next = new Intent(Swiping.this, ListEventsActivity.class);
-//                    startActivity(next);
                 }
                 completed_ref.setValue(completed_ls);
             }
@@ -223,7 +215,6 @@ public class SwipingFragment extends Fragment implements View.OnClickListener{
                     // MAKE NUMBER GO OUT OF RANGE NOW
                     number[0]++;
                     // UPDATE DATABASE VOTES LIST
-                    //TODO LAST RESTAURANT VOTES NOT BEING UPDATED, CHANGE LOGIC
                     restVote_ref.setValue((listRestVotes));
                     //CHECK IF ALL MEMBERS HAVE FINISHED SWIPING, IF YES MAKE DECISION
                     stillSwiping();

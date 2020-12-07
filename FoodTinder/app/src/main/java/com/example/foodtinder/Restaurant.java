@@ -18,14 +18,8 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public class Restaurant {
-    //TODO create restaurant class
     static Integer count = 0;
-    String name;
-    String formatted_address;
-    String rating;
-    String business_status;
-    String price_level;
-    String location;
+    String name, formatted_address, rating, business_status, price_level, location;
     ArrayList<String> images;
 
     static DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("RESTAURANT");
@@ -33,36 +27,36 @@ public class Restaurant {
     Restaurant(){}
 
     Restaurant(String name, String formatted_address, String business_status, String rating, String price_level, String location, ArrayList<String> images){
-        this.name=name;
-        this.rating=rating;
-        this.business_status=business_status;
-        this.formatted_address=formatted_address;
-        this.images=images;
-        this.location=location;
-        this.price_level=price_level;
+        this.name = name;
+        this.rating = rating;
+        this.business_status = business_status;
+        this.formatted_address = formatted_address;
+        this.images = images;
+        this.location = location;
+        this.price_level = price_level;
         count++;
     }
 
     Restaurant(String name, HashMap<String, Object> info, ArrayList<String> images){
-        this.name=name;
-        this.rating=(String) info.get("rating");
-        this.business_status=(String)info.get("business_status");
-        this.formatted_address=(String) info.get("formatted_address");
-        this.images=images;
-        this.location=(String)info.get("location");
-        this.price_level=(String) info.get("price_level");
+        this.name = name;
+        this.rating = (String) info.get("rating");
+        this.business_status = (String)info.get("business_status");
+        this.formatted_address = (String) info.get("formatted_address");
+        this.images = images;
+        this.location = (String)info.get("location");
+        this.price_level = (String) info.get("price_level");
         count++;
     }
 
     Restaurant(HashMap<String, Object> info){
-        this.name=(String)info.get("name");
-        this.rating=(String) info.get("rating");
-        this.business_status=(String)info.get("business_status");
-        this.formatted_address=(String) info.get("formatted_address");
+        this.name = (String)info.get("name");
+        this.rating = (String) info.get("rating");
+        this.business_status = (String)info.get("business_status");
+        this.formatted_address = (String) info.get("formatted_address");
         this.images = new ArrayList<>();
         this.images.addAll((ArrayList<String>) info.get("images"));
-        this.location=(String)info.get("location");
-        this.price_level=(String)info.get("price_level");
+        this.location = (String)info.get("location");
+        this.price_level = (String)info.get("price_level");
         count++;
     }
 
@@ -81,7 +75,6 @@ public class Restaurant {
                     Restaurant r = new Restaurant(temp);
                     allInfo.add(r);
                 }
-                Log.i("Retrieve Restaurants", allInfo.toString());
                 dbcallback.onCallback(allInfo, true);
             }
 

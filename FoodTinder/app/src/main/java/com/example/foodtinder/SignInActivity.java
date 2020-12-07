@@ -34,15 +34,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 public class SignInActivity extends AppCompatActivity{
-    private static final int RC_SIGN_IN = 120;
+
+    // TAG for debugging purposes
     private static final String TAG = "SignInActivity";
+
+    private static final int RC_SIGN_IN = 120;
     private FirebaseAuth mAuth;
     private static GoogleSignInClient mGoogleSignInClient;
 
     DatabaseReference db, users_ref;
+
     private ArrayList allUsers = new ArrayList();
-
-
 
 
     @Override
@@ -70,10 +72,10 @@ public class SignInActivity extends AppCompatActivity{
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // Initialize Firebase Auth
+        // Initialize Firebase Authentication
         mAuth = FirebaseAuth.getInstance();
 
-        // Set Firebase database references
+        // Initialise Firebase database references
         db = FirebaseDatabase.getInstance().getReference();
         users_ref = db.child("USERS");
 
@@ -117,11 +119,11 @@ public class SignInActivity extends AppCompatActivity{
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
-                // ...
             }
         }
     }
 
+    // Function to call to authenticate Firebase using Google
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
@@ -145,6 +147,10 @@ public class SignInActivity extends AppCompatActivity{
                 });
     }
 
+
+    // Function to call to redirect user to correct page
+    // If user is signed in, redirect to SignOutActivity
+    // Else, redirect back to Sign in page (SignInActivity)
     private void updateUI(FirebaseUser user) {
         if (user != null){
             // User is signed in
@@ -159,9 +165,10 @@ public class SignInActivity extends AppCompatActivity{
         }
     }
 
+    // Function to call to create a new User object
+    // Add user to Firebase Realtime Database
     private void fillUserDetails(FirebaseUser user){
         if (user != null) {
-            Log.i(TAG, user.getUid());
             String id = user.getUid();
             User currUser = new User(id, user.getDisplayName(), user.getEmail());
             if (!allUsers.contains(id)) {

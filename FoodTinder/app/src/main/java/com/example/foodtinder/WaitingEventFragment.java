@@ -27,44 +27,27 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-//import com.example.cardItems.EventListAdapter;
 
 public class WaitingEventFragment extends Fragment {
 
-    private FloatingActionButton create_event_btn;
-    private FragmentWaitingEventListener waitingEventFragmentListener;
-    private RecyclerView recyclerView;
-    private ArrayList<Event> eventItemArrayList = new ArrayList<>();;
+    // TAG for debugging purposes
     private static final String TAG = "WaitingEventFragment";
 
-
-    // listing of events variables
     DatabaseReference db, events_ref;
     ArrayList<String> eventsList = new ArrayList<>();
     ArrayList<Event> eventsInfoList = new ArrayList<>();
     HashMap<String, Event> allEvents = new HashMap<String, Event>();
     int eventCount;
 
+    // Listener is used to call the abstract method in the interface
+    private FragmentWaitingEventListener waitingEventFragmentListener;
 
-
+    // Implement this interface in host Activity (SignOutActivity.java) to transfer data from this Fragment to host Activity
+    // Abstract method will be override in host Activity to receive information needed and communicate with the next fragment
     public interface FragmentWaitingEventListener {
         void onListingEvents(ArrayList<Event> eventArrayList);
     }
 
-
-
-
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
-        View v = inflater.inflate(R.layout.fragment_waiting_event, container, false);
-
-        latestEvent();
-
-
-        return v;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,8 +59,19 @@ public class WaitingEventFragment extends Fragment {
         }
     }
 
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
+        View v = inflater.inflate(R.layout.fragment_waiting_event, container, false);
+
+        latestEvent();
+        return v;
+    }
+
+
+    // Function to call to get the list of events the user is in from Firebase Realtime Database
     private void latestEvent() {
-        // READ LIST OF EVENTS FROM FIREBASE AND PUT INTO LOCAL USER OBJECT
         db = FirebaseDatabase.getInstance().getReference();
         Log.i(TAG, "waiting event fragment user id");
 
@@ -86,7 +80,7 @@ public class WaitingEventFragment extends Fragment {
         User.setUserEvents(events_ref, new DatabaseCallback() {
             @Override
             public void onCallback(ArrayList<String> ls) {
-                //CHECK IF USER HAS NO EVENTS
+                // Check if user has any event
                 if(!ls.isEmpty()){
                     eventsList.addAll(ls);
                     eventCount = eventsList.size();
@@ -109,6 +103,7 @@ public class WaitingEventFragment extends Fragment {
         });
     }
 
+    // Function to call if user has one or more events
     void infoList(){
         final DatabaseReference allEvents_ref = db.child("EVENTS");
         allEvents_ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -131,7 +126,6 @@ public class WaitingEventFragment extends Fragment {
                     catch(NullPointerException ex){}
 
                 }
-                // Log.i("Check", eventsInfoList.toString());
                 displayList();
 
             }
@@ -142,6 +136,7 @@ public class WaitingEventFragment extends Fragment {
 
     }
 
+    // Function to call when users reloads the Home Fragment to obtain the latest event and their status
     void displayList(){
         waitingEventFragmentListener.onListingEvents(eventsInfoList);
 

@@ -15,10 +15,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.concurrent.Future;
 
+// User class to create and access User object to update Firebase Realtime Database
 public class User  {
-    public static String id;
-    public static String name;
-    public static String email;
+
+    // TAG for debugging purposes
+    public static final String TAG = "User";
+
+    public static String id, name, email;
 
     static ArrayList<String> listOfEvents = new ArrayList<>();
     static ArrayList<String> inGroups = new ArrayList<>();
@@ -31,17 +34,18 @@ public class User  {
         email = in_email;
     }
 
-//    @Exclude
     public static String getId(){ return id;}
     public static String getName(){return name;}
     public static String getEmail(){return email;}
 
+    // Function to call when user creates a new group
+    // Add user to group and group to user in Firebase Realtime Database
     public static void addGroup(String groupId){
         DatabaseReference db = FirebaseDatabase.getInstance().getReference();
         DatabaseReference ref = db.child("USERS").child(id);
-
         ref.child("inGroups").child(groupId).setValue(true);
     }
+
 
     public static void setUserGroups(DatabaseReference userGroups_ref, final DatabaseCallback dbcallback){
         final ArrayList<String> ls = new ArrayList<>();
@@ -55,7 +59,7 @@ public class User  {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.w("Check", error.toException());
+                Log.w(TAG, error.toException());
             }
         });
     }
@@ -72,7 +76,7 @@ public class User  {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.w("Check", error.toException());
+                Log.w(TAG, error.toException());
             }
         });
     }

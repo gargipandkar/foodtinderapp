@@ -23,23 +23,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-//import com.example.cardItems.EventListAdapter;
 
 public class WaitingRestaurantFragment extends Fragment {
 
-    private FragmentWaitingRestaurantListener waitingRestaurantFragmentListener;
+    // TAG for debugging purposes
     private static final String TAG = "WaitingRestFragment";
 
-    TextView rest_name,rest_desc,rest_rating;
-    ImageView rest_image;
-
-    String user_id;
-    String event_id;
+    String user_id, event_id;
     Event selectedEvent;
 
-    int[] number = {0};   //FOR ITERATING THROUGH RESTAURANT LIST
-    HashMap<String, Object> item;
-    ArrayList<String> itemPhotos;
+    int[] number = {0};
     HashMap<String, Integer> listRestVotes;
     HashMap<String, HashMap<String, Object>> listRestInfo;
     HashMap<String, ArrayList<String>> listRestPhotos;
@@ -47,7 +40,11 @@ public class WaitingRestaurantFragment extends Fragment {
     boolean firstEntry;
     boolean checkLastItem = false;
 
+    // Listener is used to call the abstract method in the interface
+    private FragmentWaitingRestaurantListener waitingRestaurantFragmentListener;
 
+    // Implement this interface in host Activity (SignOutActivity.java) to transfer data from this Fragment to host Activity
+    // Abstract method will be override in host Activity to receive information needed and communicate with the next fragment
     public interface FragmentWaitingRestaurantListener {
         void onListingRestaurant(String event_id, ArrayList<String> restAddr, ArrayList<String> restName, HashMap<String, ArrayList<String>> listRestPhotos, Object[] listRestNames,HashMap<String, Integer> listRestVotes);
     }
@@ -88,7 +85,7 @@ public class WaitingRestaurantFragment extends Fragment {
         final DatabaseReference event_ref = selectedEvent.ref;
 
 
-        // ADD USER TO LIST OF THOSE WHO HAVE FINISHED SWIPING
+        // Add user to list of those who have finished swiping
         completed_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -102,13 +99,6 @@ public class WaitingRestaurantFragment extends Fragment {
                 else if (!completed_ls.contains(user_id)) {
                     completed_ls.add(user_id);
                 }
-                // IDEALLY SHOULDN'T COME TO THIS CHECK SINCE USER CAN ONLY ACCESS SWIPING ACTIVITY ONCE
-                // SEND USER BACK TO HOME IF VISITS AGAIN
-                else {
-                    //TODO: PREVENT USER FROM COMING BACK
-//                    Intent next = new Intent(Swiping.this, ListEventsActivity.class);
-//                    startActivity(next);
-                }
                 completed_ref.setValue(completed_ls);
             }
 
@@ -117,7 +107,7 @@ public class WaitingRestaurantFragment extends Fragment {
             }
         });
 
-        // RETRIEVE LIST OF RESTAURANT OPTIONS DETAILS AND IMAGES
+        // Retrieved list of restaurant options from Google Places API and Firebase Realtime Database
         event_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -137,14 +127,12 @@ public class WaitingRestaurantFragment extends Fragment {
 
                 }
 
-                Log.i("placeDetails", arr.toString());
-                Log.i("placeDetailPhotos", arrPhotos.toString());
 
                 listRestInfo = arr;
                 listRestPhotos = arrPhotos;
                 listRestNames = arr.keySet().toArray();
 
-                // RETRIEVE LIST OF VOTES, IF ANY AND CREATE LOCAL COPY
+                // Retrieve list of votes
                 restVote_ref.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -157,7 +145,6 @@ public class WaitingRestaurantFragment extends Fragment {
                         }
 
                         if (number[0]<arr.size() && !arr.isEmpty()){
-//                            select_restaurant(arr, v);
                             displayList();
                         }
                     }
@@ -177,24 +164,7 @@ public class WaitingRestaurantFragment extends Fragment {
     }
 
 
-    // GETS RESTAURANT INFORMATION TO DISPLAY AS NEXT ITEM
-    public void select_restaurant(final HashMap<String, HashMap<String, Object>> arr, View v) {
-        String rest = (String) listRestNames[number[0]];
-        item = arr.get(rest);
-        rest_name.setText(rest);
-        rest_desc.setText((String)item.get("formatted_address"));
-        rest_rating.setText((String)item.get("rating"));
-        if (listRestPhotos.containsKey(rest)){
-            itemPhotos = listRestPhotos.get(rest);
-            new DownloadImageTask((ImageView) v.findViewById(R.id.rest_image)).execute(itemPhotos.get(0));
-        }
-    }
-
-
     void displayList(){
-        Log.i(TAG, "listing in display list:" + listRestInfo.toString());
-        Log.i(TAG, "Size: " + listRestInfo.size());
-        Log.i(TAG, "photos: " + listRestPhotos.toString());
         ArrayList<String> restName = new ArrayList<>();
         ArrayList<String> restAddr = new ArrayList<>();
         for (int i = 0; i<listRestInfo.size(); i++){
@@ -202,9 +172,6 @@ public class WaitingRestaurantFragment extends Fragment {
             restName.add(rest);
             restAddr.add(String.valueOf(listRestInfo.get(rest).get("formatted_address")));
         }
-        Log.i(TAG, "Rest name: "+ restName.toString());
-        Log.i(TAG, "Rest addr: "+ restAddr.toString());
-
         waitingRestaurantFragmentListener.onListingRestaurant(event_id, restAddr, restName, listRestPhotos, listRestNames, listRestVotes);
     }
 

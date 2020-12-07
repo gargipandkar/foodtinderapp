@@ -26,15 +26,12 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".SwipeActivity" />
         <activity android:name=".SignOutActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".EventSelectionActivity" />
-        <activity android:name=".EventFinalActivity" />
         <activity android:name=".GroupLandingPage">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>

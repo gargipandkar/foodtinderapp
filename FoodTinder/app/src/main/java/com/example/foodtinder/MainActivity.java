@@ -28,9 +28,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    // TAG for debugging purposes
+    public static final String TAG = "MainActivity";
+
     private FirebaseAuth mAuth;
     private Handler handler;
-    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -38,11 +40,8 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-
-        // Initialize Firebase Auth
+        // Initialize Firebase Authentication
         mAuth = FirebaseAuth.getInstance();
-
-
 
     }
 
@@ -54,9 +53,10 @@ public class MainActivity extends AppCompatActivity {
         updateUI(currentUser);
     }
 
+
+    // Function to call to update UI depending on whether user is signed in or not
     private void updateUI(FirebaseUser currentUser) {
         boolean fromDynamicLink = getIntent().getBooleanExtra("EXTRA_FROM_DL", false);
-        Log.i(TAG, String.valueOf(fromDynamicLink));
         if (currentUser != null && fromDynamicLink == true) {
             Intent toDynamicLink = new Intent(MainActivity.this, GroupLandingPage.class);
             toDynamicLink.putExtra("EXTRA_SIGNED_DL", true);

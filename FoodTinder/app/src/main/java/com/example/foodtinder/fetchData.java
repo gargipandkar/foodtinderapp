@@ -18,12 +18,9 @@ import java.util.HashMap;
 
 public class fetchData extends AsyncTask<Void,Void,Void> {
     private BufferedReader reader;
-    private String line;
     private StringBuffer responseContent = new StringBuffer();
     private  HttpURLConnection connection;
-    private String toParse;
-    private String urlStr;
-    private String type;
+    private String line, toParse, urlStr, type;
 
     public static HashMap<String, String> result;
     public static ArrayList<String> placeIDs;
@@ -49,7 +46,7 @@ public class fetchData extends AsyncTask<Void,Void,Void> {
             connection.setReadTimeout(5000);
 
             int status = connection.getResponseCode();
-            if (status>299){
+            if (status > 299){
                 reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 while ((line = reader.readLine()) != null){
                     responseContent.append(line);
@@ -105,7 +102,7 @@ public class fetchData extends AsyncTask<Void,Void,Void> {
 
                     fetchData process = new fetchData();
                     process.setType("placedetails");
-                    if (placeIDs.size()>0) {
+                    if (placeIDs.size() > 0) {
                         urlStr = urlGenerator.generatePlaceDetailsURL(placeIDs.remove(0));
                         process.setUrl(urlStr);
                         process.execute();

@@ -23,11 +23,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-//import com.example.cardItems.EventListAdapter;
 
 public class WaitingGroupFragment extends Fragment {
 
-    private FragmentWaitingGroupListener waitingGroupFragmentListener;
+    // TAG for debugging purposes
     private static final String TAG = "WaitingGroupFragment";
 
 
@@ -39,8 +38,11 @@ public class WaitingGroupFragment extends Fragment {
     ArrayList<Group> groupsInfoList = new ArrayList<>();
     int groupCount = 0;
 
+    // Listener is used to call the abstract method in the interface
+    private FragmentWaitingGroupListener waitingGroupFragmentListener;
 
-
+    // Implement this interface in host Activity (SignOutActivity.java) to transfer data from this Fragment to host Activity
+    // Abstract method will be override in host Activity to receive information needed and communicate with the next fragment
     public interface FragmentWaitingGroupListener {
         void onListingGroup(ArrayList<Group> groupArrayList);
     }
@@ -59,10 +61,7 @@ public class WaitingGroupFragment extends Fragment {
         return v;
     }
 
-
-
-
-
+    // Function to call to get the list of groups the user is in from Firebase Realtime Database
     private void latestEvent() {
         db = FirebaseDatabase.getInstance().getReference();
         groups_ref = db.child("USERS").child(User.getId()).child("inGroups");
@@ -78,11 +77,6 @@ public class WaitingGroupFragment extends Fragment {
 
                 infoList();
 
-                Log.i("Check", ls.toString());
-                Log.i("Check", User.getId());
-                Log.i("Check", groupsList.toString());
-                Log.i("Check", "# of groups = "+ groupCount);
-
             }
 
             @Override
@@ -91,7 +85,6 @@ public class WaitingGroupFragment extends Fragment {
             public void onCallback(ArrayList<Restaurant> allRest, boolean done){}
         });
     }
-
 
     void infoList(){
         final DatabaseReference allGroups_ref = db.child("GROUPS");
@@ -117,6 +110,7 @@ public class WaitingGroupFragment extends Fragment {
 
     }
 
+    // Function to call when users reloads the Group Fragment to obtain the latest event and their status
     void displayList(){
         waitingGroupFragmentListener.onListingGroup(groupsInfoList);
     }

@@ -3,7 +3,6 @@ package com.example.foodtinder;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -36,33 +35,38 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import static com.firebase.ui.auth.AuthUI.getApplicationContext;
+
 
 public class CreateEventFragment extends Fragment {
 
+    // TAG for debugging purposes
     public static final String TAG = "CreateEventFragment";
+
+    // Initialise an event object
     Event currEvent;
 
+    // Variables to modify View objects in layout
     TextView btnDatePicker, btnTimePicker;
-    EditText txtName;     //ENCAP INTO EVENT CLASS
-    private int mYear, mMonth, mDay, mHour, mMinute;
-    private String mName, mLocation, mBudget, group, deadline, eventStatus, dateTimeString; //ENCAP INTO EVENT CLASS
-    private Long eventDateTimeLong;
-
+    EditText txtName;
+    Button btnCreateEvent;
     static final Parser parser = Parser.getParser();
     Spinner locationPicker, budgetPicker, groupPicker, deadlinePicker;
     private Calendar eventDateTime = Calendar.getInstance();
     ArrayAdapter<String> dataAdapter;
 
-    Button btnCreateEvent;
-    DatabaseReference db, eventCount_ref, events_ref, users_ref;
+    private int mYear, mMonth, mDay, mHour, mMinute;
+    private String mName, mLocation, mBudget, group, deadline, eventStatus, dateTimeString, groupId;
+    private Long eventDateTimeLong;
+
+
+    DatabaseReference db, events_ref, users_ref;
     HashMap<String, String> grpNameId = new HashMap<>();
-    String groupId;
 
-    public int eventCount;      //ENCAP INTO EVENT CLASS
-    public ArrayList<String> eventInfoList = new ArrayList<>();
-
+    // Listener is used to call the abstract method in the interface
     private CreateEventFragmentListener listener;
+
+    // Implement this interface in host Activity (SignOutActivity.java) to transfer data from this Fragment to host Activity
+    // Abstract method will be override in host Activity to receive information needed and communicate with the next fragment
     public interface CreateEventFragmentListener {
         void onNewEventUpdate();
     }
@@ -75,15 +79,17 @@ public class CreateEventFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_create_event, container, false);
 
+        // Toolbar is created to give the Fragment a header
         Toolbar toolbar = v.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-//        ((AppCompatActivity)getActivity()).setDisplayHomeAsUpEnabled(true);
-//        ((AppCompatActivity)getActivity()).setDisplayShowHomeEnabled(true);
         ((AppCompatActivity)getActivity()).setTitle("Create New Event");
 
+        // Initialise FirebaseDatabase Realtime Database
         db = FirebaseDatabase.getInstance().getReference();
         events_ref = db.child("EVENTS");
         users_ref = db.child("USERS").child(User.getId());
+
+        // Call View objects in layout
         txtName = v.findViewById(R.id.in_event_name);
         groupPicker = v.findViewById(R.id.group_options);
         btnDatePicker = v.findViewById(R.id.btn_date);
@@ -100,6 +106,7 @@ public class CreateEventFragment extends Fragment {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         dateTimeString = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                        // When user selects a date, DD/MM/YYYY will be shown in the text field
                         btnDatePicker.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
                         eventDateTime.set(year, monthOfYear, dayOfMonth);
                         eventDateTimeLong = eventDateTime.getTimeInMillis();
@@ -121,6 +128,7 @@ public class CreateEventFragment extends Fragment {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        // When user selects a time, XX.XX in 12-hour format will be shown in the text field
                         if (hourOfDay > 12 ){
                             dateTimeString += ", " + hourOfDay + "." + minute + "pm";
                         } else {
@@ -140,7 +148,6 @@ public class CreateEventFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mLocation = parent.getItemAtPosition(position).toString();
-                Log.i("Check", "Location selected: "+ mLocation);
             }
 
             @Override
@@ -153,7 +160,6 @@ public class CreateEventFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mBudget = parent.getItemAtPosition(position).toString();
-                Log.i("Check", "Budget selected: "+ mBudget);
             }
 
             @Override
@@ -166,7 +172,6 @@ public class CreateEventFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 deadline = parent.getItemAtPosition(position).toString();
-                Log.i("Check", "Deadline selected: "+deadline);
             }
 
             @Override
@@ -179,40 +184,41 @@ public class CreateEventFragment extends Fragment {
         btnCreateEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //CHECK IF FORM IS FILLED APPROPRIATELY
+                // Check if all fields are filled
+                // If not all fields are valid, send a Toast to alert user and prevent user from creating an event
+                // Else an event is created
                 Calendar now = Calendar.getInstance();
                 Calendar buffer = Calendar.getInstance();
                 buffer.add(Calendar.HOUR_OF_DAY, 2);
 
-                if (group.equals("Select Group") || txtName.getText().equals("") ||
+                if (group.equals("Select Group") || txtName.getText().toString().isEmpty() ||
                         eventDateTime == null || btnDatePicker.getText().length()==0 || btnTimePicker.getText().length()==0 ||
                         mLocation.equals("Select Location") || mBudget.equals("Select Budget")) {
                     Toast.makeText(getContext(), "DO NOT LEAVE FIELD BLANK", Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Event cannot be created, field is empty");
                 }
-
                 else if (eventDateTime.getTimeInMillis()<=now.getTimeInMillis()){
                     Toast.makeText(getContext(), "DATE-TIME HAS ALREADY PASSED", Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Event cannot be created, date/time has passed");
                 }
-
                 else if (eventDateTime.getTimeInMillis()<buffer.getTimeInMillis()){
                     Toast.makeText(getContext(), "PICK A LATER DATE-TIME", Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Event cannot be created, date/time has passed");
                 }
-
-                //PROCEED WHEN ALL FORM CONTENT IS VALID
                 else {
                     eventStatus = "Ready to swipe";
-                    //CONVERT CALENDAR TO LONG
+                    // Convert Calendar to long
                     Long dt = eventDateTime.getTimeInMillis();
                     mName = txtName.getText().toString();
-                    Log.i(TAG, mName);
-                    //WRITE TO "EVENTS" DATABASE
+
+                    // Write to "EVENTS" database
                     final String eventId = db.child("EVENTS").push().getKey();
                     groupId = grpNameId.get(group);
                     currEvent = new Event(eventId, mName, groupId, User.getId(), eventDateTimeLong, dateTimeString, mLocation, mBudget, deadline, eventStatus);
                     events_ref.child(eventId).setValue(currEvent);
-                    Log.i("Check", "Event created");
+                    Log.i(TAG, "Event is successfully created");
 
-                    //Call API to get restaurants and update status when ready
+                    // Call API to get restaurants and update status when ready
                     parser.setEventId(eventId);
                     parser.queryInfo.put("min_price", "1");
                     parser.queryInfo.put("max_price", String.valueOf(mBudget.length()));
@@ -224,7 +230,7 @@ public class CreateEventFragment extends Fragment {
                     process.setUrl(urlStr);
                     process.execute();
 
-                    //UPDATE "USERS", IF NEEDED "GROUPS" DATABASE
+                    // Update "USERS" database and if needed "GROUPS" database
                     users_ref.child("listOfEvents").child(eventId).setValue(true);
 
                     Group.retrieveGroup(groupId, new DatabaseCallback() {
@@ -238,20 +244,18 @@ public class CreateEventFragment extends Fragment {
                         @Override
                         public void onCallback(Group grp) {
                             grp.updateAllUsers(eventId, groupId);
-//                            grpNameId.put(grp.name, groupId);
-//                            dataAdapter.add(grp.name);
                         }
 
 
                     });
 
-
+                // Return to host Activity (SignOutActivity.java)
                 listener.onNewEventUpdate();
 
             };
         }; });
 
-
+        // Retrieve all the groups that the user is in and add it in the Spinner for user to select a group
         setGroupOptions();
 
 
@@ -279,6 +283,7 @@ public class CreateEventFragment extends Fragment {
 
     }
 
+    // Retrieve all the groups user are in from Firebase Realtime Database
     private void setGroupOptions(){
         dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, new ArrayList<String>());
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -289,7 +294,6 @@ public class CreateEventFragment extends Fragment {
             @Override
             public void onCallback(ArrayList<String> ls) {
                 groupOptions.addAll(ls);
-//                ArrayList<String> groupNames = new ArrayList<>();
                 for(String grpId: groupOptions){
                     Group.retrieveGroup(grpId, new DatabaseCallback() {
                         @Override

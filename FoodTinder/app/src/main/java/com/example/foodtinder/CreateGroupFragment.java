@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,20 +35,23 @@ import java.util.Calendar;
 
 public class CreateGroupFragment extends Fragment {
 
+    // TAG for debugging purposes
     public static final String TAG = "CreateGroupFragment";
+
+    // Variables to modify View objects in layou
     Button btn_create_grp;
     EditText grpName;
+
     String currLink;
 
-
+    // Listener is used to call the abstract method in the interface
     private CreateGroupFragmentListener listener;
+
+    // Implement this interface in host Activity (SignOutActivity.java) to transfer data from this Fragment to host Activity
+    // Abstract method will be override in host Activity to receive information needed and communicate with the next fragment
     public interface CreateGroupFragmentListener {
         void onNewGroupUpdate();
     }
-
-//    public CreateGroupFragment() {
-//        // Required empty public constructor
-//    }
 
 
     @Override
@@ -56,38 +60,35 @@ public class CreateGroupFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_create_group, container, false);
 
+        // Toolbar is created to give the Fragment a header
         Toolbar toolbar = v.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-//        ((AppCompatActivity)getActivity()).setDisplayHomeAsUpEnabled(true);
-//        ((AppCompatActivity)getActivity()).setDisplayShowHomeEnabled(true);
         ((AppCompatActivity)getActivity()).setTitle("Create New Group");
 
-
+        // Call View objects in layout
         btn_create_grp = v.findViewById(R.id.btn_create_group);
         grpName = v.findViewById(R.id.in_grpName);
 
 
-        //TODO call to build link with grpId as parameter
-
         btn_create_grp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // CREATE GROUP OBJECT AND SEND TO FIREBASE
-                final Group currGroup = Group.createGroup(grpName.getText().toString());
+                // Check if all fields are filled
+                // If not all fields are valid, send a Toast to alert user and prevent user from creating a group
+                // Else a group is created
+                if (grpName.getText().toString().isEmpty()) {
+                    Toast.makeText(getContext(), "DO NOT LEAVE FIELD BLANK", Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Group cannot be created, field is empty");
+                } else {
+                    // Create Group object and add to Firebase Realtime Database
+                    final Group currGroup = Group.createGroup(grpName.getText().toString());
+                    Group currentGroup = new Group(currGroup.id);
+                    currLink = currentGroup.getShareableLink(currGroup.id);
 
-                Group currentGroup = new Group(currGroup.id);
-                currLink = currentGroup.getShareableLink(currGroup.id);
+                    Log.i(TAG, "Group is successfully created");
 
-
-                Log.i(TAG, "CreateGroupFragment getId");
-                Log.i(TAG, User.getId());
-                Log.i(TAG, currLink);
-
-//                Intent displayLink = new Intent(CreateGroupActivity.this, DisplayGroupLink.class);
-//                displayLink.putExtra("grpId", currGroup.id);
-//                startActivity(displayLink);
-
-                listener.onNewGroupUpdate();
+                    listener.onNewGroupUpdate();
+                }
 
 
             }
