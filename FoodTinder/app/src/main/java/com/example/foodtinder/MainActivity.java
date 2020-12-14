@@ -1,13 +1,19 @@
 package com.example.foodtinder;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.auth.AuthUI;
@@ -24,35 +30,20 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    // TAG for debugging purposes
+    public static final String TAG = "MainActivity";
+
     private FirebaseAuth mAuth;
     private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-
-        //code starts here
-        Button enter_btn = findViewById(R.id.enter_btn);
-//        enter_btn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                Log.i("Check", "Button clicked");
-//                Intent toCreateEvent = new Intent(MainActivity.this, SignInActivity.class);
-//                startActivity(toCreateEvent);
-//            }
-//        });
-
-        // Initialize Firebase Auth
+        // Initialize Firebase Authentication
         mAuth = FirebaseAuth.getInstance();
-
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if ()
-//            }
-//        });
 
     }
 
@@ -64,12 +55,26 @@ public class MainActivity extends AppCompatActivity {
         updateUI(currentUser);
     }
 
+    // Function to call to update UI depending on whether user is signed in or not
     private void updateUI(FirebaseUser currentUser) {
+        boolean fromDynamicLink = getIntent().getBooleanExtra("EXTRA_FROM_DL", false);
+        if (currentUser != null && fromDynamicLink == true) {
+            Intent toDynamicLink = new Intent(MainActivity.this, GroupLandingPage.class);
+            toDynamicLink.putExtra("EXTRA_SIGNED_DL", true);
+            startActivity(toDynamicLink);
+            finish();
+        } else if (currentUser == null && fromDynamicLink == true){
+            Intent toSignIn = new Intent(MainActivity.this, SignInActivity.class);
+            toSignIn.putExtra("EXTRA_NOT_SIGNEDIN_DL", true);
+            startActivity(toSignIn);
+            finish();
+        }
 
         if (currentUser != null){
             // User is signed in
-            Intent toListEvent = new Intent (MainActivity.this, SignOutActivity.class);
-            startActivity(toListEvent);
+            User currUser = new User(currentUser.getUid(), currentUser.getDisplayName(), currentUser.getEmail());
+            Intent toHome = new Intent (MainActivity.this, SignOutActivity.class);
+            startActivity(toHome);
             finish();
         } else {
             // No user is signed in

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,20 +31,35 @@ import com.google.firebase.database.ValueEventListener;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 public class SignInActivity extends AppCompatActivity{
-    private static final int RC_SIGN_IN = 120;
+
+    // TAG for debugging purposes
     private static final String TAG = "SignInActivity";
+
+    private static final int RC_SIGN_IN = 120;
     private FirebaseAuth mAuth;
     private static GoogleSignInClient mGoogleSignInClient;
+
+    DatabaseReference db, users_ref;
+
+    private ArrayList allUsers = new ArrayList();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super .onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_signin);
 
+        boolean fromDynamicLink = getIntent().getBooleanExtra("EXTRA_NOT_SIGNEDIN_DL", false);
+        if (fromDynamicLink == true){
+            Intent toDynamicLink = new Intent(SignInActivity.this, GroupLandingPage.class);
+            toDynamicLink.putExtra("EXTRA_NOT_SIGNEDIN_DL_SIGNED", true);
+            startActivity(toDynamicLink);
+        }
 
-        TextView header = findViewById(R.id.signinpagelabel_label);
-        Button enter_btn = findViewById(R.id.signin_btn);
         SignInButton googleSignInButton = findViewById(R.id.sign_in_button);
 
 
@@ -56,9 +72,26 @@ public class SignInActivity extends AppCompatActivity{
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // Initialize Firebase Auth
+        // Initialize Firebase Authentication
         mAuth = FirebaseAuth.getInstance();
 
+        // Initialise Firebase database references
+        db = FirebaseDatabase.getInstance().getReference();
+        users_ref = db.child("USERS");
+
+        users_ref.addValueEventListener(new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot){
+                for (DataSnapshot user: dataSnapshot.getChildren())
+                    allUsers.add(user.getKey());
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w("Check", databaseError.toException());
+            }
+        });
+
+        // Sign in button
         googleSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,11 +119,11 @@ public class SignInActivity extends AppCompatActivity{
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
-                // ...
             }
         }
     }
 
+    // Function to call to authenticate Firebase using Google
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
@@ -101,6 +134,8 @@ public class SignInActivity extends AppCompatActivity{
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser(); // can remove if user data is not needed
+                            Log.w(TAG, allUsers.toString());
+                            fillUserDetails(user);
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -112,6 +147,10 @@ public class SignInActivity extends AppCompatActivity{
                 });
     }
 
+
+    // Function to call to redirect user to correct page
+    // If user is signed in, redirect to SignOutActivity
+    // Else, redirect back to Sign in page (SignInActivity)
     private void updateUI(FirebaseUser user) {
         if (user != null){
             // User is signed in
@@ -123,6 +162,21 @@ public class SignInActivity extends AppCompatActivity{
             Intent toSignIn = new Intent (SignInActivity.this, SignInActivity.class);
             startActivity(toSignIn);
             finish();
+        }
+    }
+
+    // Function to call to create a new User object
+    // Add user to Firebase Realtime Database
+    private void fillUserDetails(FirebaseUser user){
+        if (user != null) {
+            String id = user.getUid();
+            User currUser = new User(id, user.getDisplayName(), user.getEmail());
+            if (!allUsers.contains(id)) {
+                users_ref.child(id).child("id").setValue(User.getId());
+                users_ref.child(id).child("name").setValue(User.getName());
+                users_ref.child(id).child("email").setValue(User.getEmail());
+            }
+
         }
     }
 

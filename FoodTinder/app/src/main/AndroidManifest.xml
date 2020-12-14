@@ -1,39 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.foodtinder">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_add_circle"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_add_circle_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignInActivity">
+        <activity android:name=".SignInActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation">
             <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignOutActivity">
+        <activity android:name=".SignOutActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation">
             <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateEventActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+        <activity android:name=".GroupLandingPage"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="foodtinder.example.com"
+                    android:scheme="https"/>
+                <data
+                    android:host="foodtinder.example.com"
+                    android:scheme="http"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ListEventsActivity"/>
-        <activity android:name=".IndicatePreferencesActivity"/>
+
+
     </application>
 
 </manifest>
