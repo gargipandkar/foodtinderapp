@@ -1,5 +1,6 @@
 package com.example.foodtinder;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.auth.AuthUI;
@@ -52,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
-
 
     // Function to call to update UI depending on whether user is signed in or not
     private void updateUI(FirebaseUser currentUser) {

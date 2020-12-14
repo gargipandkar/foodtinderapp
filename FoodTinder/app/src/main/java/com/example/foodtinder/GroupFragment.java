@@ -1,5 +1,6 @@
 package com.example.foodtinder;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -96,6 +97,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
                 Intent sendIntent = new Intent(Intent.ACTION_SEND);
+//                Intent sendIntent = new Intent(Intent.ACTION_SEND);
                 sendIntent.setType("text/plain");
                 sendIntent.putExtra(Intent.EXTRA_TEXT, groupsInfoList.get(position).getLink());
                 startActivity(Intent.createChooser(sendIntent, "Share Link"));

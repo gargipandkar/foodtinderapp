@@ -26,77 +26,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-//public class CardStackAdapterFinal extends RecyclerView.Adapter<CardStackAdapterFinal.MyViewHolder> {
-//
-//    private static final String TAG = "CardStackAdapter";
-//    private ArrayList<String> restName;
-//    private myOnRestItemClickListener mListener;
-//
-//    public interface myOnRestItemClickListener {
-//        void onItemClick(int position);
-//    }
-//
-//    public void setOnRestItemClickListener(myOnRestItemClickListener listener){
-//        this.mListener = listener;
-//    }
-//
-//    public CardStackAdapterFinal(ArrayList<String> restName) {
-//        this.restName = restName;
-//    }
-//
-//    @NonNull
-//    @Override
-//    public CardStackAdapterFinal.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.swipe_card_view, parent, false);
-//        return new MyViewHolder(v, mListener);
-//    }
-//
-//    @Override
-//    public void onBindViewHolder(@NonNull CardStackAdapterFinal.MyViewHolder holder, int position) {
-//        Log.i(TAG, restName.get(position));
-////        holder.name.setText("hello");
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return restName.size();
-//    }
-//
-//
-//    public class MyViewHolder extends RecyclerView.ViewHolder {
-//
-//        ImageView image;
-//        TextView name;
-//
-//        public MyViewHolder(@NonNull View itemView, final myOnRestItemClickListener listener) {
-//            super(itemView);
-//            image = itemView.findViewById(R.id.card_rest_dp);
-//            name = itemView.findViewById(R.id.card_rest_name);
-//
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    if (listener != null){
-//                        int position = getAdapterPosition();
-//                        if (position != RecyclerView.NO_POSITION) {
-//                            listener.onItemClick(position);
-//                        }
-//                    }
-//                }
-//            });
-//
-//        }
-//    }
-//
-//
-//}
-
-
 public class CardStackAdapterFinal extends RecyclerView.Adapter<CardStackAdapterFinal.ViewHolder> {
 
     private ArrayList<String> listRestName, listRestAddr;
     HashMap<String, ArrayList<String>> listRestPhotos;
     ArrayList<String> itemPhotos;
+    TextView noImageLabel;
 
 
     public CardStackAdapterFinal(ArrayList<String> listRestName, ArrayList<String> listRestAddr, HashMap<String, ArrayList<String>> listRestPhotos) {
